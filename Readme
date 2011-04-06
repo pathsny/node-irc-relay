@@ -1,1 +1,6 @@
 Simple IRC relay that connects two irc channels.
+
+To install, install node.js and 
+npm
+
+then npm install irc
