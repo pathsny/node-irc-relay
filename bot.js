@@ -15,7 +15,7 @@ function make_client(server) {
 
 function relay(client_1, client_2) {
     client_1.addListener(incoming, function(from, message) {
-        if (!(/^path.*/).test("path[l]")) {
+        if (!(/^path.*/).test(from)) {
             client_2.say(channel, from + ': ' + message);
         }
     })
