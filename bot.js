@@ -1,10 +1,14 @@
 var sys = require('sys');
 var irc = require('irc');
-var channel = "#animestan";
+var _ = require('./underscore');
+var commands = require('./commands')
+
+var channel = "#animestan-hell";
 var incoming = 'message' + channel;
+var nick = 'amelia';
 
 function make_client(server) {
-    var client = new irc.Client(server, 'ze_bot', {
+    var client = new irc.Client('irc.immortal-anime.net', nick, {
         channels: [channel],
     });
     client.addListener('error', function(message) {
@@ -13,20 +17,26 @@ function make_client(server) {
     return client;
 }
 
-function relay(client_1, client_2) {
-    client_1.addListener(incoming, function(from, message) {
-        if (!(/^path.*/).test(from)) {
-            client_2.say(channel, from + ': ' + message);
-        }
-    })
-};
+var bot = make_client();
 
-var immortal_anime = make_client('irc.immortal-anime.net');
-var rizon = make_client('irc.rizon.net');
+function dispatch(command, tokens) {
+    if (typeof(commands[command]) === 'function') {
+        commands[command](tokens, function(result) {
+            sys.puts('fuwa ' + result);
+            if (result) bot.say(result);
+        });
+    }
+}
 
-relay(immortal_anime, rizon);
-relay(rizon, immortal_anime);
-
-
-
-
+bot.addListener(incoming, function(from, message) {
+    var tokens = message.split(' ');
+    var first = _(tokens).head();
+    if (first === nick) {
+        var msg_tokens = _(tokens).tail();
+        dispatch(_(msg_tokens).head(), _(msg_tokens).tail())
+    };
+    var match = /(.*)!/.exec(first);
+    if (match) {
+        dispatch(match[1], _(tokens).tail())
+    };
+})
