@@ -1,8 +1,12 @@
 var _ = require('./underscore');
 
 (function(){
-    exports.g = function(from, tokens, cb) {
-        cb("google searched for " + tokens);
+    // exports.g = function(from, tokens, cb) {
+    //     cb("google searched for " + tokens);
+    // };
+    
+    exports.commands = function(from, token, cb) {
+        cb("I know tell!")
     };
 
     var tells = {};
@@ -20,12 +24,12 @@ var _ = require('./underscore');
     
     var seen_data = {};
     
-    exports.seen = function(from, tokens, cb) {
-        var person = _(tokens).head();
-        if (person && seen_data[person]) {
-            cb(from + ": " + "Last saw " + person)
-        }
-    };
+    // exports.seen = function(from, tokens, cb) {
+    //     var person = _(tokens).head();
+    //     if (person && seen_data[person]) {
+    //         cb(from + ": " + "Last saw " + person)
+    //     }
+    // };
     
     exports.listeners = function(respond){
         return [
@@ -34,8 +38,8 @@ var _ = require('./underscore');
                 console.log(from, message);
                 // seen_data[from] = []
             },
-
-            //convey messages
+    
+            // convey messages
             function(from, message) {
                 if (tells[from]) {
                     _(tells[from]).forEach(function(item){
@@ -44,6 +48,6 @@ var _ = require('./underscore');
                     delete tells[from];
                 };
             }
-        ]
+        ];
     }
 })()
