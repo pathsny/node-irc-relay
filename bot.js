@@ -44,12 +44,15 @@ bot.addListener(incoming, function(from, message) {
     };
 });
 
-_(commands.listeners(channel_say)).each(function(listener){
-    bot.addListener(incoming, listener);
-});
-
 var misaka_adjectives = JSON.parse(fs.readFileSync('./misaka_adjectives.json',"ascii"));
 var misakify = function(command, result) {
     var adjective = misaka_adjectives[command] || misaka_adjectives['generic'];
     return result + " said " + nick + ' ' + adjective;
 }
+
+_(commands.listeners(function(command, message){
+    channel_say(misakify(command, message));
+})).each(function(listener){
+    bot.addListener(incoming, listener);
+});
+

@@ -43,7 +43,7 @@ var _ = require('./underscore');
             function(from, message) {
                 if (tells[from]) {
                     _(tells[from]).forEach(function(item){
-                        respond(from + ": " + item[0] + " said '" + item[1] + "'");
+                        respond("tell", from + ": " + item[0] + " said '" + item[1] + "'");
                     })
                     delete tells[from];
                 };
