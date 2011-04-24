@@ -3,7 +3,7 @@ var _ = require('./underscore');
 var model = require('./model.js');
 var commands = require('./commands')
 var fs = require('fs');
-var settings = JSON.parse(fs.readFileSync('./settings.json',"ascii"));
+var settings = JSON.parse(fs.readFileSync('./data/settings.json',"ascii"));
 
 var server = settings["server"];
 var channel = settings["channel"];
