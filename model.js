@@ -132,6 +132,7 @@ userdb.aliases = function(nick) {
 };
 
 userdb.aliasedNicks = function(nick) {
+    // console.log(userdb.aliases(nick));
     if (!userdb.get(nick)) return undefined;
     return _(userdb.aliases(nick)).pluck('key');
 };
