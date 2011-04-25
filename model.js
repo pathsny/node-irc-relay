@@ -10,7 +10,10 @@ userdb.listeners = [
 {
     type: 'names',
     listener: function(channel, given_nicks) {
-        var nicks = _(given_nicks).chain().keys().without('').value();
+        var nicks = _(given_nicks).chain().keys().without('').map(function(nick){
+            var match = /[~%](.*)/.exec(nick);
+            return match ? match[1] : nick;
+        }).value();
         userdb.addNicks(nicks);
         userdb.forEach(function(nick,doc) {
             if (!_(nicks).include(nick)) {
