@@ -39,7 +39,7 @@ Commands.prototype.nick = function(from, tokens, cb) {
         if (!aliases) {
             cb(user + " is not known");
         } else {
-            if (aliases.length === 1) cb(user " has only one known nick");
+            if (aliases.length === 1) cb(user + " has only one known nick");
             else cb("known nicks of " + user + " are " + _(aliases).sentence());
         }
     }
