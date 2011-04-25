@@ -1,53 +1,75 @@
 var _ = require('./underscore');
+require('./utils');
 
-(function(){
-    // exports.g = function(from, tokens, cb) {
-    //     cb("google searched for " + tokens);
-    // };
+var Commands = exports.Commands = function(users) {
+    if (!(this instanceof Commands)) return new Commands(users);
+    this.users = users;
+}
     
-    exports.commands = function(from, token, cb) {
-        cb("I know tell!")
-    };
+Commands.prototype.commands = function(from, token, cb) {
+    cb("I know " + _(Commands.prototype).chain().keys().
+    without("listeners").
+    without("private").
+    without("commands").
+    map(function(command){
+        return command + "!";
+    }).
+    sentence().value());
+};
 
-    var tells = {};
-
-    exports.tell = function(from, tokens, cb) {
-        var to = _(tokens).head();
-        var msg = _(tokens).tail().join(' ');
-        if (to && msg) {
-            tells[to] = _(tells[to] || []).push([from, msg])
-            cb(from + ": Message Noted");
-        } else {
-            cb("Message not understood");
-        }
-    };
-    
-    var seen_data = {};
-    
-    // exports.seen = function(from, tokens, cb) {
-    //     var person = _(tokens).head();
-    //     if (person && seen_data[person]) {
-    //         cb(from + ": " + "Last saw " + person)
-    //     }
-    // };
-    
-    exports.listeners = function(respond){
-        return [
-            //collect data for seen
-            function(from, message) {
-                console.log(from, message);
-                // seen_data[from] = []
-            },
-    
-            // convey messages
-            function(from, message) {
-                if (tells[from]) {
-                    _(tells[from]).forEach(function(item){
-                        respond("tell", from + ": " + item[0] + " said '" + item[1] + "'");
-                    })
-                    delete tells[from];
-                };
-            }
-        ];
+Commands.prototype.tell = function(from, tokens, cb) {
+    var to = _(tokens).head();
+    var msg = _(tokens).tail().join(' ');
+    if (!(to && msg)) {
+        cb("Message not understood");
+    } else if(!this.users.get(to)) {
+        cb(to + " is not known");
+    } else {
+        this.users.addTell(to, {from: from, msg: msg});
+        cb(from + ": Message Noted");
     }
-})()
+};
+
+Commands.prototype.nick = function(from, tokens, cb) {
+    var user = _(tokens).head();
+    if (!user) {
+        cb("it's nick! <username> ");
+    } else {
+        var aliases = this.users.aliasedNicks(user);
+        if (!aliases) {
+            cb(user + " is not known");
+        } else {
+            cb("known nicks of " + user + " are " + _(aliases).sentence());
+        }
+    }
+};
+
+Commands.prototype.link = function(from, tokens, cb) {
+    var nick = _(tokens).head();
+    var group = _(tokens).chain().tail().head().value();
+    if (!(nick && group)) {
+        cb("link <nick> <group>");
+    } else {
+        var result = this.users.link(nick, group);
+        if (result) cb(nick + " has been linked with " + group);
+            else cb('link only known UNLINKED nicks with other nicks');
+    }
+};
+
+Commands.prototype.listeners = function(respond){
+    var self = this;
+    return [
+    // convey messages
+    function(from, message) {
+        var rec = self.users.get(from);
+        if (rec) {
+            var tells = self.users.getTells(from);
+            if (tells.length > 0) {
+                _(tells).forEach(function(item){
+                    respond("tell", from + ": " + item.from + " said '" + item.msg + "'");
+                });
+                self.users.clearTells(from);
+            }
+        };
+    }]
+};
