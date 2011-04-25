@@ -112,6 +112,8 @@ userdb.online = function(nick) {
 
 userdb.offline = function(nick) {
     var rec = userdb.get(nick);
+    console.log(nick);
+    console.log(rec);
     if (rec.status === 'offline') return;
     rec.status = 'offline';
     var time = new Date().getTime();
