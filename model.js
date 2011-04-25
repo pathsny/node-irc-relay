@@ -1,4 +1,4 @@
-var userdb = require('dirty')('./user.db');
+var userdb = require('dirty')('./data/user.db');
 var uuid = require('node-uuid');
 var _ = require('./underscore');
 

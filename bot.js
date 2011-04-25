@@ -36,6 +36,7 @@ function dispatch(command, from, tokens) {
 };
 
 bot.addListener(incoming, function(from, message) {
+    console.log(from, message);
     var tokens = message.split(' ');
     var first = _(tokens).head();
     var match = /(.*)!/.exec(first);
