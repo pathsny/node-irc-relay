@@ -67,6 +67,8 @@ model.start(function(users){
     
     var compactDB = function(){
         var idle_time = new Date().getTime() - last_msg_time;
+        console.log(idle_time);
+        console.log(users.redundantLength);
         if (users.redundantLength > 200 && idle_time > 60000) {
             console.log('compacting');
             users.compact();
