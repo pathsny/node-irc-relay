@@ -38,7 +38,9 @@ model.start(function(users){
         }
     };
 
+    var last_msg_time = new Date().getTime();
     bot.addListener(incoming, function(from, message) {
+        last_msg_time = new Date().getTime();
         var tokens = message.split(' ');
         var first = _(tokens).head();
         var match = /(.*)!/.exec(first);
@@ -62,7 +64,18 @@ model.start(function(users){
     })).each(function(listener){
         bot.addListener(incoming, listener);
     });
-})
+    
+    var compactDB = function(){
+        var idle_time = new Date().getTime() - last_msg_time;
+        if (users.redundantLength > 200 && idle_time > 60000) {
+            console.log('compacting');
+            users.compact();
+        }
+        setTimeout(compactDB,60000)
+    };
+    
+    setTimeout(compactDB,60000);
+});
 
 
 
