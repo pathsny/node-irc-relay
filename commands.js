@@ -28,18 +28,26 @@ Commands.prototype.g = function(from, tokens, cb) {
         var number = "1";
         var msg = tokens.join(' ');
     };
-    var resNumber = Number(number) - 1;
-    var url = 'https://ajax.googleapis.com/ajax/services/search/web?'+$.param({q: msg, v: "1.0", key: 'ABQIAAAAmqvdndVxudDZA_xSMoCqDBQyyjtMOZtazoTpMWZuTp2BDOla7BQzREgP8nJbidAaWzZvpZncD__vAw', start: resNumber});
+    
+    var requestNumber = Math.floor((Number(number) - 1) / 4)*4;
+    var resultIndex = Number(number) - requestNumber - 1;
+    
+    var url = 'https://ajax.googleapis.com/ajax/services/search/web?'+$.param({q: msg, v: "1.0", key: 'ABQIAAAAmqvdndVxudDZA_xSMoCqDBQyyjtMOZtazoTpMWZuTp2BDOla7BQzREgP8nJbidAaWzZvpZncD__vAw', start: requestNumber});
     request({uri:url}, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            var res = JSON.parse(body).responseData;
-            if (res.results[resNumber]) {
-                var result = res.results[resNumber];
-                cb(result.titleNoFormatting + "   " + result.unescapedUrl + "  " + $(result.content).text() + " ... Result " + number + " out of " + res.cursor.estimatedResultCount);
-            } else {
-                if (resNumber === 0) cb("no results! ")
-                else cb("no result at position " + number);
+            var responseJson = JSON.parse(body);
+            if (responseJson.responseStatus !== 200) {
+                cb("google error '" + responseJson.responseDetails + "' ");
+                return
             }
+            var res = responseJson.responseData;
+            var results = res.results;
+            if (!results[resultIndex]) {resultIndex = results.length - 1};
+            
+            if (resultIndex === -1) {cb("no results! "); return}
+            var result = results[resultIndex];
+            var resNumber = res.cursor.currentPageIndex * 4 + resultIndex + 1;
+            cb(result.titleNoFormatting + "   " + result.unescapedUrl + "  " + $(result.content).text() + " ... Result " + resNumber + " out of " + res.cursor.estimatedResultCount);
         }
     });        
 }
