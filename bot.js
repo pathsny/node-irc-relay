@@ -1,5 +1,6 @@
 var irc = require('irc');
 var _ = require('./underscore');
+require('./utils');
 var model = require('./model.js');
 var commands_lib = require('./commands');
 
@@ -43,7 +44,7 @@ model.start(function(users){
         last_msg_time = new Date().getTime();
         var tokens = message.split(' ');
         var first = _(tokens).head();
-        var match = /(.*)!/.exec(first);
+        var match = /!(.*)/.exec(first);
         if (match) {
             dispatch(match[1], from, _(tokens).tail())
         };
@@ -51,8 +52,8 @@ model.start(function(users){
 
     var misaka_adjectives = JSON.parse(fs.readFileSync('./misaka_adjectives.json',"ascii"));
     var misakify = function(command, result) {
-        var adjective = misaka_adjectives[command] || misaka_adjectives['generic'];
-        return result + " said " + nick + ' ' + adjective;
+        var adjectives = misaka_adjectives[command] || misaka_adjectives['generic'];
+        return result + " said " + nick + ' ' + _(adjectives).rand();
     }
     
     _(users.listeners).each(function(model_listener){

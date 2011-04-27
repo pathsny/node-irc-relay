@@ -1,3 +1,4 @@
-{
-    "generic": ["<insert word here>"]
+{    
+     "generic": ["apprehensively", "nervously","enthusiastically","bravely","cheerfully", "vigilantaly", "wishfully","disgustedly", "surprised","sadly","shocked", "terrified","furiously","irritated","jealously", "livid", "in a panicky tone", "humiliated" ,"perplexed", "frustrated", "thrillingly", "trippingly", "worriedly","anxiously", "hysterically"], 
+     "tell" : ["blah", "bleh"]
 }

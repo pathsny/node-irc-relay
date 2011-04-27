@@ -32,7 +32,7 @@ Commands.prototype.g = function(from, tokens, cb) {
     var requestNumber = Math.floor((Number(number) - 1) / 4)*4;
     var resultIndex = Number(number) - requestNumber - 1;
     
-    var url = 'https://ajax.googleapis.com/ajax/services/search/web?'+$.param({q: msg, v: "1.0", key: 'ABQIAAAAmqvdndVxudDZA_xSMoCqDBQyyjtMOZtazoTpMWZuTp2BDOla7BQzREgP8nJbidAaWzZvpZncD__vAw', start: requestNumber});
+    var url = 'https://ajax.googleapis.com/ajax/services/search/web?'+$.param({q: msg, v: "1.0", key: this.settings["google_key"], start: requestNumber});
     request({uri:url}, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             var responseJson = JSON.parse(body);
