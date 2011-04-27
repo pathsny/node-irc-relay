@@ -12,7 +12,7 @@ var incoming = 'message' + channel;
 var nick = settings["nick"];
 
 model.start(function(users){
-    var commands = commands_lib.Commands(users);
+    var commands = commands_lib.Commands(users, settings);
     
     function channel_say(message) {
         bot.say(channel, message)

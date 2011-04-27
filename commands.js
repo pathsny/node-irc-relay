@@ -1,9 +1,12 @@
 var _ = require('./underscore');
 require('./utils');
+var request = require('request');
+var $ = require('jquery');
 
-var Commands = exports.Commands = function(users) {
-    if (!(this instanceof Commands)) return new Commands(users);
+var Commands = exports.Commands = function(users, settings) {
+    if (!(this instanceof Commands)) return new Commands(users, settings);
     this.users = users;
+    this.settings = settings;
 }
     
 Commands.prototype.commands = function(from, token, cb) {
@@ -16,6 +19,30 @@ Commands.prototype.commands = function(from, token, cb) {
     }).
     sentence().value());
 };
+
+Commands.prototype.g = function(from, tokens, cb) {
+    if (/\d+/.test(_(tokens).head())) {
+        var number = _(tokens).head();
+        var msg = _(tokens).tail().join(' ');
+    } else {
+        var number = "1";
+        var msg = tokens.join(' ');
+    };
+    var resNumber = Number(number) - 1;
+    var url = 'https://ajax.googleapis.com/ajax/services/search/web?'+$.param({q: msg, v: "1.0", key: 'ABQIAAAAmqvdndVxudDZA_xSMoCqDBQyyjtMOZtazoTpMWZuTp2BDOla7BQzREgP8nJbidAaWzZvpZncD__vAw'});
+    request({uri:url}, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            var res = JSON.parse(body).responseData;
+            if (res.results[resNumber]) {
+                var result = res.results[resNumber];
+                cb(result.titleNoFormatting + "   " + result.unescapedUrl + "  " + $(result.content).text() + " ... Result " + number + " out of " + res.cursor.estimatedResultCount);
+            } else {
+                if (resNumber === 0) cb("no results! ")
+                else cb("no result at position " + number);
+            }
+        }
+    });        
+}
 
 Commands.prototype.tell = function(from, tokens, cb) {
     var to = _(tokens).head();
@@ -56,6 +83,19 @@ Commands.prototype.link = function(from, tokens, cb) {
             else cb('link only known UNLINKED nicks with other nicks');
     }
 };
+
+Commands.prototype.unlink = function(from, tokens, cb) {
+    var nick = _(tokens).head();
+    var group = _(tokens).chain().tail().head().value();
+    if (!(nick && group)) {
+        cb("unlink <nick> <group>");
+    } else {
+        var result = this.users.unlink(nick, group);
+        if (result) cb(nick + " has been unlinked from " + group);
+            else cb('unlink linked nicks');
+    }
+};
+
 
 Commands.prototype.listeners = function(respond){
     var self = this;

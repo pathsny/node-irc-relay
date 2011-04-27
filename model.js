@@ -70,7 +70,7 @@ userdb.link = function(nick, nickgroup) {
 userdb.unlink = function(nick, nickgroup) {
     var rec = userdb.get(nick);
     var recgroup = userdb.get(nickgroup);
-    if (!(rec && recgroup)) return false;
+    if (!(rec && recgroup && rec.nickId === recgroup.nickId)) return false;
     rec.nickId = uuid();
     userdb.set(nick, rec);
     return true;
