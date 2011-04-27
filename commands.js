@@ -128,8 +128,8 @@ Commands.prototype.listeners = function(respond){
         request({uri:url}, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 var res = JSON.parse(body).data;
-                respond("ytube_metadata", "ah " + from + " is talking about " + ytube_match[0] + " which is ofcourse a video of " + res.title + ".");
-                respond("ytube_metadata", "There are " + res.viewCount + " views and the Tags are "  + _(res.tags).sentence() + ". The category is " + res.category);
+                respond("ytube_metadata", "ah " + from + " is talking about a video of " + res.title + ".");
+                respond("ytube_metadata", "There are " + res.viewCount + " views and the Tags are "  + _(res.tags).sentence() + ". The category is " + res.category + " . the link again is " + ytube_match[0]);
             }
         });
     }]
