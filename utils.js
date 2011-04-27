@@ -7,5 +7,8 @@ _.mixin({
     },
     rand: function(list) {
         return list[Math.floor(Math.random()*list.length)];
+    },
+    articleize: function(word) {
+        return (/^[aeiou]/i.test(word) ? "an" : "a") + " " + word;
     }
 })
