@@ -29,7 +29,7 @@ Commands.prototype.g = function(from, tokens, cb) {
         var msg = tokens.join(' ');
     };
     var resNumber = Number(number) - 1;
-    var url = 'https://ajax.googleapis.com/ajax/services/search/web?'+$.param({q: msg, v: "1.0", key: 'ABQIAAAAmqvdndVxudDZA_xSMoCqDBQyyjtMOZtazoTpMWZuTp2BDOla7BQzREgP8nJbidAaWzZvpZncD__vAw'});
+    var url = 'https://ajax.googleapis.com/ajax/services/search/web?'+$.param({q: msg, v: "1.0", key: 'ABQIAAAAmqvdndVxudDZA_xSMoCqDBQyyjtMOZtazoTpMWZuTp2BDOla7BQzREgP8nJbidAaWzZvpZncD__vAw', start: resNumber});
     request({uri:url}, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             var res = JSON.parse(body).responseData;
