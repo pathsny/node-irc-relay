@@ -15,7 +15,7 @@ Commands.prototype.commands = function(from, token, cb) {
     without("private").
     without("commands").
     map(function(command){
-        return command + "!";
+        return "!" + command;
     }).
     sentence().value());
 };
@@ -26,7 +26,7 @@ Commands.prototype.g = function(from, tokens, cb) {
         var msg = _(tokens).tail().join(' ');
     } else {
         var number = "1";
-        var msg = tokens.join(' ');
+        var msg = escape(tokens.join(' '));
     };
     
     var requestNumber = Math.floor((Number(number) - 1) / 4)*4;
@@ -50,7 +50,7 @@ Commands.prototype.g = function(from, tokens, cb) {
             cb(result.titleNoFormatting + "   " + result.unescapedUrl + "  " + $(result.content).text() + " ... Result " + resNumber + " out of " + res.cursor.estimatedResultCount);
         }
     });        
-}
+};
 
 Commands.prototype.tell = function(from, tokens, cb) {
     var to = _(tokens).head();
@@ -120,5 +120,17 @@ Commands.prototype.listeners = function(respond){
                 self.users.clearTells(from);
             }
         };
+    },
+    function(from, message){
+        var ytube_match = /http:\/\/www\.youtube\.com\/watch\?v=([^\s\t&]*)(?:.*?)\b/.exec(message);
+        if (!ytube_match) return;
+        var url = "http://gdata.youtube.com/feeds/api/videos/" + ytube_match[1] + "?" + $.param({v: 2,alt: 'jsonc'});
+        request({uri:url}, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                var res = JSON.parse(body).data;
+                respond("ytube_metadata", "ah " + from + " is talking about " + ytube_match[0] + " which is ofcourse a video of " + res.title + ".");
+                respond("ytube_metadata", "There are " + res.viewCount + " views and the Tags are "  + _(res.tags).sentence() + ". The category is " + res.category);
+            }
+        });
     }]
 };
