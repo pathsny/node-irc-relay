@@ -26,13 +26,13 @@ Commands.prototype.g = function(from, tokens, cb) {
         var msg = _(tokens).tail().join(' ');
     } else {
         var number = "1";
-        var msg = escape(tokens.join(' '));
+        var msg = tokens.join(' ');
     };
     
     var requestNumber = Math.floor((Number(number) - 1) / 4)*4;
     var resultIndex = Number(number) - requestNumber - 1;
     
-    var url = 'https://ajax.googleapis.com/ajax/services/search/web?'+$.param({q: msg, v: "1.0", key: this.settings["google_key"], start: requestNumber});
+    var url = 'https://ajax.googleapis.com/ajax/services/search/web?' + _($.param({q: msg, v: "1.0", key: this.settings["google_key"], start: requestNumber})).escape_quote();
     request({uri:url}, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             var responseJson = JSON.parse(body);
@@ -104,6 +104,8 @@ Commands.prototype.unlink = function(from, tokens, cb) {
     }
 };
 
+// Commands.prototype.a = function(from,)
+
 
 Commands.prototype.listeners = function(respond){
     var self = this;
@@ -122,7 +124,8 @@ Commands.prototype.listeners = function(respond){
         };
     },
     function(from, message){
-        var ytube_match = /http:\/\/www\.youtube\.com\/watch\?v=([^\s\t&]*)(?:.*?)\b/.exec(message);
+        var ytube_match = /http:\/\/www\.youtube\.com\/watch\?v=([^\s\t&]*)(?:.*?)\b/.exec(message) || 
+        /http:\/\/youtu\.be\/([^\s\t&\/]*)/.exec(message);
         if (!ytube_match) return;
         var url = "http://gdata.youtube.com/feeds/api/videos/" + ytube_match[1] + "?" + $.param({v: 2,alt: 'jsonc'});
         request({uri:url}, function (error, response, body) {

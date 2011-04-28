@@ -10,5 +10,8 @@ _.mixin({
     },
     articleize: function(word) {
         return (/^[aeiou]/i.test(word) ? "an" : "a") + " " + word;
+    },
+    escape_quote: function(str) {
+        return str.replace(/'/g, "%27");
     }
 })
