@@ -1,6 +1,5 @@
 var _ = require('./underscore');
 require('./utils');
-var request = require('request');
 var $ = require('jquery');
 
 var Commands = exports.Commands = function(users, settings) {
@@ -33,7 +32,7 @@ Commands.prototype.g = function(from, tokens, cb) {
     var resultIndex = Number(number) - requestNumber - 1;
     
     var url = 'https://ajax.googleapis.com/ajax/services/search/web?' + _($.param({q: msg, v: "1.0", key: this.settings["google_key"], start: requestNumber})).escape_quote();
-    request({uri:url}, function (error, response, body) {
+    _.request({uri:url}, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             var responseJson = JSON.parse(body);
             if (responseJson.responseStatus !== 200) {
@@ -128,12 +127,29 @@ Commands.prototype.listeners = function(respond){
         /http:\/\/youtu\.be\/([^\s\t&\/]*)/.exec(message);
         if (!ytube_match) return;
         var url = "http://gdata.youtube.com/feeds/api/videos/" + ytube_match[1] + "?" + $.param({v: 2,alt: 'jsonc'});
-        request({uri:url}, function (error, response, body) {
+        _.request({uri:url}, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 var res = JSON.parse(body).data;
                 respond("ytube_metadata", "ah " + from + " is talking about " + _(res.category).articleize() + " video of " + res.title + ".");
                 respond("ytube_metadata", "There are " + res.viewCount + " views and the Tags are "  + _(res.tags).sentence() + ". The link again is " + ytube_match[0]);
             }
         });
-    }]
+    },
+    function(from, message) {
+        var anidb_match = /http:\/\/anidb\.net\/perl-bin\/animedb.pl\?(?:.*)aid=(\d+)(?:.*)/.exec(message);
+        if (!anidb_match) return;
+        var url = "http://api.anidb.net:9001/httpapi?request=anime&client=misakatron&clientver=1&protover=1&aid=" + anidb_match[1];
+        _.request({uri: url, cache: anidb_match[1]}, function(error, response, body) {
+            if (!error & response.statusCode == 200) {
+                var res = $(body);
+                var english_name = res.find("titles > title[xml\\:lang='en'][type='official']").html();
+                if (!english_name) english_name = res.find("titles > title[xml\\:lang='en'][type='synonym']").first().html();
+                if (!english_name) english_name = res.find("titles > title[xml\\:lang='x-jat'][type='synonym']").first().html();
+                var msg = res.find("titles > title[type='main']").html();
+                if (english_name && msg !== english_name) {msg += "    ( " + english_name + " )"}
+                respond("anidb_metadata", msg);
+            };
+        });
+    }
+    ]
 };

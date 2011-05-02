@@ -45,7 +45,6 @@ model.start(function(users){
 
     var last_msg_time = new Date().getTime();
     bot.addListener(incoming, function(from, message) {
-        console.log(from, message);
         last_msg_time = new Date().getTime();
         var tokens = message.split(' ');
         var first = _(tokens).head();
