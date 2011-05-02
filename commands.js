@@ -103,9 +103,6 @@ Commands.prototype.unlink = function(from, tokens, cb) {
     }
 };
 
-// Commands.prototype.a = function(from,)
-
-
 Commands.prototype.listeners = function(respond){
     var self = this;
     return [
