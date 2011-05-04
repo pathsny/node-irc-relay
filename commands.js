@@ -67,7 +67,7 @@ Commands.prototype.a = function(from, tokens, cb) {
     var long_tokens = _(search_tokens).filter(function(token){return token.length >= 4});
     var short_tokens = _(search_tokens).filter(function(token){return token.length < 4});
     var msg = _(long_tokens).chain().map(function(token){return "+" + token}).concat( 
-        _(short_tokens).map(function(token){return "%" + token + "%"})).value().join(' ');
+        _(short_tokens).map(function(token){return "+%" + token + "%"})).value().join(' ');
     
     var anidb_info = function(title) {
         var english_name =  _(title).chain().select('title[lang="en"][type="official"]').text().value() ||
