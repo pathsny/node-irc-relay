@@ -1,6 +1,6 @@
 var _ = require('./underscore');
 require('./utils');
-var $ = require('jquery');
+var qs = require('querystring');
 
 var Commands = exports.Commands = function(users, settings) {
     if (!(this instanceof Commands)) return new Commands(users, settings);
@@ -31,7 +31,7 @@ Commands.prototype.g = function(from, tokens, cb) {
     var requestNumber = Math.floor((Number(number) - 1) / 4)*4;
     var resultIndex = Number(number) - requestNumber - 1;
     
-    var url = 'https://ajax.googleapis.com/ajax/services/search/web?' + _($.param({q: msg, v: "1.0", key: this.settings["google_key"], start: requestNumber})).escape_quote();
+    var url = 'https://ajax.googleapis.com/ajax/services/search/web?' + _({q: msg, v: "1.0", key: this.settings["google_key"], start: requestNumber}).stringify();
     _.request({uri:url}, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             var responseJson = JSON.parse(body);
@@ -46,10 +46,16 @@ Commands.prototype.g = function(from, tokens, cb) {
             if (resultIndex === -1) {cb("no results! "); return}
             var result = results[resultIndex];
             var resNumber = res.cursor.currentPageIndex * 4 + resultIndex + 1;
-            cb(result.titleNoFormatting + "   " + result.unescapedUrl + "  " + $(result.content).text() + " ... Result " + resNumber + " out of " + res.cursor.estimatedResultCount);
+            _.parse(result.content, function(content){
+                cb(result.titleNoFormatting + "   " + result.unescapedUrl + "  " + _(content).text() + " ... Result " + resNumber + " out of " + res.cursor.estimatedResultCount);
+            });
         }
     });        
 };
+
+// Commands.prototype.a = function(from, tokens, cb) {
+//     
+// };
 
 Commands.prototype.tell = function(from, tokens, cb) {
     var to = _(tokens).head();
@@ -123,12 +129,12 @@ Commands.prototype.listeners = function(respond){
         var ytube_match = /http:\/\/www\.youtube\.com\/watch\?v=([^\s\t&]*)(?:.*?)\b/.exec(message) || 
         /http:\/\/youtu\.be\/([^\s\t&\/]*)/.exec(message);
         if (!ytube_match) return;
-        var url = "http://gdata.youtube.com/feeds/api/videos/" + ytube_match[1] + "?" + $.param({v: 2,alt: 'jsonc'});
+        var url = "http://gdata.youtube.com/feeds/api/videos/" + ytube_match[1] + "?" + _({v: 2,alt: 'jsonc'}).stringify();
         _.request({uri:url}, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 var res = JSON.parse(body).data;
                 respond("ytube_metadata", "ah " + from + " is talking about " + _(res.category).articleize() + " video of " + res.title + ".");
-                respond("ytube_metadata", "There are " + res.viewCount + " views and the Tags are "  + _(res.tags).sentence() + ". The link again is " + ytube_match[0]);
+                respond("ytube_metadata", "The Tags are "  + _(res.tags).sentence() + ".");
             }
         });
     },
@@ -138,13 +144,15 @@ Commands.prototype.listeners = function(respond){
         var url = "http://api.anidb.net:9001/httpapi?request=anime&client=misakatron&clientver=1&protover=1&aid=" + anidb_match[1];
         _.request({uri: url, cache: anidb_match[1]}, function(error, response, body) {
             if (!error & response.statusCode == 200) {
-                var res = $(body);
-                var english_name = res.find("titles > title[xml\\:lang='en'][type='official']").html();
-                if (!english_name) english_name = res.find("titles > title[xml\\:lang='en'][type='synonym']").first().html();
-                if (!english_name) english_name = res.find("titles > title[xml\\:lang='x-jat'][type='synonym']").first().html();
-                var msg = res.find("titles > title[type='main']").html();
-                if (english_name && msg !== english_name) {msg += "    ( " + english_name + " )"}
-                respond("anidb_metadata", msg);
+                _.parse(body, function(err, dom){
+                    var english_name =  _(dom).chain().select('titles title[xml:lang="en"]').select('title[type="official"]').text().value() ||
+                                        _(dom).chain().select('titles title[xml:lang="en"]').select('title[type="synonym"]').first().text().value() ||
+                                        _(dom).chain().select('titles title[xml:lang="x-jat"]').select('title[type="synonym"]').first().text().value();
+                    var msg = _(dom).chain().select('titles title[type="main"]').text().value();  
+                    console.log(msg)                  
+                    if (english_name) {msg += " (" + english_name + ")"};
+                    respond("anidb_metadata", "That anidb link is " + msg);
+                });
             };
         });
     }

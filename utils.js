@@ -2,6 +2,11 @@ var _ = global._  = require('./underscore');
 var req = require('request');
 var fs = require('fs');
 Date = require('./date').DateJS;
+var select = require('soupselect').select;
+var htmlparser = require("htmlparser");
+var qs = require('querystring');
+var domUtils = htmlparser.DomUtils;
+
 
 _.mixin({
     sentence: function(words) {
@@ -15,8 +20,21 @@ _.mixin({
     articleize: function(word) {
         return (/^[aeiou]/i.test(word) ? "an" : "a") + " " + word;
     },
-    escape_quote: function(str) {
-        return str.replace(/'/g, "%27");
+    stringify: function(obj) {
+        return qs.stringify(obj).replace(/'/g, "%27");
+    },
+    select: function(dom, selector){
+        return select(dom, selector);
+    },
+    parse: function(text, cb){
+        var parser = new htmlparser.Parser(new htmlparser.DefaultHandler(cb));
+        parser.parseComplete(text);
+    },
+    text: function(elems) {
+        if (!elems) return '';
+        return _(domUtils.getElementsByTagType('text',elems)).reduce(function(acc, elem){
+            return acc + elem.data;
+        }, '');
     },
     request: function(options, cb) {
         var cache;
