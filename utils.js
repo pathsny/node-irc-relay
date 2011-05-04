@@ -26,15 +26,41 @@ _.mixin({
     select: function(dom, selector){
         return select(dom, selector);
     },
+    invoke_: function(obj, method) {
+        var args = _(arguments).slice(2);
+        return _.map(obj, function(value) {
+            value = _(value);
+            return (method ? value[method] : value).apply(value, args);
+        });
+    },
     parse: function(text, cb){
-        var parser = new htmlparser.Parser(new htmlparser.DefaultHandler(cb));
+        var parser = new htmlparser.Parser(new htmlparser.DefaultHandler(function(err, dom){
+            cb(err, function(selector){ 
+                return _(dom).chain().select(selector);
+            }, text);
+        }));
         parser.parseComplete(text);
+    },
+    parseRequest: function(options, cb) {
+        this.request(options, function(error, response, body){
+          if (error || response.statusCode !== 200) cb(error);
+          else _.parse(body, cb); 
+        })
     },
     text: function(elems) {
         if (!elems) return '';
-        return _(domUtils.getElementsByTagType('text',elems)).reduce(function(acc, elem){
-            return acc + elem.data;
+        var textContent = function(elem) {
+            return elem.type === 'text' ? elem.data : /\!\[CDATA\[(.*)\]\]/.exec(elem.data)[1]
+        }
+        return _(domUtils.getElements({
+            tag_type: function(type){ 
+                return type === 'text' || type === 'directive'
+                }}, elems)).reduce(function(acc, elem){
+            return acc + textContent(elem);
         }, '');
+    },
+    numbered: function(list) {
+        return _(1).chain().range(list.length+1).zip(list).value();
     },
     request: function(options, cb) {
         var cache;

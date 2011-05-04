@@ -53,9 +53,51 @@ Commands.prototype.g = function(from, tokens, cb) {
     });        
 };
 
-// Commands.prototype.a = function(from, tokens, cb) {
-//     
-// };
+Commands.prototype.a = function(from, tokens, cb) {
+    var search_tokens;
+    if (/\d+/.test(_(tokens).head())) {
+        var number = _(tokens).head();
+        search_tokens = _(tokens).tail();
+    } else {
+        var number = undefined;
+        search_tokens = tokens;
+    };
+    
+    if (search_tokens.length === 0) {cb("a! <anime name>"); return}
+    var long_tokens = _(search_tokens).filter(function(token){return token.length >= 4});
+    var short_tokens = _(search_tokens).filter(function(token){return token.length < 4});
+    var msg = _(long_tokens).chain().map(function(token){return "+" + token}).concat( 
+        _(short_tokens).map(function(token){return "%" + token + "%"})).value().join(' ');
+    
+    var anidb_info = function(title) {
+        var english_name =  _(title).chain().select('title[lang="en"][type="official"]').text().value() ||
+        _(title).chain().select('title[lang="en"][type="syn"]').first().text().value() ||
+        _(title).chain().select('title[lang="x-jat"][type="syn"]').first().text().value();
+        var main = _(title).chain().select('title[type="main"]').text().value();
+        var exact = _(title).chain().select('title[exact]').first().text().value();
+        var msg = main;
+        if (exact != main) {msg = exact + " offically known as " + msg};
+        if (english_name && english_name != exact) {msg += " (" + english_name + ")"};
+        cb(msg + ". http://anidb.net/perl-bin/animedb.pl?show=anime&aid=" + title.attribs['aid']);
+        
+    }
+    
+    var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: msg}).stringify();
+    _.parseRequest({uri:url}, function (error, $) {
+        if (!error) {
+            var titles = $('anime');
+            var size = titles.size().value();
+            var extra_msg = size > 7 ? " or others." : ".";
+
+            if (size === 0) cb("No Results");
+            else if (size === 1) anidb_info(titles.first().value());
+            else if (number && number <= size) anidb_info(titles.value()[number - 1])
+            else cb(_(search_tokens).join(' ') + " could be " + titles.first(7).numbered().map(function(ttl){
+                return ttl[0] + ". " + _(ttl[1]).chain().select('title[exact]').first().text().value();
+            }).join(', ').value() + extra_msg);
+        }
+    });    
+};
 
 Commands.prototype.tell = function(from, tokens, cb) {
     var to = _(tokens).head();
@@ -141,18 +183,15 @@ Commands.prototype.listeners = function(respond){
         var anidb_match = /http:\/\/anidb\.net\/perl-bin\/animedb.pl\?(?:.*)aid=(\d+)(?:.*)/.exec(message);
         if (!anidb_match) return;
         var url = "http://api.anidb.net:9001/httpapi?request=anime&client=misakatron&clientver=1&protover=1&aid=" + anidb_match[1];
-        _.request({uri: url, cache: anidb_match[1]}, function(error, response, body) {
-            if (!error & response.statusCode == 200) {
-                _.parse(body, function(err, dom){
-                    var english_name =  _(dom).chain().select('titles title[xml:lang="en"]').select('title[type="official"]').text().value() ||
-                                        _(dom).chain().select('titles title[xml:lang="en"]').select('title[type="synonym"]').first().text().value() ||
-                                        _(dom).chain().select('titles title[xml:lang="x-jat"]').select('title[type="synonym"]').first().text().value();
-                    var msg = _(dom).chain().select('titles title[type="main"]').text().value();  
-                    console.log(msg)                  
-                    if (english_name) {msg += " (" + english_name + ")"};
-                    respond("anidb_metadata", "That anidb link is " + msg);
-                });
-            };
+        _.parseRequest({uri: url, cache: anidb_match[1]}, function(err, $){
+            if (!err) {
+                var english_name =  $('titles title[xml:lang="en"][type="official"]').text().value() ||
+                $('titles title[xml:lang="en"][type="synonym"]').first().text().value() ||
+                $('titles title[xml:lang="x-jat"][type="synonym"]').first().text().value();
+                var msg = $('titles title[type="main"]').text().value();
+                if (english_name) {msg += " (" + english_name + ")"};
+                respond("anidb_metadata", "That anidb link is " + msg);
+            }
         });
     }
     ]
