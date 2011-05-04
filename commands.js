@@ -133,9 +133,8 @@ Commands.prototype.listeners = function(respond){
         _.request({uri:url}, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 var res = JSON.parse(body).data;
-                respond("ytube_metadata", "ah " + from + " is talking about " + _(res.category).articleize() + " video of " + res.title + ".");
-                respond("ytube_metadata", "The Tags are "  + _(res.tags).sentence() + ".");
-            }
+                respond("ytube_metadata", "ah " + from + " is talking about " + _(res.category).articleize() + " video of " + res.title + ". The Tags are "  + _(res.tags).sentence() + ".");
+            };
         });
     },
     function(from, message) {
