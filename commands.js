@@ -99,10 +99,9 @@ Commands.prototype.a = function(from, tokens, cb) {
         if (!error) {
             var titles = $('anime');
             var size = titles.size().value();
-            
             if (size > 0) parse_results(titles, size);
             else {
-                var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: exact_msg}).stringify();
+                var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: msg}).stringify();
                 _.parseRequest({uri:url}, function (error, $) {
                     if (!error) {
                         var titles = $('anime');
