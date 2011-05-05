@@ -1,4 +1,4 @@
-var _ = require('./underscore');
+var _ = require('underscore');
 require('./utils');
 var qs = require('querystring');
 
@@ -8,7 +8,7 @@ var Commands = exports.Commands = function(users, settings) {
     this.settings = settings;
 }
     
-Commands.prototype.commands = function(from, token, cb) {
+Commands.prototype.commands = function(from, tokens, cb) {
     cb("I know " + _(Commands.prototype).chain().keys().
     without("listeners").
     without("private").
@@ -55,7 +55,7 @@ Commands.prototype.g = function(from, tokens, cb) {
 
 Commands.prototype.a = function(from, tokens, cb) {
     var search_tokens;
-    if (/\d+/.test(_(tokens).head())) {
+    if (/^\d+$/.test(_(tokens).head())) {
         var number = _(tokens).head();
         search_tokens = _(tokens).tail();
     } else {
@@ -64,10 +64,14 @@ Commands.prototype.a = function(from, tokens, cb) {
     };
     
     if (search_tokens.length === 0) {cb("a! <anime name>"); return}
-    var long_tokens = _(search_tokens).filter(function(token){return token.length >= 4});
-    var short_tokens = _(search_tokens).filter(function(token){return token.length < 4});
-    var msg = _(long_tokens).chain().map(function(token){return "+" + token}).concat( 
-        _(short_tokens).map(function(token){return "+%" + token + "%"})).value().join(' ');
+    if (/^\\/.test(search_tokens[0])) {
+        var msg = search_tokens.join(' ');
+    } else {
+        var long_tokens = _(search_tokens).filter(function(token){return token.length >= 4});
+        var short_tokens = _(search_tokens).filter(function(token){return token.length < 4});
+        var msg = _(long_tokens).chain().map(function(token){return "+" + token}).concat( 
+            _(short_tokens).map(function(token){return "+%" + token + "%"})).value().join(' ');
+    }
     
     var anidb_info = function(title) {
         var english_name =  _(title).chain().select('title[lang="en"][type="official"]').text().value() ||
@@ -111,6 +115,33 @@ Commands.prototype.tell = function(from, tokens, cb) {
         cb(from + ": Message Noted");
     }
 };
+
+Commands.prototype.seen = function(from, tokens, cb) {
+    var person = _(tokens).head();
+    if (!person) cb("!seen needs a person to have been seen");
+    else if (!this.users.get(person)) {
+        cb(person + " is not known");
+    } else {
+        var online_aliases = _(this.users.aliases(person)).filter(function(item){
+            return item.val.status === 'online';
+        });
+        if (online_aliases.length > 0) {
+            var msg = person + " is online";
+            if (online_aliases.length > 1 || _(online_aliases).first().key !== person)
+            msg += " as " + _(online_aliases).chain().pluck('key').sentence().value();
+            cb(msg);    
+        } else {
+            var lastOnline = _(this.users.aliases(person)).max(function(item){
+                return item.val.lastSeen;
+            });
+            var msg = person + " was last seen online";
+            if (person !== lastOnline.key) {msg += " as " + lastOnline.key}
+            cb( msg + " " + _.date(lastOnline.val.lastSeen).fromNow());
+        }
+    }
+};
+
+
 
 Commands.prototype.nick = function(from, tokens, cb) {
     var user = _(tokens).head();

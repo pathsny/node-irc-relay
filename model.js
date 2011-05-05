@@ -1,6 +1,6 @@
 var userdb = require('dirty')('./data/user.db');
 var uuid = require('node-uuid');
-var _ = require('./underscore');
+var _ = require('underscore');
 
 userdb.addIndex('nickId', function(k, v){
     return v.nickId;
@@ -139,7 +139,6 @@ userdb.aliases = function(nick) {
 };
 
 userdb.aliasedNicks = function(nick) {
-    // console.log(userdb.aliases(nick));
     if (!userdb.get(nick)) return undefined;
     return _(userdb.aliases(nick)).pluck('key');
 };

@@ -1,5 +1,5 @@
 var irc = require('irc');
-var _ = require('./underscore');
+var _ = require('underscore');
 require('./utils');
 var model = require('./model.js');
 var commands_lib = require('./commands');

@@ -1,13 +1,27 @@
-var _ = global._  = require('./underscore');
+var _ = global._  = require('underscore');
+_.mixin(require('underscore.date'));
 var req = require('request');
 var fs = require('fs');
-Date = require('./date').DateJS;
 var select = require('soupselect').select;
 var htmlparser = require("htmlparser");
 var qs = require('querystring');
 var domUtils = htmlparser.DomUtils;
 
-
+_.date().customize({relativeTime : {
+        future: "in %s",
+        past: "%s ago",
+        s: "less than a minute",
+        m: "about a minute",
+        mm: "%d minutes",
+        h: "about an hour",
+        hh: "about %d hours",
+        d: "a day",
+        dd: "%d days",
+        M: "about a month",
+        MM: "%d months",
+        y: "about a year",
+        yy: "%d years"
+}});
 _.mixin({
     sentence: function(words) {
         if (!words || words.length === 1) return words;
@@ -79,7 +93,7 @@ _.mixin({
         };
         if (!cache) return http_req();
         fs.stat(cache, function(err, stats){
-            if (!err && stats.mtime.between(Date.now().addWeeks(-1), Date.now())) {
+            if (!err && stats.mtime >= _.now().subtract({w: 1}).date) {
                 fs.readFile(cache, function (err, data) {
                     if (err) http_req()
                     else {
