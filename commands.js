@@ -64,14 +64,11 @@ Commands.prototype.a = function(from, tokens, cb) {
     };
     
     if (search_tokens.length === 0) {cb("a! <anime name>"); return}
-    if (/^\\/.test(search_tokens[0])) {
-        var msg = search_tokens.join(' ');
-    } else {
-        var long_tokens = _(search_tokens).filter(function(token){return token.length >= 4});
-        var short_tokens = _(search_tokens).filter(function(token){return token.length < 4});
-        var msg = _(long_tokens).chain().map(function(token){return "+" + token}).concat( 
-            _(short_tokens).map(function(token){return "+%" + token + "%"})).value().join(' ');
-    }
+    var exact_msg = "\\" + search_tokens.join(' ');
+    var long_tokens = _(search_tokens).filter(function(token){return token.length >= 4});
+    var short_tokens = _(search_tokens).filter(function(token){return token.length < 4});
+    var msg = _(long_tokens).chain().map(function(token){return "+" + token}).concat( 
+        _(short_tokens).map(function(token){return "+%" + token + "%"})).value().join(' ');
     
     var anidb_info = function(title) {
         var english_name =  _(title).chain().select('title[lang="en"][type="official"]').text().value() ||
@@ -86,19 +83,34 @@ Commands.prototype.a = function(from, tokens, cb) {
         
     }
     
-    var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: msg}).stringify();
+    var parse_results = function(titles, size) {
+        var extra_msg = size > 7 ? " or others." : ".";
+
+        if (size === 0) cb("No Results");
+        else if (size === 1) anidb_info(titles.first().value());
+        else if (number && number <= size) anidb_info(titles.value()[number - 1])
+        else cb(_(search_tokens).join(' ') + " could be " + titles.first(7).numbered().map(function(ttl){
+            return ttl[0] + ". " + _(ttl[1]).chain().select('title[exact]').first().text().value();
+        }).join(', ').value() + extra_msg);
+    }
+    
+    var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: exact_msg}).stringify();
     _.parseRequest({uri:url}, function (error, $) {
         if (!error) {
             var titles = $('anime');
             var size = titles.size().value();
-            var extra_msg = size > 7 ? " or others." : ".";
-
-            if (size === 0) cb("No Results");
-            else if (size === 1) anidb_info(titles.first().value());
-            else if (number && number <= size) anidb_info(titles.value()[number - 1])
-            else cb(_(search_tokens).join(' ') + " could be " + titles.first(7).numbered().map(function(ttl){
-                return ttl[0] + ". " + _(ttl[1]).chain().select('title[exact]').first().text().value();
-            }).join(', ').value() + extra_msg);
+            
+            if (size > 0) parse_results(titles, size);
+            else {
+                var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: exact_msg}).stringify();
+                _.parseRequest({uri:url}, function (error, $) {
+                    if (!error) {
+                        var titles = $('anime');
+                        var size = titles.size().value();
+                        parse_results(titles, size);
+                    }
+                });
+            }
         }
     });    
 };
