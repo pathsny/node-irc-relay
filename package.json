@@ -21,7 +21,7 @@
       "underscore.date": ">= 0.4.0",
       "dirty": "https://github.com/pathsny/node-dirty/tarball/master",
       "request": "https://github.com/pathsny/request/tarball/master",
-      "irc": "0.1.2",
+      "irc": "https://github.com/martynsmith/node-irc/tarball/master",
       "node-uuid": "1.1.0"
   },
   "private": true

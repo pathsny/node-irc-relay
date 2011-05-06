@@ -44,9 +44,6 @@ userdb.listeners = [
 {
     type: 'quit',
     listener: function(nick, message, channels) {
-        console.log(nick);
-        console.log(message);
-        console.log(channels);
         userdb.offline(nick, message);
     }
 },
