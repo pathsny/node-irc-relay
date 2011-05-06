@@ -17,6 +17,7 @@
       "htmlparser": ">= 0.2.0",
       "soupselect": "https://github.com/pathsny/node-soupselect/tarball/master",
       "underscore": ">= 1.1.6",
+      "compress" : ">= 0.1.9",
       "underscore.date": ">= 0.4.0",
       "dirty": "https://github.com/pathsny/node-dirty/tarball/master",
       "request": "https://github.com/pathsny/request/tarball/master",
