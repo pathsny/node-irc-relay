@@ -166,7 +166,7 @@ Commands.prototype.seen = function(from, tokens, cb) {
         if (lastSpoke && lastSpoke.val.lastMessage) {
             var lastMessage = lastSpoke.val.lastMessage;
             msg += " and " + _.date(lastMessage.time).fromNow() + " I saw ";
-            var actionMatch = /^ACTION(.*)/.exec(lastMessage.msg);
+            var actionMatch = /^\u0001ACTION(.*)\u0001$/.exec(lastMessage.msg);
             if (actionMatch) {
                 msg += "*" + lastSpoke.key + actionMatch[1];
             } else {
