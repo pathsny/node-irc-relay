@@ -68,7 +68,7 @@ Commands.prototype.a = function(from, tokens, cb) {
     var long_tokens = _(search_tokens).filter(function(token){return token.length >= 4});
     var short_tokens = _(search_tokens).filter(function(token){return token.length < 4});
     var msg = _(long_tokens).chain().map(function(token){return "+" + token}).concat( 
-        _(short_tokens).map(function(token){return "+%" + token + "%"})).value().join(' ');
+        _(short_tokens).map(function(token){return "%" + token + "%"})).value().join(' ');
     
     var anidb_info = function(title) {
         var english_name =  _(title).chain().select('title[lang="en"][type="official"]').text().value() ||
@@ -94,24 +94,33 @@ Commands.prototype.a = function(from, tokens, cb) {
         }).join(', ').value() + extra_msg);
     }
     
-    var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: exact_msg}).stringify();
-    _.parseRequest({uri:url}, function (error, $) {
-        if (!error) {
-            var titles = $('anime');
-            var size = titles.size().value();
-            if (size > 0) parse_results(titles, size);
-            else {
-                var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: msg}).stringify();
-                _.parseRequest({uri:url}, function (error, $) {
-                    if (!error) {
-                        var titles = $('anime');
-                        var size = titles.size().value();
-                        parse_results(titles, size);
-                    }
-                });
+    var inexactMatch = function() {
+        var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: msg}).stringify();
+        _.parseRequest({uri:url}, function (error, $) {
+            if (!error) {
+                var titles = $('anime');
+                var size = titles.size().value();
+                parse_results(titles, size);
             }
-        }
-    });    
+        });
+    }
+    
+    var exact_Match = function() {
+        var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: exact_msg}).stringify();
+        _.parseRequest({uri:url}, function (error, $) {
+            if (!error) {
+                var titles = $('anime');
+                var size = titles.size().value();
+                if (size > 0) parse_results(titles, size);
+                else {
+                    inexactMatch();
+                }
+            }
+        });    
+    }
+    
+    if (/^~$/.test(search_tokens[0]) && search_tokens.length > 1) inexactMatch();
+        else exact_Match();
 };
 
 Commands.prototype.tell = function(from, tokens, cb) {
@@ -147,13 +156,12 @@ Commands.prototype.seen = function(from, tokens, cb) {
             });
             var msg = person + " was last seen online";
             if (person !== lastOnline.key) {msg += " as " + lastOnline.key}
-            msg + = " " + _.date(lastOnline.val.lastSeen).fromNow();
+            msg += " " + _.date(lastOnline.val.lastSeen).fromNow();
             if (lastOnline.val.quitMsg) {msg += " and quit saying " + lastOnline.val.quitMsg;}
             cb(msg);
         }
     }
 };
-
 
 
 Commands.prototype.nick = function(from, tokens, cb) {
