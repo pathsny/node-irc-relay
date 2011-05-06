@@ -142,24 +142,38 @@ Commands.prototype.seen = function(from, tokens, cb) {
     else if (!this.users.get(person)) {
         cb(person + " is not known");
     } else {
-        var online_aliases = _(this.users.aliases(person)).filter(function(item){
+        var aliases = this.users.aliases(person);
+        var online_aliases = _(aliases).filter(function(item){
             return item.val.status === 'online';
         });
         if (online_aliases.length > 0) {
             var msg = person + " is online";
             if (online_aliases.length > 1 || _(online_aliases).first().key !== person)
             msg += " as " + _(online_aliases).chain().pluck('key').sentence().value();
-            cb(msg);    
         } else {
-            var lastOnline = _(this.users.aliases(person)).max(function(item){
+            var lastOnline = _(aliases).max(function(item){
                 return item.val.lastSeen;
             });
             var msg = person + " was last seen online";
             if (person !== lastOnline.key) {msg += " as " + lastOnline.key}
             msg += " " + _.date(lastOnline.val.lastSeen).fromNow();
             if (lastOnline.val.quitMsg) {msg += " and quit saying " + lastOnline.val.quitMsg;}
-            cb(msg);
         }
+        var lastSpoke = _(aliases).max(function(item) {
+            if (!item.val.lastMessage) return 0;
+            return item.val.lastMessage.time;
+        });
+        if (lastSpoke && lastSpoke.val.lastMessage) {
+            var lastMessage = lastSpoke.val.lastMessage;
+            msg += " and " + _.date(lastMessage.time).fromNow() + " I saw ";
+            var actionMatch = /^ACTION(.*)/.exec(lastMessage.msg);
+            if (actionMatch) {
+                msg += "*" + lastSpoke.key + actionMatch[1];
+            } else {
+                msg += "<" + lastSpoke.key + "> " + lastMessage.msg;
+            }
+        };
+        cb(msg);
     }
 };
 

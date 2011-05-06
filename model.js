@@ -54,6 +54,14 @@ userdb.listeners = [
         userdb.addNick(newnick);
         userdb.link(oldnick, newnick) || userdb.link(newnick, oldnick);
     }
+},
+{
+    type: 'message',
+    listener: function(from, to, message) {
+        if (/^#/.test(to)) {
+            userdb.lastMessage(from, message);
+        }
+    }
 }
 ];
 
@@ -109,6 +117,20 @@ userdb.online = function(nick) {
     userdb.set(nick, rec);
 };
 
+
+userdb.lastMessage = function(nick, message) {
+    var rec = userdb.get(nick);
+    rec.status = 'online';
+    var time = new Date().getTime();
+    rec.timeSpent = time - rec.lastSeen;
+    rec.lastSeen = time;
+    rec.lastMessage = {
+        msg: message,
+        time: time
+    };
+    userdb.set(nick, rec);
+}
+
 userdb.offline = function(nick, quitMsg) {
     var rec = userdb.get(nick);
     if (!rec) {
@@ -154,7 +176,7 @@ userdb.getTells = function(nick) {
     return _(this.aliases(nick)).chain().map(function(item){
        return item.val.tells || []; 
     }).flatten().value();
-}
+};
 
 userdb.clearTells = function(nick) {
     _(this.aliases(nick)).each(function(item){
@@ -162,7 +184,7 @@ userdb.clearTells = function(nick) {
         rec.tells = [];
         userdb.set(item.key, rec);
     });
-}
+};
 
 exports.start = function(fn) {
     userdb.on('load', function(){
