@@ -2,27 +2,11 @@
 // var commands = commands_lib.Commands(undefined, undefined);
 
 var _ = require('underscore');
-_.mixin(require('underscore.date'));
+require('./utils');
 
-console.log('about')
-_.date().customize({relativeTime : {
-        future: "in %s",
-        past: "%s ago",
-        s: "less than a minute",
-        m: "about a minute",
-        mm: "%d minutes",
-        h: "about an hour",
-        hh: "about %d hours",
-        d: "a day",
-        dd: "%d days",
-        M: "about a month",
-        MM: "%d months",
-        y: "about a year",
-        yy: "%d years"
-}});
-console.log('to')
-
-console.log(_.now().subtract({s: 35}).fromNow());
+console.log(_.now());
+console.log(_.now().date.getTime())
+console.log(new Date(1304631970873));
 
 // require('./utils');
 

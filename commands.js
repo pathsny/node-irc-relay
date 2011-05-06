@@ -147,7 +147,9 @@ Commands.prototype.seen = function(from, tokens, cb) {
             });
             var msg = person + " was last seen online";
             if (person !== lastOnline.key) {msg += " as " + lastOnline.key}
-            cb( msg + " " + _.date(lastOnline.val.lastSeen).fromNow());
+            msg + = " " + _.date(lastOnline.val.lastSeen).fromNow();
+            if (lastOnline.val.quitMsg) {msg += " and quit saying " + lastOnline.val.quitMsg;}
+            cb(msg);
         }
     }
 };

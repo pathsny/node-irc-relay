@@ -32,7 +32,6 @@ userdb.listeners = [
 {
     type: 'part',
     listener: function(channel, nick) {
-        console.log(nick);
         userdb.offline(nick);
     }
 },
@@ -44,8 +43,8 @@ userdb.listeners = [
 },
 {
     type: 'quit',
-    listener: function(channel, nick) {
-        userdb.offline(nick);
+    listener: function(nick, message, channels) {
+        userdb.offline(nick, message);
     }
 },
 {
@@ -110,17 +109,17 @@ userdb.online = function(nick) {
     userdb.set(nick, rec);
 };
 
-userdb.offline = function(nick) {
+userdb.offline = function(nick, quitMsg) {
     var rec = userdb.get(nick);
     if (!rec) {
         console.log('error');
         console.log(nick);
         console.log(rec);
         return
-        
     }
     if (rec.status === 'offline') return;
     rec.status = 'offline';
+    rec.quitMsg = quitMsg;
     var time = new Date().getTime();
     rec.timeSpent = time - rec.lastSeen;
     rec.lastSeen = time;
