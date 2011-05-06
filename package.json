@@ -1,0 +1,27 @@
+{
+  "name": "misaka",
+  "description": "irc bot",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pathsny/node-irc-relay.git"
+  },
+  "author": "Vishnu Iyengar <pathsny@gmail.com> (blog.vishnuiyengar.com)",
+  "directories": {
+    "lib": "."
+  },
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+      "htmlparser": ">= 0.2.0",
+      "soupselect": "https://github.com/pathsny/node-soupselect/tarball/master",
+      "underscore": ">= 1.1.6",
+      "underscore.date": ">= 0.4.0",
+      "dirty": "https://github.com/pathsny/node-dirty/tarball/master",
+      "request": "https://github.com/pathsny/request/tarball/master",
+      "irc": "0.1.2",
+      "node-uuid": "1.1.0"
+  },
+  "private": true
+}
