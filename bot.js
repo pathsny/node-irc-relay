@@ -21,7 +21,8 @@ model.start(function(users){
 
     function make_client() {
         var client = new irc.Client(server, nick, {
-            channels: [channel]
+            channels: [channel],
+            debug: true
         });
         client.addListener('error', function(message) {
             console.error('ERROR: ' + server + ' : '+ message.command + ': ' + message.args.join(' '));
@@ -71,6 +72,7 @@ model.start(function(users){
     });
     
     bot.conn.setTimeout(180000, function(){
+        console.log('timeout')
         bot.conn.end();
     })
     
