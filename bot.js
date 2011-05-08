@@ -21,7 +21,7 @@ model.start(function(users){
 
     function make_client() {
         var client = new irc.Client(server, nick, {
-            channels: [channel],
+            channels: [channel]
         });
         client.addListener('error', function(message) {
             console.error('ERROR: ' + server + ' : '+ message.command + ': ' + message.args.join(' '));
@@ -69,6 +69,10 @@ model.start(function(users){
     })).each(function(listener){
         bot.addListener(incoming, listener);
     });
+    
+    bot.conn.setTimeout(180000, function(){
+        bot.conn.end();
+    })
     
     var compactDB = function(){
         var idle_time = new Date().getTime() - last_msg_time;
