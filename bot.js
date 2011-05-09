@@ -21,8 +21,7 @@ model.start(function(users){
 
     function make_client() {
         var client = new irc.Client(server, nick, {
-            channels: [channel],
-            debug: true
+            channels: [channel]
         });
         client.addListener('error', function(message) {
             console.error('ERROR: ' + server + ' : '+ message.command + ': ' + message.args.join(' '));

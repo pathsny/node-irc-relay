@@ -131,7 +131,7 @@ Commands.prototype.tell = function(from, tokens, cb) {
     } else if(!this.users.get(to)) {
         cb(to + " is not known");
     } else {
-        this.users.addTell(to, {from: from, msg: msg});
+        this.users.addTell(to, {from: from, msg: msg, time: Date.now()});
         cb(from + ": Message Noted");
     }
 };
@@ -227,7 +227,9 @@ Commands.prototype.listeners = function(respond){
             var tells = self.users.getTells(from);
             if (tells.length > 0) {
                 _(tells).forEach(function(item){
-                    respond("tell", from + ": " + item.from + " said '" + item.msg + "'");
+                    var msg = from + ": " + item.from + " said '" + item.msg + "'";
+                    if (item.time) {msg += " " + _.date(item.time).fromNow()}
+                    respond("tell", msg);
                 });
                 self.users.clearTells(from);
             }
