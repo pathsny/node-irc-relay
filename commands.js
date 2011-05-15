@@ -230,8 +230,8 @@ Commands.prototype.listeners = function(respond){
         };
     },
     function(from, message){
-        var ytube_match = /http:\/\/www\.youtube\.com\/watch\?v=([^\s\t&]*)(?:.*?)\b/.exec(message) || 
-        /http:\/\/youtu\.be\/([^\s\t&\/]*)/.exec(message);
+        var ytube_match = /https?:\/\/www\.youtube\.com\/watch\?v=([^\s\t&]*)(?:.*?)\b/.exec(message) || 
+        /https?:\/\/youtu\.be\/([^\s\t&\/]*)/.exec(message);
         if (!ytube_match) return;
         var url = "http://gdata.youtube.com/feeds/api/videos/" + ytube_match[1] + "?" + _({v: 2,alt: 'jsonc'}).stringify();
         _.request({uri:url}, function (error, response, body) {
