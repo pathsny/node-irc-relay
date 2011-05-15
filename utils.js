@@ -73,8 +73,23 @@ _.mixin({
             return acc + textContent(elem);
         }, '');
     },
+    partitionAt: function(list, iterator, context) {
+      for (var i=0; i<list.length; i++) {
+          if (!iterator.call(context, list[i])) break;
+      };
+      return [list.slice(0, i), list.slice(i)];
+    },
     numbered: function(list) {
         return _(1).chain().range(list.length+1).zip(list).value();
+    },
+    gmtDate: function(date) {
+        if (date.date) date = date.date;
+        var yyyy = '' + date.getUTCFullYear();
+        var mm = '' + date.getUTCMonth();
+        if (mm.length === 1) mm = '0' + mm;
+        var dd = '' + date.getUTCDate();
+        if (dd.length === 1) dd = '00' + dd;
+        return yyyy + "_" + mm + "_" + dd;
     },
     request: function(options, cb) {
         var cache;
@@ -105,5 +120,13 @@ _.mixin({
                 return http_req();
             }
         }); 
+      },
+      displayChatMsg: function(from, msg) {
+          var actionMatch = /^\u0001ACTION(.*)\u0001$/.exec(msg);
+          if (actionMatch) {
+              return "*" + from + actionMatch[1];
+          } else {
+              return "<" + from + "> " + msg;
+          }
       }
   })

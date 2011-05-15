@@ -1,12 +1,13 @@
 // var commands_lib = require('./commands');
 // var commands = commands_lib.Commands(undefined, undefined);
 
-var _ = require('underscore');
+require('./foo')
+var u = require('underscore');
 require('./utils');
 
-console.log(_.now());
-console.log(_.now().date.getTime())
-console.log(new Date(1304631970873));
+// console.log(_.now());
+// console.log(_.now().date.getTime())
+// console.log(new Date(1304631970873));
 
 // require('./utils');
 

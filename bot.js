@@ -11,6 +11,8 @@ var server = settings["server"];
 var channel = settings["channel"];
 var incoming = 'message' + channel;
 var nick = settings["nick"];
+var ircLogger = require('./irc_log').Logger(channel);
+
 
 model.start(function(users){
     var commands = commands_lib.Commands(users, settings);
@@ -20,13 +22,17 @@ model.start(function(users){
     }
 
     function make_client() {
-        var client = new irc.Client(server, nick, {
+        return _(new irc.Client(server, nick, {
             channels: [channel]
+        })).tap(function(client){
+            client.addListener('error', function(message) {
+                console.error('ERROR: ' + server + ' : '+ message.command + ': ' + message.args.join(' '));
+            });
+            client.say = _.wrap(client.say, function(say) {
+                say.apply(client, _(arguments).slice(1));
+                client.emit('message', client.nick, arguments[1], arguments[2]);
+            });
         });
-        client.addListener('error', function(message) {
-            console.error('ERROR: ' + server + ' : '+ message.command + ': ' + message.args.join(' '));
-        });
-        return client;
     };
 
     var bot = make_client();
@@ -57,10 +63,10 @@ model.start(function(users){
     var misaka_adjectives = JSON.parse(fs.readFileSync('./misaka_adjectives.json',"ascii"));
     var misakify = function(command, result) {
         var adjectives = misaka_adjectives[command] || misaka_adjectives['generic'];
-        return result + " said " + nick + ' ' + _(adjectives).rand();
+        return result + " said " + bot.nick + ' ' + _(adjectives).rand();
     }
     
-    _(users.listeners).each(function(model_listener){
+    _(users.listeners).chain().concat(ircLogger.listeners()).each(function(model_listener){
         bot.addListener(model_listener.type, model_listener.listener);
     });
 

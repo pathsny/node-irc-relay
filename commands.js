@@ -1,6 +1,5 @@
 var _ = require('underscore');
 require('./utils');
-var qs = require('querystring');
 
 var Commands = exports.Commands = function(users, settings) {
     if (!(this instanceof Commands)) return new Commands(users, settings);
@@ -166,12 +165,7 @@ Commands.prototype.seen = function(from, tokens, cb) {
         if (lastSpoke && lastSpoke.val.lastMessage) {
             var lastMessage = lastSpoke.val.lastMessage;
             msg += " and " + _.date(lastMessage.time).fromNow() + " I saw ";
-            var actionMatch = /^\u0001ACTION(.*)\u0001$/.exec(lastMessage.msg);
-            if (actionMatch) {
-                msg += "*" + lastSpoke.key + actionMatch[1];
-            } else {
-                msg += "<" + lastSpoke.key + "> " + lastMessage.msg;
-            }
+            msg += _.displayChatMsg(lastSpoke.key, lastMessage.msg);
         };
         cb(msg);
     }
