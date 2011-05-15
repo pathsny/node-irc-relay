@@ -17,7 +17,7 @@ var Twitter = exports.Twitter = function(settings, respond) {
     var twit = new TwitterNode({
       user: 'misakabot', 
       password: settings["twitter_password"],
-      follow: _(nickmap).keys,                  
+      follow: _(nickmap).keys(),                  
     });
 
     twit.params['count'] = 0;
@@ -29,7 +29,7 @@ var Twitter = exports.Twitter = function(settings, respond) {
 
     twit
       .addListener('tweet', function(tweet) {
-          if (_(nickmap).chain().keys.contains(tweet.user.id).value() && !_(tweet.entities.hashtags).chain().pluck('text').intersect(['irc', 'fb']).isEmpty().value())
+          if (_(nickmap).chain().keys().contains(tweet.user.id).value() && !_(tweet.entities.hashtags).chain().pluck('text').intersect(['irc', 'fb']).isEmpty().value())
           {
               var nick = nickmap[tweet.user.id];
               respond(nick + " from twitter: " + tweet.text);
