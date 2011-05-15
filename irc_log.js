@@ -36,7 +36,7 @@ Logger.prototype._maybeFlush = function() {
     });
     var data = _(msgPartition).chain().first().map(function(msg){
         return JSON.stringify([msg[0].date.getTime(), msg[1]]) + '\n';
-    }).value();
+    }).value().join('');
     var self = this;
     this._msgs = msgPartition[1];
     ws.write(data, function() {
