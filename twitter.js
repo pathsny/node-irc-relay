@@ -3,8 +3,8 @@ var _ = require('underscore');
 require('./utils');
 
 
-var Twitter = exports.Twitter = function(respond) {
-    if (!(this instanceof Twitter)) return new Twitter(respond);
+var Twitter = exports.Twitter = function(settings, respond) {
+    if (!(this instanceof Twitter)) return new Twitter(settings, respond);
     this.respond = respond;
     
     nickmap = {

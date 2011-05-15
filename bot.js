@@ -78,15 +78,15 @@ model.start(function(users){
         bot.addListener(incoming, listener);
     });
     
-    new twitter(function(settings, message){
+    new twitter(settings,function(message){
         channel_say(misakify("twitter", message));
-    })
+    });
     
     
     bot.conn.setTimeout(180000, function(){
         console.log('timeout')
         bot.conn.end();
-    })
+    });
     
     var compactDB = function(){
         var idle_time = new Date().getTime() - last_msg_time;
