@@ -3,6 +3,8 @@ var _ = require('underscore');
 require('./utils');
 var model = require('./model.js');
 var commands_lib = require('./commands');
+var twitter = require('./twitter').Twitter;
+
 
 var fs = require('fs');
 var settings = JSON.parse(fs.readFileSync('./data/settings.json',"ascii"));
@@ -75,6 +77,11 @@ model.start(function(users){
     })).each(function(listener){
         bot.addListener(incoming, listener);
     });
+    
+    new twitter(function(settings, message){
+        channel_say(misakify("twitter", message));
+    })
+    
     
     bot.conn.setTimeout(180000, function(){
         console.log('timeout')

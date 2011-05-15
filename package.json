@@ -22,7 +22,8 @@
       "dirty": "https://github.com/pathsny/node-dirty/tarball/master",
       "request": "https://github.com/pathsny/request/tarball/master",
       "irc": "https://github.com/martynsmith/node-irc/tarball/master",
-      "node-uuid": "1.1.0"
+      "node-uuid": "1.1.0",
+      "twitter-node":"0.0.2"
   },
   "private": true
 }
