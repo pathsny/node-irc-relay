@@ -29,7 +29,7 @@ var Twitter = exports.Twitter = function(settings, respond) {
           if (tweet.user.id === 64939976 && !_(tweet.entities.hashtags).chain().pluck('text').intersect(['irc', 'fb']).isEmpty().value())
           {
               var nick = nickmap[tweet.user.id];
-              console.log(nick + " from twitter: " + tweet.text);
+              respond(nick + " from twitter: " + tweet.text);
           }
     })
 
