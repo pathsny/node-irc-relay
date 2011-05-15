@@ -8,13 +8,16 @@ var Twitter = exports.Twitter = function(settings, respond) {
     this.respond = respond;
     
     nickmap = {
-        64939976: 'path[l]'
+        64939976: 'path[l]',
+        119446216: 'preethi',
+        34292195: 'iwikiwi',
+        29061687: 'Stattrav'
     }
     
     var twit = new TwitterNode({
       user: 'misakabot', 
       password: settings["twitter_password"],
-      follow: [64939976],                  
+      follow: _(nickmap).keys,                  
     });
 
     twit.params['count'] = 0;
@@ -26,7 +29,7 @@ var Twitter = exports.Twitter = function(settings, respond) {
 
     twit
       .addListener('tweet', function(tweet) {
-          if (tweet.user.id === 64939976 && !_(tweet.entities.hashtags).chain().pluck('text').intersect(['irc', 'fb']).isEmpty().value())
+          if (_(nickmap).chain().keys.contains(tweet.user.id).value() && !_(tweet.entities.hashtags).chain().pluck('text').intersect(['irc', 'fb']).isEmpty().value())
           {
               var nick = nickmap[tweet.user.id];
               respond(nick + " from twitter: " + tweet.text);
