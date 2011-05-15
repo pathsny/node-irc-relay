@@ -1,6 +1,8 @@
 var userdb = require('dirty')('./data/user.db');
 var uuid = require('node-uuid');
 var _ = require('underscore');
+require('./utils');
+
 
 userdb.addIndex('nickId', function(k, v){
     return v.nickId;
@@ -58,7 +60,7 @@ userdb.listeners = [
 {
     type: 'message',
     listener: function(from, to, message) {
-        if (/^#/.test(to)) {
+        if (/^#/.test(to) && !_(message).automated()) {
             userdb.lastMessage(from, message);
         }
     }

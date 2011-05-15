@@ -128,5 +128,8 @@ _.mixin({
           } else {
               return "<" + from + "> " + msg;
           }
+      },
+      automated: function(msg) {
+          return /\u000311.•\u000310\u0002«\u0002\u000311WB\u000310 \u0002\(\u000f\u0002.+\u000310\)\u0002 \u000311WB\u000310\u0002»\u0002\u000311•. \u000310\u0002-\u000f \u001f/.test(msg)
       }
   })

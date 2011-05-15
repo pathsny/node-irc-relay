@@ -216,6 +216,7 @@ Commands.prototype.listeners = function(respond){
     return [
     // convey messages
     function(from, message) {
+        if (_(message).automated()) return;
         var rec = self.users.get(from);
         if (rec) {
             var tells = self.users.getTells(from);
