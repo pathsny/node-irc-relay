@@ -48,6 +48,7 @@ var Twitter = exports.Twitter = function(settings, respond) {
 
       .addListener('end', function(resp) {
         console.log("wave goodbye... " + resp.statusCode);
+        new Twitter(settings, respond);
       })
 
       .stream();
