@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+<head><meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title><%= title %></title>
+</head>
+<body>
+	<form name="input" action="/login" method="post" >
+	 Token: <input type="text" name="mtoken" />
+	 <input type="hidden" name="ReturnUrl" value="<%= ReturnUrl %>" >
+	 <input type="submit" value="Submit" />
+	 </form>
+</body>
+

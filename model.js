@@ -7,6 +7,9 @@ require('./utils');
 userdb.addIndex('nickId', function(k, v){
     return v.nickId;
 });
+userdb.addIndex('token', function(k, v){
+    return v.token;
+});
 
 userdb.listeners = [
 {
@@ -187,6 +190,19 @@ userdb.clearTells = function(nick) {
         userdb.set(item.key, rec);
     });
 };
+
+userdb.createToken = function(nick) {
+    var rec = userdb.get(nick);
+    if (rec.status !== 'online') return;
+    rec["token"] = uuid();
+    userdb.set(nick, rec);
+    return rec["token"];
+}
+
+userdb.validToken = function(token) {
+    if (!token) return;
+    return _(userdb.find('token', token)).first();
+}
 
 exports.start = function(fn) {
     userdb.on('load', function(){

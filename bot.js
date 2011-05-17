@@ -4,6 +4,7 @@ require('./utils');
 var model = require('./model.js');
 var commands_lib = require('./commands');
 var twitter = require('./twitter').Twitter;
+var weblog = require('./web/app').Server;
 
 
 var fs = require('fs');
@@ -56,7 +57,7 @@ model.start(function(users){
         last_msg_time = new Date().getTime();
         var tokens = message.split(' ');
         var first = _(tokens).head();
-        var match = /!(.*)/.exec(first);
+        var match = /^!(.*)/.exec(first);
         if (match) {
             dispatch(match[1], from, _(tokens).tail())
         };
@@ -82,9 +83,15 @@ model.start(function(users){
         channel_say(misakify("twitter", message));
     });
     
+    bot.addListener("pm", function(from, text){
+        if (text === 'token') {
+            var token = users.createToken(from);
+            if (token) bot.say(from, token);
+        }
+    });
+    
     
     bot.conn.setTimeout(180000, function(){
-        console.log('timeout')
         bot.conn.end();
     });
     
@@ -98,6 +105,8 @@ model.start(function(users){
     };
     
     setTimeout(compactDB,60000);
+    
+    weblog(users, bot.nick);
 });
 
 
