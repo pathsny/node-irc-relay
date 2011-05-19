@@ -4,6 +4,7 @@
 	<title><%= title %></title>
 </head>
 <body>
+	<h3>Unauthorized! Get a token from <%= nick %></h3>
 	<form name="input" action="/login" method="post" >
 	 Token: <input type="text" name="mtoken" />
 	 <input type="hidden" name="ReturnUrl" value="<%= ReturnUrl %>" >

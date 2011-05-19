@@ -3,7 +3,18 @@
 <head><meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title><%= title %></title>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+	<script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/underscore.js/1.1.6/underscore-min.js"></script>
 	<script type="text/javascript" src="javascripts/logs.js"></script>	
+	<script type="text/javascript" src="javascripts/underscore.date.min.js"></script>
+	<script id="logTemplate" type="text/x-jquery-tmpl"> 
+		{{each Logs}}
+			<span>
+				<a href='#${$value.timestamp}' name='${$value.timestamp}'>${$value.date}</a>:${$value.msg}
+			</span>
+			<br/>
+		{{/each}}
+	</script>	
 </head>
 <body>
 </body>

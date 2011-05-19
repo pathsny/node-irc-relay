@@ -51,7 +51,7 @@ var Twitter = exports.Twitter = function(settings, respond) {
         new Twitter(settings, respond);
       })
 
-      .stream();
+      // .stream();
 }
 
 

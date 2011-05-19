@@ -32,12 +32,14 @@ var Server = exports.Server = function(users, nick) {
         res.end(ejs.render(views['login'], {
             locals: {
                 title: 'MISAKA logs',
-                ReturnUrl: req.url
+                ReturnUrl: req.url,
+                nick: nick
             }
         }));    
     };
     
     var app = connect.createServer(
+        connect.favicon(__dirname + '/public/favicon.ico'),
         connect.bodyParser(),
         connect.cookieParser(),
         auth,
