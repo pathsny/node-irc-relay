@@ -105,8 +105,7 @@ model.start(function(users){
     };
     
     setTimeout(compactDB,60000);
-    
-    weblog(users, bot.nick);
+    weblog(users, nick);
 });
 
 
