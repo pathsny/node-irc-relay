@@ -71,13 +71,14 @@ function bottomData(marker, number, cb, rows) {
         if (!logs) {
             marker.location === "end";
             bottomData(marker, 0, cb, rows || []);
+        } else {
+            rlogs = logs.slice(marker.location+1, marker.location + number + 1);
+            if (rlogs.length < number) {
+                marker.date = _(_(marker.date).createGmtDate().add({d: 1})).gmtDate();
+                marker.location = -1;
+            }
+            bottomData(marker, number - rlogs.length, cb, _(rows || []).concat(rlogs));
         }
-        rlogs = logs.slice(marker.location+1, marker.location + number + 1);
-        if (rlogs.length < number) {
-            marker.date = _(_(marker.date).createGmtDate().add({d: 1})).gmtDate();
-            marker.location = -1;
-        }
-        bottomData(marker, number - rlogs.length, cb, _(rows || []).concat(rlogs));
     });
 };
 
@@ -90,21 +91,22 @@ function topData(marker, number, cb, rows) {
         if (!logs) {
             marker.location === "end";
             topData(marker, 0, cb, rows || []);
+        } else {
+            var count = number;
+            if (!marker.location) marker.location = logs.length;
+            var n = marker.location - number;
+            if (n < 0) {
+                n = 0;
+                count = marker.location;
+            };
+            rlogs = logs.slice(n, marker.location);
+            marker.location = n;
+            if (n === 0) {
+                marker.date = _(_(marker.date).createGmtDate().subtract({d: 1})).gmtDate();
+                marker.location = undefined;
+            }
+            topData(marker, number - count, cb, _(rlogs).concat(rows || []));
         }
-        var count = number;
-        if (!marker.location) marker.location = logs.length;
-        var n = marker.location - number;
-        if (n < 0) {
-            n = 0;
-            count = marker.location;
-        };
-        rlogs = logs.slice(n, marker.location);
-        marker.location = n;
-        if (n === 0) {
-            marker.date = _(_(marker.date).createGmtDate().subtract({d: 1})).gmtDate();
-            marker.location = undefined;
-        }
-        topData(marker, number - count, cb, _(rlogs).concat(rows || []));
     });
 };
 
