@@ -18,6 +18,10 @@ Commands.prototype.commands = function(from, tokens, cb) {
     sentence().value());
 };
 
+Commands.prototype.logs = function(from, tokens, cb) {
+    if (_(tokens).head() === 'now') cb("http://www.got-rice.asia:8008/#" + _.now(true))
+}
+
 Commands.prototype.g = function(from, tokens, cb) {
     if (/\d+/.test(_(tokens).head())) {
         var number = _(tokens).head();
