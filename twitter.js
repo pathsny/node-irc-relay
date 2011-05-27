@@ -3,10 +3,9 @@ var _ = require('underscore');
 require('./utils');
 
 
-var Twitter = exports.Twitter = function(settings, respond) {
-    if (!(this instanceof Twitter)) return new Twitter(settings, respond);
-    this.respond = respond;
-    
+var Twitter = exports.Twitter = function(settings, respond, timeout) {
+    if (!(this instanceof Twitter)) return new Twitter(settings, respond, timeout);
+    if (!timeout) timeout = 1000;
     nickmap = {
         64939976: 'path[l]',
         119446216: 'preethi',
@@ -22,8 +21,9 @@ var Twitter = exports.Twitter = function(settings, respond) {
       follow: nick_ids,                  
     });
     
-    var createInstance = function() {
-        new Twitter(settings, respond);
+    var createInstance = function(newtimeout) {
+        if (!newtimeout) newtimeout = timeout;
+        new Twitter(settings, respond, newtimeout);
     };
     
     twit.params['count'] = 0;
@@ -54,9 +54,10 @@ var Twitter = exports.Twitter = function(settings, respond) {
 
         console.log("wave goodbye... " + resp.statusCode);
         if (resp.statusCode === 420) {
-            setTimeout(createInstance, 10)
+            console.log(timeout)
+            setTimeout(function(){createInstance(timeout*2)}, timeout)
         }
-        else createInstance();
+        else createInstance(10000);
       })
 
       .stream();
