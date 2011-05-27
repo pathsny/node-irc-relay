@@ -10,5 +10,9 @@
 	 <input type="hidden" name="ReturnUrl" value="<%= ReturnUrl %>" >
 	 <input type="submit" value="Submit" />
 	 </form>
+	
+	<script type="text/javascript">
+		document.forms[0]["ReturnUrl"].value += window.location.hash;
+	</script>
 </body>
 

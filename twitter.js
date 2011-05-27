@@ -22,6 +22,10 @@ var Twitter = exports.Twitter = function(settings, respond) {
       follow: nick_ids,                  
     });
     
+    var createInstance = function() {
+        new Twitter(settings, respond);
+    };
+    
     twit.params['count'] = 0;
     twit.headers['User-Agent'] = 'misaka';
     
@@ -47,11 +51,15 @@ var Twitter = exports.Twitter = function(settings, respond) {
       })
 
       .addListener('end', function(resp) {
+
         console.log("wave goodbye... " + resp.statusCode);
-        new Twitter(settings, respond);
+        if (resp.statusCode === 420) {
+            setTimeout(createInstance, 10)
+        }
+        else createInstance();
       })
 
-      // .stream();
+      .stream();
 }
 
 
