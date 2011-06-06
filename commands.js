@@ -20,7 +20,7 @@ Commands.prototype.commands = function(from, tokens, cb) {
 
 Commands.prototype.logs = function(from, tokens, cb) {
     if (_(tokens).head() === 'now') cb("http://www.got-rice.asia:8008/#" + _.now(true))
-    if (_(tokens).head() === 'search') cb("http://www.got-rice.asia:8008/search?" + _(tokens).tail().join('+'))
+    if (_(tokens).head() === 'q') cb("http://www.got-rice.asia:8008/search?" + _(tokens).tail().join('+'))
 }
 
 Commands.prototype.g = function(from, tokens, cb) {
