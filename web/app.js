@@ -45,7 +45,7 @@ var Server = exports.Server = function(users, nick) {
     var search = function(req, res, next){
         var parsedUrl = qs.parse(url.parse(req.url).query);
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8;'});
-        var search = parsedUrl['search'];
+        var search = parsedUrl['q'];
         var render = function(res, search, results) {
             res.end(ejs.render(views['search'], {
                 locals : { 
@@ -91,7 +91,6 @@ var Server = exports.Server = function(users, nick) {
                 }));
             });
             app.get('/search', search);
-            app.post('/search', search);    
         })
     )
     app.listen(8008);
