@@ -3,11 +3,13 @@ var gzip = require('connect-gzip');
 var ejs = require('ejs');
 var fs = require('fs');
 var _ = require('underscore');
+require('../utils');
+var exec = require('child_process').exec;
 
 var Server = exports.Server = function(users, nick) {
     if (!(this instanceof Server)) return new Server(users, nick);
     
-    var views = _(['index', 'login']).inject(function(views, page){
+    var views = _(['index', 'login', 'search']).inject(function(views, page){
         return _({}).chain().extend(views).tap(function(views){
             views[page] = fs.readFileSync(__dirname + '/views/' + page + '.ejs', 'utf8');
         }).value();
@@ -38,6 +40,40 @@ var Server = exports.Server = function(users, nick) {
         }));    
     };
     
+    var search = function(req, res, next){
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8;'});
+        var search = req.body && req.body['search'];
+        if (search) {
+            var cmd = "egrep -h -m 10 '\\b(" + _(search.split(' ')).join('|') + ")\\b' data/irclogs/*.log";
+            exec(cmd, function(error, stdout, stderr) { 
+                var results = stdout === '' ? [] : _(stdout.split('\n')).map(function(l){
+                    var t = l.indexOf(',');
+                    var timestamp = Number(l.slice(1,t));
+                    return {
+                        timestamp: timestamp,
+                        date: _.date(timestamp).format("dddd, MMMM Do YYYY, hh:mm:ss"),
+                        msg: l.slice(t+2,-2)
+                    };
+                });
+                res.end(ejs.render(views['search'], {
+                    locals : { 
+                        title: 'MISAKA logs',
+                        search: search,
+                        results: results
+                    }
+                }));
+            });
+        } else {
+            res.end(ejs.render(views['search'], {
+                locals : { 
+                    title: 'MISAKA logs',
+                    search: search,
+                    results: []
+                }
+            }));
+        }
+    };
+    
     var app = connect.createServer(
         connect.favicon(__dirname + '/public/favicon.ico'),
         connect.bodyParser(),
@@ -54,6 +90,8 @@ var Server = exports.Server = function(users, nick) {
                     }
                 }));
             });
+            app.get('/search', search);
+            app.post('/search', search);    
         })
     )
     app.listen(8008);

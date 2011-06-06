@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head><meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title><%= title %></title>
+</head>
+<body>
+	<form name="input" action="/search" method="post" >
+		Search Terms: <input type="text" name="search" />
+		<input type="submit" value="Submit" />
+		<span><%= search %></span>
+	</form>
+	<div>
+		<ul>
+			<% for(var i=0; i<results.length; i++) {%>
+			   <li><a href='/#<%= results[i].timestamp %>'><%= results[i].date %></a><%= results[i].msg %></li>
+			<% } %>
+		</ul>
+	<div>	
+</body>
+

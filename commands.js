@@ -23,7 +23,7 @@ Commands.prototype.logs = function(from, tokens, cb) {
 }
 
 Commands.prototype.g = function(from, tokens, cb) {
-    if (/\d+/.test(_(tokens).head())) {
+    if (/^\d+/.test(_(tokens).head())) {
         var number = _(tokens).head();
         var msg = _(tokens).tail().join(' ');
     } else {
