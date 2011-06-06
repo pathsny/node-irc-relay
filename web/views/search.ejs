@@ -4,10 +4,9 @@
 	<title><%= title %></title>
 </head>
 <body>
-	<form name="input" action="/search" method="post" >
-		Search Terms: <input type="text" name="search" />
+	<form name="input" action="/search" method="get" >
+		Search Terms: <input type="text" name="search" value="<%=search%>"/>
 		<input type="submit" value="Submit" />
-		<span><%= search %></span>
 	</form>
 	<div>
 		<ul>

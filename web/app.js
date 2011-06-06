@@ -5,6 +5,8 @@ var fs = require('fs');
 var _ = require('underscore');
 require('../utils');
 var exec = require('child_process').exec;
+var url = require('url');
+var qs = require('querystring');
 
 var Server = exports.Server = function(users, nick) {
     if (!(this instanceof Server)) return new Server(users, nick);
@@ -41,8 +43,18 @@ var Server = exports.Server = function(users, nick) {
     };
     
     var search = function(req, res, next){
+        var parsedUrl = qs.parse(url.parse(req.url).query);
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8;'});
-        var search = req.body && req.body['search'];
+        var search = parsedUrl['search'];
+        var render = function(res, search, results) {
+            res.end(ejs.render(views['search'], {
+                locals : { 
+                    title: 'MISAKA logs',
+                    search: search,
+                    results: results
+                }
+            }));
+        }
         if (search) {
             var cmd = "egrep -h -m 10 '\\b(" + _(search.split(' ')).join('|') + ")\\b' data/irclogs/*.log";
             exec(cmd, function(error, stdout, stderr) { 
@@ -55,22 +67,10 @@ var Server = exports.Server = function(users, nick) {
                         msg: l.slice(t+2,-2)
                     };
                 });
-                res.end(ejs.render(views['search'], {
-                    locals : { 
-                        title: 'MISAKA logs',
-                        search: search,
-                        results: results
-                    }
-                }));
+                render(res, search, results);
             });
         } else {
-            res.end(ejs.render(views['search'], {
-                locals : { 
-                    title: 'MISAKA logs',
-                    search: search,
-                    results: []
-                }
-            }));
+            render(res, '', []);
         }
     };
     
