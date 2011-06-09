@@ -42,7 +42,7 @@ Commands.prototype.logs = function(from, tokens, cb) {
             cb("that makes no sense :( ")
         }
     }
-    else cb("usage !logs <x days, y hours, z mins ago> or !logs now or !logs q <search terms>")
+    else cb("usage: !logs <x days, y hours, z mins ago> or !logs now or !logs q <search terms>")
 }
 
 Commands.prototype.g = function(from, tokens, cb) {
@@ -240,6 +240,7 @@ Commands.prototype.unlink = function(from, tokens, cb) {
 
 Commands.prototype.listeners = function(respond){
     var self = this;
+    var matchers = require('./url_matchers').matchers;
     return [
     // convey messages
     function(from, message) {
@@ -257,32 +258,17 @@ Commands.prototype.listeners = function(respond){
             }
         };
     },
-    function(from, message){
-        var ytube_match = /https?:\/\/www\.youtube\.com\/watch\?v=([^\s\t&]*)(?:.*?)\b/.exec(message) || 
-        /https?:\/\/youtu\.be\/([^\s\t&\/]*)/.exec(message);
-        if (!ytube_match) return;
-        var url = "http://gdata.youtube.com/feeds/api/videos/" + ytube_match[1] + "?" + _({v: 2,alt: 'jsonc'}).stringify();
-        _.request({uri:url}, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                var res = JSON.parse(body).data;
-                respond("ytube_metadata", "ah " + from + " is talking about " + _(res.category).articleize() + " video of " + res.title + ". The Tags are "  + _(res.tags).sentence() + ".");
-            };
-        });
-    },
     function(from, message) {
-        var anidb_match = /http:\/\/anidb\.net\/perl-bin\/animedb.pl\?(?:.*)aid=(\d+)(?:.*)/.exec(message);
-        if (!anidb_match) return;
-        var url = "http://api.anidb.net:9001/httpapi?request=anime&client=misakatron&clientver=1&protover=1&aid=" + anidb_match[1];
-        _.parseRequest({uri: url, cache: anidb_match[1]}, function(err, $){
-            if (!err) {
-                var english_name =  $('titles title[xml:lang="en"][type="official"]').text().value() ||
-                $('titles title[xml:lang="en"][type="synonym"]').first().text().value() ||
-                $('titles title[xml:lang="x-jat"][type="synonym"]').first().text().value();
-                var msg = $('titles title[type="main"]').text().value();
-                if (english_name) {msg += " (" + english_name + ")"};
-                respond("anidb_metadata", "That anidb link is " + msg);
-            }
+        _(matchers).chain().keys().detect(function(type) {
+            var matching_regex = _(matchers[type].regexes).detect(function(regex){
+                return regex.test(message);
+            });
+            if (matching_regex) {
+                matchers[type].responder(from, message, matching_regex.exec(message), function(msg){
+                    respond(type + "_metadata", msg);
+                });
+                return true;
+            } 
         });
-    }
-    ]
+    }]
 };
