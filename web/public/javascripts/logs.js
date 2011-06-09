@@ -31,7 +31,7 @@ function displayAbove(hash) {
     topMarker.lock = true;
     topData(topMarker, 200, function(rows, newTopMarker){
         topMarker = newTopMarker;
-        logTemplate.tmpl({Logs: rows}).prependTo("body");
+        logTemplate.tmpl({Logs: rows}).prependTo("#content");
         if (hash) {
             setTimeout(function(){
                 window.location.hash = "#1";
@@ -49,7 +49,7 @@ function displayBelow(hash) {
     bottomMarker.lock = true;
     bottomData(bottomMarker, 200, function(rows, newBottomMarker){
         bottomMarker = newBottomMarker;
-        logTemplate.tmpl({Logs: rows}).appendTo("body");
+        logTemplate.tmpl({Logs: rows}).appendTo("#content");
         bottomMarker.lock = undefined;
         if (hash) {
             setTimeout(function(){
@@ -121,7 +121,7 @@ function init() {
             });
             topMarker = {date: date, location: location};
             bottomMarker = {date: date, location: location};
-            logTemplate.tmpl({Logs: [data[location]]}).appendTo("body");
+            logTemplate.tmpl({Logs: [data[location]]}).appendTo("#content");
             displayAbove();
             displayBelow(data[location].timestamp);
         });
@@ -164,7 +164,7 @@ function getLog(dateString, cb) {
         }
 
         if($(window).scrollTop() < 500){
-            var oldHash = $('body a').attr('name');
+            var oldHash = $('#content a').attr('name');
             //wait for 500 milliseconds to confirm the user scroll action
             displayAbove(oldHash)
         }
