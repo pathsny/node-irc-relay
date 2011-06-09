@@ -26,8 +26,8 @@ var parser = PEG.buildParser(fs.readFileSync('log_request.js',"ascii"));
 
 Commands.prototype.logs = function(from, tokens, cb) {
     if (_(tokens).head() === 'now') cb("http://www.got-rice.asia:8008/#" + _.now(true))
-    if (_(tokens).head() === 'q') cb("http://www.got-rice.asia:8008/search?q=" + _(tokens).tail().join('+'))
-    if (_(tokens).last() === 'ago') {
+    else if (_(tokens).head() === 'q') cb("http://www.got-rice.asia:8008/search?q=" + _(tokens).tail().join('+'))
+    else if (_(tokens).last() === 'ago') {
         try {
             var time = parser.parse(_(tokens).join(' '));
             var time_hash = _(time).inject(function(hsh, item){
@@ -42,6 +42,7 @@ Commands.prototype.logs = function(from, tokens, cb) {
             cb("that makes no sense :( ")
         }
     }
+    else cb("usage !logs <x days, y hours, z mins ago> or !logs now or !logs q <search terms>")
 }
 
 Commands.prototype.g = function(from, tokens, cb) {
