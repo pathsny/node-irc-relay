@@ -22,12 +22,13 @@
       "dirty": "https://github.com/pathsny/node-dirty/tarball/master",
       "request": "https://github.com/pathsny/request/tarball/master",
       "irc": "https://github.com/martynsmith/node-irc/tarball/master",
-      "node-uuid": "1.1.0",
-      "twitter-node":"0.0.2",
-      "ejs": "0.4.2",
-      "connect-gzip": "0.1.0",
-      "connect": "1.4.1",
-      "qs": "0.1"
+      "node-uuid": ">= 1.1.0",
+      "twitter-node":">= 0.0.2",
+      "ejs": ">= 0.4.2",
+      "connect-gzip": ">= 0.1.0",
+      "connect": ">= 1.4.1",
+      "qs": ">= 0.1",
+      "pegjs": ">= 0.6.1"
   },
   "private": true
 }
