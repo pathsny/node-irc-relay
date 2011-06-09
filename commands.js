@@ -35,8 +35,12 @@ Commands.prototype.logs = function(from, tokens, cb) {
                 hsh[item[1]] = item[0];
                 return hsh;
             },{})
+            if (time_hash)
             cb("http://www.got-rice.asia:8008/#" + _.now().subtract(time_hash).date.getTime())
-        } catch (err) {}
+            else cb("that makes no sense :( ")
+        } catch (err) {
+            cb("that makes no sense :( ")
+        }
     }
 }
 
