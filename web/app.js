@@ -93,7 +93,7 @@ var Server = exports.Server = function(users, nick) {
             app.get('/search', search);
         })
     )
-    app.listen(8008);
+    app.listen(8083);
 }
 
 
