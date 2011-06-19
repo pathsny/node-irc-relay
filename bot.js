@@ -114,30 +114,24 @@ model.start(function(users){
     
     process.on('uncaughtException', function(err) {
        console.log(err);
-       process.exit();
     });
     
     process.on('SIGHUP', function(err) {
        console.log('SIGHUP');
-       process.exit();
     });
     process.on('SIGQUIT', function(err) {
        console.log('SIGQUIT');
-       process.exit();
     });
     process.on('SIGKILL', function(err) {
        console.log('SIGKILL');
-       process.exit();
     });
     
     process.on('SIGINT', function(err) {
        console.log('SIGINT');
-       process.exit();
     });
     
     process.on('SIGTERM', function(err) {
        console.log('SIGTERM');
-       process.exit();
     });
     
 });
