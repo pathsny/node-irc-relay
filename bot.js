@@ -110,6 +110,20 @@ model.start(function(users){
        console.log(err);
        process.exit();
     });
+    
+    process.on('SIGHUP', function(err) {
+       console.log('SIGHUP');
+       process.exit();
+    });
+    process.on('SIGQUIT', function(err) {
+       console.log('SIGQUIT');
+       process.exit();
+    });
+    process.on('SIGKILL', function(err) {
+       console.log('SIGKILL');
+       process.exit();
+    });
+    
 });
 
 
