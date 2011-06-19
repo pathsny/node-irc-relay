@@ -92,8 +92,9 @@ var Server = exports.Server = function(users, nick, port) {
             });
             app.get('/search', search);
         })
-    )
-    app.listen(port);
+    );
+    console.log("starting webserver on port " + port)
+    app.listen(Number(port));
 }
 
 
