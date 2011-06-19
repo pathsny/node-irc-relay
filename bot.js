@@ -5,8 +5,6 @@ var model = require('./model.js');
 var commands_lib = require('./commands');
 var twitter = require('./twitter').Twitter;
 var weblog = require('./web/app').Server;
-var process = require('process');
-
 
 var fs = require('fs');
 var settings = JSON.parse(fs.readFileSync('./data/settings.json',"ascii"));
