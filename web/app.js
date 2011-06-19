@@ -9,7 +9,7 @@ var url = require('url');
 var qs = require('querystring');
 
 var Server = exports.Server = function(users, nick, port) {
-    if (!(this instanceof Server)) return new Server(users, nick);
+    if (!(this instanceof Server)) return new Server(users, nick, port);
     
     var views = _(['index', 'login', 'search']).inject(function(views, page){
         return _({}).chain().extend(views).tap(function(views){
