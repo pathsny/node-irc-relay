@@ -105,7 +105,7 @@ model.start(function(users){
     };
     
     setTimeout(compactDB,60000);
-    weblog(users, nick);
+    weblog(users, nick, settings["port"]);
 });
 
 

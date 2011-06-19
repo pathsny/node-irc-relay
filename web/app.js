@@ -8,7 +8,7 @@ var exec = require('child_process').exec;
 var url = require('url');
 var qs = require('querystring');
 
-var Server = exports.Server = function(users, nick) {
+var Server = exports.Server = function(users, nick, port) {
     if (!(this instanceof Server)) return new Server(users, nick);
     
     var views = _(['index', 'login', 'search']).inject(function(views, page){
@@ -93,7 +93,7 @@ var Server = exports.Server = function(users, nick) {
             app.get('/search', search);
         })
     )
-    app.listen(8083);
+    app.listen(port);
 }
 
 
