@@ -89,8 +89,14 @@ model.start(function(users){
         }
     });
     
+    bot.addListener("raw", function(){
+        console.log("raw");
+        console.log(arguments);
+    })
+    
     
     bot.conn.setTimeout(180000, function(){
+        console.log('timeout');
         bot.conn.end();
     });
     
