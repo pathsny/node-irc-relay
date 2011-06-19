@@ -5,6 +5,7 @@ var model = require('./model.js');
 var commands_lib = require('./commands');
 var twitter = require('./twitter').Twitter;
 var weblog = require('./web/app').Server;
+var process = require('process');
 
 
 var fs = require('fs');
@@ -106,6 +107,11 @@ model.start(function(users){
     
     setTimeout(compactDB,60000);
     weblog(users, nick, settings["port"]);
+    
+    process.on('uncaughtException', function(err) {
+       console.log(err);
+       process.exit();
+    });
 });
 
 
