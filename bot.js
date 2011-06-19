@@ -130,6 +130,16 @@ model.start(function(users){
        process.exit();
     });
     
+    process.on('SIGINT', function(err) {
+       console.log('SIGINT');
+       process.exit();
+    });
+    
+    process.on('SIGTERM', function(err) {
+       console.log('SIGTERM');
+       process.exit();
+    });
+    
 });
 
 
