@@ -89,12 +89,6 @@ model.start(function(users){
         }
     });
     
-    bot.addListener("raw", function(){
-        console.log("raw");
-        console.log(arguments);
-    })
-    
-    
     bot.conn.setTimeout(180000, function(){
         console.log('timeout');
         bot.conn.end();
@@ -112,28 +106,12 @@ model.start(function(users){
     setTimeout(compactDB,60000);
     weblog(users, nick, settings["port"]);
     
-    process.on('uncaughtException', function(err) {
-       console.log(err);
+    _(['uncaughtException', 'SIGHUP', 'SIGQUIT', 'SIGKILL', 'SIGINT', 'SIGTERM']).each(function(condition){
+        process.on(condition, function(err){
+            console.log(condition, err);
+            process.exit();
+        });
     });
-    
-    process.on('SIGHUP', function(err) {
-       console.log('SIGHUP');
-    });
-    process.on('SIGQUIT', function(err) {
-       console.log('SIGQUIT');
-    });
-    process.on('SIGKILL', function(err) {
-       console.log('SIGKILL');
-    });
-    
-    process.on('SIGINT', function(err) {
-       console.log('SIGINT');
-    });
-    
-    process.on('SIGTERM', function(err) {
-       console.log('SIGTERM');
-    });
-    
 });
 
 
