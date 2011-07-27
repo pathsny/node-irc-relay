@@ -4,7 +4,7 @@ require('./utils');
 exports.matchers =  {
     ytube: {
         regexes: [ /https?:\/\/www\.youtube\.com\/watch\?v=([^\s\t&]*)(?:.*?)\b/ , /https?:\/\/youtu\.be\/([^\s\t&\/]*)/],
-        
+
         responder: function(from, message, match, respond) {
             var url = "http://gdata.youtube.com/feeds/api/videos/" + match[1] + "?" + _({v: 2,alt: 'jsonc'}).stringify();
             _.request({uri:url}, function (error, response, body) {
@@ -15,7 +15,7 @@ exports.matchers =  {
             });
         }
     },
-    
+
     anidb: {
         regexes: [/http:\/\/anidb\.net\/perl-bin\/animedb.pl\?(?:.*)aid=(\d+)(?:.*)/],
 
@@ -32,6 +32,20 @@ exports.matchers =  {
                 }
             });
         }
-    } 
+    },
+  imdb: {
+        regexes: [/http:\/\/www\.imdb\.com\/title\/(.*)\//],
+
+        responder: function(from, message, match, respond) {
+          var url = "http://www.imdbapi.com/?i=" + match[1];
+	  _.request({uri:url}, function (error, response, body) {
+	    if (!error && response.statusCode == 200) {
+	      var res = JSON.parse(body);
+              respond("ah "+ from + " is talking about " + res["Title"] + "("+ res["Year"] +") which is about " +res["Plot"]);
+            }
+          });
+        }
+    }
+
 }
 
