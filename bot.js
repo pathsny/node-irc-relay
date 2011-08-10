@@ -106,7 +106,11 @@ model.start(function(users){
     setTimeout(compactDB,60000);
     weblog(users, nick, settings["port"]);
     
-    _(['uncaughtException', 'SIGHUP', 'SIGQUIT', 'SIGKILL', 'SIGINT', 'SIGTERM']).each(function(condition){
+    exit_conditions = ['SIGHUP', 'SIGQUIT', 'SIGKILL', 'SIGINT', 'SIGTERM']
+    if (settings["catch_all_exceptions"]) {
+        exit_conditions.push('uncaughtException')
+    };
+    _(exit_conditions).each(function(condition){
         process.on(condition, function(err){
             console.log(condition, err);
             process.exit();
