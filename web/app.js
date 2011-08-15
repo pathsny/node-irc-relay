@@ -55,23 +55,23 @@ var Server = exports.Server = function(users, nick, port) {
                 }
             }));
         }
-        // if (search) {
-        //     var cmd = "egrep -h -m 10 '\\b(" + _(search.split(' ')).join('|') + ")\\b' data/irclogs/*.log";
-        //     exec(cmd, function(error, stdout, stderr) { 
-        //         var results = stdout === '' ? [] : _(stdout.split('\n')).map(function(l){
-        //             var t = l.indexOf(',');
-        //             var timestamp = Number(l.slice(1,t));
-        //             return {
-        //                 timestamp: timestamp,
-        //                 date: _.date(timestamp).format("dddd, MMMM Do YYYY, hh:mm:ss"),
-        //                 msg: l.slice(t+2,-2)
-        //             };
-        //         });
-        //         render(res, search, results);
-        //     });
-         // else {
+        if (search) {
+            var cmd = "egrep -h -m 10 '\\b(" + _(search.split(' ')).join('|') + ")\\b' data/irclogs/*.log";
+            exec(cmd, function(error, stdout, stderr) { 
+                var results = stdout === '' ? [] : _(stdout.split('\n')).map(function(l){
+                    var t = l.indexOf(',');
+                    var timestamp = Number(l.slice(1,t));
+                    return {
+                        timestamp: timestamp,
+                        date: _.date(timestamp).format("dddd, MMMM Do YYYY, hh:mm:ss"),
+                        msg: l.slice(t+2,-2)
+                    };
+                });
+                render(res, search, results);
+            });
+         else {
             render(res, '', []);
-        // }
+        }
     };
     
     var app = connect.createServer(
