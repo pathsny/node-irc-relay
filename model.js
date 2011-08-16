@@ -177,6 +177,25 @@ userdb.addTell = function(nick, data) {
     userdb.set(nick, rec);
 };
 
+userdb.addMsg = function(nick, data) {
+    var rec = userdb.get(nick);
+    var msgs = rec.msgs || [];
+    msgs.push(data);
+    rec.msgs = msgs;
+    rec.newMsgs = true;
+    userdb.set(nick, rec);
+}
+
+userdb.unSetNewMsgFlag = function(nick) {
+    return _(this.aliases(nick)).any(function(item){
+        var rec = item.val;
+        var newMsgs = rec.newMsgs;
+        rec.newMsgs = false;
+        userdb.set(item.key, rec);
+        return newMsgs; 
+    });
+}
+
 userdb.getTells = function(nick) {
     return _(this.aliases(nick)).chain().map(function(item){
        return item.val.tells || []; 

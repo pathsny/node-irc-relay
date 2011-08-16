@@ -150,18 +150,32 @@ Commands.prototype.a = function(from, tokens, cb) {
         else exact_Match();
 };
 
-Commands.prototype.tell = function(from, tokens, cb) {
+var directedMessage = function(from, tokens, cb, users, success) {
     var to = _(tokens).head();
     var msg = _(tokens).tail().join(' ');
     if (!(to && msg)) {
         cb("Message not understood");
-    } else if(!this.users.get(to)) {
+    } else if(!users.get(to)) {
         cb(to + " is not known");
     } else {
-        this.users.addTell(to, {from: from, msg: msg, time: Date.now()});
+        success(to, {from: from, msg: msg, time: Date.now()});
         cb(from + ": Message Noted");
     }
+}
+
+Commands.prototype.tell = function(from, tokens, cb) {
+    var users = this.users;
+    directedMessage(from, tokens, cb, users, function(nick, data) {
+        users.addTell(nick, data);
+    });
 };
+
+Commands.prototype.msg = function(from, tokens, cb) {
+    var users = this.users;
+    directedMessage(from, tokens, cb, users, function(nick, data) {
+        users.addMsg(nick, data);
+    });
+}
 
 Commands.prototype.seen = function(from, tokens, cb) {
     var person = _(tokens).head();
@@ -258,6 +272,12 @@ Commands.prototype.listeners = function(respond){
                 self.users.clearTells(from);
             }
         };
+    },
+    function(from, message) {
+        if (_(message).automated()) return;
+        if (self.users.unSetNewMsgFlag(from)) {
+                respond("tell", from + ": There are new Messages for you. Msg me to retrieve them");
+            }
     },
     function(from, message) {
         _(matchers).chain().keys().detect(function(type) {
