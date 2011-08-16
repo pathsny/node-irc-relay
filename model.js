@@ -195,7 +195,6 @@ userdb.unSetNewMsgFlag = function(nick) {
         if (rec.newMsgs) newMsgExists = true;
         rec.newMsgs = false;
         userdb.set(item.key, rec);
-        return newMsgs; 
     });
     return newMsgExists;
 }
