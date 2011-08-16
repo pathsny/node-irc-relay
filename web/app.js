@@ -69,6 +69,7 @@ var Server = exports.Server = function(users, nick, port) {
                 });
                 render(res, search, results);
             });
+        }
          else {
             render(res, '', []);
         }
