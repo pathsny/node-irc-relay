@@ -95,7 +95,7 @@ _.mixin({
         var cache;
         if (options.cache) cache = './data/cache/' + options.cache;
         var http_req = function() {
-            req(options, function(error, response, body){
+            req(_.extend(options,{unCompress: true}), function(error, response, body){
                 if (!error && options.cache) {
                     var encoding = options.encoding || 'utf8';
                     fs.writeFile(cache, JSON.stringify([{
