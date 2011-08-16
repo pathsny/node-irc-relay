@@ -32,3 +32,14 @@ Commands.prototype.list = function(from, tokens, cb) {
         cb("There are no messages for you");
     }
 }
+
+Commands.prototype.del = function(from, tokens, cb) {
+    if (!this.users.get(from)) return;
+    var first = _(tokens).head()
+    if (first && /^\d+$/.test(first)) {
+        var number = Number(first);
+        if (this.users.deleteMsg(from, number - 1)) {
+            cb('message number ' + number + ' has been deleted');
+        } else cb('there is no message number ' + number);
+    } else cb('delete requires a message number to delete');
+}

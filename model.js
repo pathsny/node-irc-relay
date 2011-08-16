@@ -198,6 +198,17 @@ userdb.unSetNewMsgFlag = function(nick) {
     });
 }
 
+userdb.deleteMsg = function(nick, number) {
+    return _(this.aliases(nick)).any(function(item){
+        var msgs = item.val.msgs || [];
+        if (msgs.length > number) {
+            msgs.splice(number, 1);
+            userdb.set(item.key, item.val);
+            return true
+        } else number -= msgs.length
+    });
+}
+
 userdb.clearTells = function(nick) {
     _(this.aliases(nick)).each(function(item){
         var rec = item.val;
