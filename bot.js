@@ -3,6 +3,7 @@ var _ = require('underscore');
 require('./utils');
 var model = require('./model.js');
 var commands_lib = require('./commands');
+var private_commands_lib = require('./private_commands');
 var twitter = require('./twitter').Twitter;
 var weblog = require('./web/app').Server;
 
@@ -18,6 +19,7 @@ var ircLogger = require('./irc_log').Logger(channel);
 
 model.start(function(users){
     var commands = commands_lib.Commands(users, settings);
+    var private_commands = private_commands_lib.Commands(users, settings);
     
     function channel_say(message) {
         bot.say(channel, message)
@@ -55,18 +57,21 @@ model.start(function(users){
     bot.addListener(incoming, function(from, message) {
         last_msg_time = new Date().getTime();
         var tokens = message.split(' ');
-        var first = _(tokens).head();
-        var match = /^!(.*)/.exec(first);
+        var match = /^!(.*)/.exec(_(tokens).head());
         if (match) {
             dispatch(match[1], from, _(tokens).tail())
         };
     });
-
-    var misaka_adjectives = JSON.parse(fs.readFileSync('./misaka_adjectives.json',"ascii"));
-    var misakify = function(command, result) {
-        var adjectives = misaka_adjectives[command] || misaka_adjectives['generic'];
-        return result + " said " + bot.nick + ' ' + _(adjectives).rand();
-    }
+    
+    bot.addListener("pm", function(from, message) {
+        last_msg_time = new Date().getTime();
+        var tokens = message.split(' ');
+        command = _(tokens).head();
+        if (typeof(private_commands[command]) === 'function')
+            private_commands[command](from, _(tokens).tail(), function(reply){
+                bot.say(from, reply);
+            });
+    });
     
     _(users.listeners).chain().concat(ircLogger.listeners()).each(function(model_listener){
         bot.addListener(model_listener.type, model_listener.listener);
@@ -82,12 +87,11 @@ model.start(function(users){
         channel_say(misakify("twitter", message));
     });
     
-    bot.addListener("pm", function(from, text){
-        if (text === 'token') {
-            var token = users.createToken(from);
-            if (token) bot.say(from, token);
-        }
-    });
+    var misaka_adjectives = JSON.parse(fs.readFileSync('./misaka_adjectives.json',"ascii"));
+    var misakify = function(command, result) {
+        var adjectives = misaka_adjectives[command] || misaka_adjectives['generic'];
+        return result + " said " + bot.nick + ' ' + _(adjectives).rand();
+    }
     
     bot.conn.setTimeout(180000, function(){
         console.log('timeout');

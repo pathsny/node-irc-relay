@@ -28,8 +28,14 @@ _.mixin({
         var beginning = _(words).first(words.length - 1);
         return beginning.join(', ') + " and " + _(words).last();
     },
+    capitalize: function(word) {
+        return word.charAt(0).toUpperCase() + word.slice(1)
+    },
     rand: function(list) {
         return list[Math.floor(Math.random()*list.length)];
+    },
+    zipWithIndex: function(list) {
+        return _.zip(list, _.range(list.length));
     },
     articleize: function(word) {
         return (/^[aeiou]/i.test(word) ? "an" : "a") + " " + word;

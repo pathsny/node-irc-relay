@@ -169,22 +169,24 @@ userdb.aliasedNicks = function(nick) {
     return _(userdb.aliases(nick)).pluck('key');
 };
 
-userdb.addTell = function(nick, data) {
-    var rec = userdb.get(nick);
-    var tells = rec.tells || [];
-    tells.push(data);
-    rec.tells = tells;
-    userdb.set(nick, rec);
-};
+_(["msg", "tell"]).each(function(type){
+    userdb['add' + _(type).capitalize()] = function(nick, data) {
+        var rec = userdb.get(nick);
+        var collection = rec[type + 's'] || [];
+        collection.push(data);
+        rec[type + 's'] = collection;
+        if (type === 'msg') rec.newMsgs = true;
+        userdb.set(nick, rec);
+    }
+});
 
-userdb.addMsg = function(nick, data) {
-    var rec = userdb.get(nick);
-    var msgs = rec.msgs || [];
-    msgs.push(data);
-    rec.msgs = msgs;
-    rec.newMsgs = true;
-    userdb.set(nick, rec);
-}
+_(["msgs", "tells"]).each(function(type){
+    userdb['get' + _(type).capitalize()] = function(nick) {
+        return _(this.aliases(nick)).chain().map(function(item){
+           return item.val[type] || []; 
+        }).flatten().value();
+    }
+});
 
 userdb.unSetNewMsgFlag = function(nick) {
     return _(this.aliases(nick)).any(function(item){
@@ -195,12 +197,6 @@ userdb.unSetNewMsgFlag = function(nick) {
         return newMsgs; 
     });
 }
-
-userdb.getTells = function(nick) {
-    return _(this.aliases(nick)).chain().map(function(item){
-       return item.val.tells || []; 
-    }).flatten().value();
-};
 
 userdb.clearTells = function(nick) {
     _(this.aliases(nick)).each(function(item){
