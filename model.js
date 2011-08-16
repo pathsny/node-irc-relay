@@ -189,13 +189,15 @@ _(["msgs", "tells"]).each(function(type){
 });
 
 userdb.unSetNewMsgFlag = function(nick) {
-    return _(this.aliases(nick)).any(function(item){
+    var newMsgExists = false;
+    _(this.aliases(nick)).each(function(item){
         var rec = item.val;
-        var newMsgs = rec.newMsgs;
+        if (rec.newMsgs) newMsgExists = true;
         rec.newMsgs = false;
         userdb.set(item.key, rec);
         return newMsgs; 
     });
+    return newMsgExists;
 }
 
 userdb.deleteMsg = function(nick, number) {
