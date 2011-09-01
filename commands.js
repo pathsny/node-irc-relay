@@ -7,7 +7,7 @@ var Commands = exports.Commands = function(users, settings) {
     this.users = users;
     this.settings = settings;
 }
-    
+
 Commands.prototype.commands = function(from, tokens, cb) {
     cb("I know " + _(Commands.prototype).chain().keys().
     without("listeners").
@@ -54,10 +54,10 @@ Commands.prototype.g = function(from, tokens, cb) {
         var number = "1";
         var msg = tokens.join(' ');
     };
-    
+
     var requestNumber = Math.floor((Number(number) - 1) / 4)*4;
     var resultIndex = Number(number) - requestNumber - 1;
-    
+
     var url = 'https://ajax.googleapis.com/ajax/services/search/web?' + _({q: msg, v: "1.0", key: this.settings["google_key"], start: requestNumber}).stringify();
     _.request({uri:url}, function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -69,7 +69,7 @@ Commands.prototype.g = function(from, tokens, cb) {
             var res = responseJson.responseData;
             var results = res.results;
             if (!results[resultIndex]) {resultIndex = results.length - 1};
-            
+
             if (resultIndex === -1) {cb("no results! "); return}
             var result = results[resultIndex];
             var resNumber = res.cursor.currentPageIndex * 4 + resultIndex + 1;
@@ -77,8 +77,24 @@ Commands.prototype.g = function(from, tokens, cb) {
                 cb(result.titleNoFormatting + "   " + result.unescapedUrl + "  " + _(content).text() + " ... Result " + resNumber + " out of " + res.cursor.estimatedResultCount);
             });
         }
-    });        
+    });
 };
+
+Commands.prototype.m = function(from, tokens, cb) {
+    query = tokens.join(" ").replace(/^\s+|\s+$/g, "");
+    var url = "http://tinysong.com/b/" + encodeURIComponent(query) + "?" +
+        _({format: "json", key: this.settings["tinysong_key"]}).stringify();
+    _.request({uri:url}, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            var responseJson = JSON.parse(body);
+            if (responseJson.Url != undefined) {
+                cb("Listen to " + responseJson.ArtistName + " - " + responseJson.SongName + " at " + responseJson.Url);
+            } else {
+                cb("No song found for: " + query);
+            }
+        }
+    });
+}
 
 Commands.prototype.a = function(from, tokens, cb) {
     var search_tokens;
@@ -89,14 +105,14 @@ Commands.prototype.a = function(from, tokens, cb) {
         var number = undefined;
         search_tokens = tokens;
     };
-    
+
     if (search_tokens.length === 0) {cb("a! <anime name>"); return}
     var exact_msg = "\\" + search_tokens.join(' ');
     var long_tokens = _(search_tokens).filter(function(token){return token.length >= 4});
     var short_tokens = _(search_tokens).filter(function(token){return token.length < 4});
-    var msg = _(long_tokens).chain().map(function(token){return "+" + token}).concat( 
+    var msg = _(long_tokens).chain().map(function(token){return "+" + token}).concat(
         _(short_tokens).map(function(token){return "%" + token + "%"})).value().join(' ');
-    
+
     var anidb_info = function(title) {
         var english_name =  _(title).chain().select('title[lang="en"][type="official"]').text().value() ||
         _(title).chain().select('title[lang="en"][type="syn"]').first().text().value() ||
@@ -107,9 +123,9 @@ Commands.prototype.a = function(from, tokens, cb) {
         if (exact != main) {msg = exact + " offically known as " + msg};
         if (english_name && english_name != exact) {msg += " (" + english_name + ")"};
         cb(msg + ". http://anidb.net/perl-bin/animedb.pl?show=anime&aid=" + title.attribs['aid']);
-        
+
     }
-    
+
     var parse_results = function(titles, size) {
         var extra_msg = size > 7 ? " or others." : ".";
 
@@ -120,7 +136,7 @@ Commands.prototype.a = function(from, tokens, cb) {
             return ttl[0] + ". " + _(ttl[1]).chain().select('title[exact]').first().text().value();
         }).join(', ').value() + extra_msg);
     }
-    
+
     var inexactMatch = function() {
         var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: msg}).stringify();
         _.parseRequest({uri:url}, function (error, $) {
@@ -131,7 +147,7 @@ Commands.prototype.a = function(from, tokens, cb) {
             }
         });
     }
-    
+
     var exact_Match = function() {
         var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: exact_msg}).stringify();
         _.parseRequest({uri:url}, function (error, $) {
@@ -143,9 +159,9 @@ Commands.prototype.a = function(from, tokens, cb) {
                     inexactMatch();
                 }
             }
-        });    
+        });
     }
-    
+
     if (/^~$/.test(search_tokens[0]) && search_tokens.length > 1) inexactMatch();
         else exact_Match();
 };
@@ -289,7 +305,7 @@ Commands.prototype.listeners = function(respond){
                     respond(type + "_metadata", msg);
                 });
                 return true;
-            } 
+            }
         });
     }]
 };
