@@ -1,8 +1,9 @@
 {
-    "nick": "raquel", 
+    "nick": "raquel",
     "channel": "#animestan-hell",
     "server": "irc.immortal-anime.net",
     "google_key": "<needed>",
+    "tinysong_key": "<needed>",
     "server_password": "<needed>",
     "port": "<needed>"
 }
