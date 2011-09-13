@@ -73,9 +73,7 @@ Commands.prototype.g = function(from, tokens, cb) {
             if (resultIndex === -1) {cb("no results! "); return}
             var result = results[resultIndex];
             var resNumber = res.cursor.currentPageIndex * 4 + resultIndex + 1;
-            _.parse(result.content, function(content){
-                cb(result.titleNoFormatting + "   " + result.unescapedUrl + "  " + _(content).text() + " ... Result " + resNumber + " out of " + res.cursor.estimatedResultCount);
-            });
+            cb(result.titleNoFormatting + "   " + result.unescapedUrl + "  " + result.content.replace(/<[^>]*>/g, '') + " ... Result " + resNumber + " out of " + res.cursor.estimatedResultCount);
         }
     });
 };
