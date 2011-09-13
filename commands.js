@@ -1,7 +1,6 @@
 var _ = require('underscore');
 require('./utils');
 
-
 var Commands = exports.Commands = function(users, settings) {
     if (!(this instanceof Commands)) return new Commands(users, settings);
     this.users = users;
@@ -73,7 +72,7 @@ Commands.prototype.g = function(from, tokens, cb) {
             if (resultIndex === -1) {cb("no results! "); return}
             var result = results[resultIndex];
             var resNumber = res.cursor.currentPageIndex * 4 + resultIndex + 1;
-            cb(result.titleNoFormatting + "   " + result.unescapedUrl + "  " + result.content.replace(/<[^>]*>/g, '') + " ... Result " + resNumber + " out of " + res.cursor.estimatedResultCount);
+            cb(result.titleNoFormatting + "   " + result.unescapedUrl + "  " + _(result.content).html_as_text() + " ... Result " + resNumber + " out of " + res.cursor.estimatedResultCount);
         }
     });
 };

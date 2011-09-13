@@ -6,6 +6,7 @@ var select = require('soupselect').select;
 var htmlparser = require("htmlparser");
 var qs = require('querystring');
 var domUtils = htmlparser.DomUtils;
+var sanitizer = require('sanitizer');
 
 _.date().customize({relativeTime : {
         future: "in %s",
@@ -52,6 +53,9 @@ _.mixin({
             value = _(value);
             return (method ? value[method] : value).apply(value, args);
         });
+    },
+    html_as_text: function(text) {
+        return sanitizer.unescapeEntities(text.replace(/<[^>]*>/g, ''));
     },
     parse: function(text, cb){
         var parser = new htmlparser.Parser(new htmlparser.DefaultHandler(function(err, dom){
