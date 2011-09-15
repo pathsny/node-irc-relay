@@ -45,7 +45,7 @@ var command_definitions = {
     },
    logs: {
        command: function(from, tokens, cb) {
-           var url = this.settings["baseURL"] + this.settings["port"];
+           var url = this.settings["baseURL"] + ":" + this.settings["port"];
            if (_(tokens).head() === 'now') cb(url + "/#" + _.now(true))
            else if (_(tokens).head() === 'q') cb(url + "/search?q=" + _(tokens).tail().join('+'))
            else if (_(tokens).last() === 'ago') {

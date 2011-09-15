@@ -5,5 +5,8 @@
     "google_key": "<needed>",
     "tinysong_key": "<needed>",
     "server_password": "<needed>",
-    "port": "<needed>"
+    "port": "<needed>",
+    "tinysong_key": "<key for tinysong searches>",
+    "catch_all_exceptions": <true or false>,
+    "baseURL": "<url with protocol>"
 }
