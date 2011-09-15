@@ -47,6 +47,10 @@ _.mixin({
     select: function(dom, selector){
         return select(dom, selector);
     },
+    firstMatchIfExists: function(string, pattern) {
+        var match = pattern.exec(string)
+        return match ? match[1] : string;
+    },
     invoke_: function(obj, method) {
         var args = _(arguments).slice(2);
         return _.map(obj, function(value) {
