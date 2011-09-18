@@ -2,30 +2,34 @@ var TwitterNode = require('twitter-node').TwitterNode
 var _ = require('underscore');
 require('./utils');
 
-var nickmap = {
-    64939976: 'path[l]',
-    119446216: 'preethi',
-    34292195: 'iwikiwi',
-    29061687: 'Stattrav'
-}
-
-var nick_ids = _(nickmap).chain().keys().map(function(i){return Number(i)}).value();
-
 var Twitter = exports.Twitter = function(users, settings, respond) {
     if (!(this instanceof Twitter)) return new Twitter(users, settings, respond);
-    var getFollows = function() { return _(users.indexValues('twitter_id')).without('undefined')};
-    
     var twit = new TwitterNode({
       user: settings.user, 
       password: settings.password,
-      follow: getFollows(),
       headers: {'User-Agent': 'misaka'},
     });
+    
+    var follows = [];
+    var updateFollows = function() { 
+        follows = _(users.indexValues('twitter_id')).
+        chain().
+        without('undefined').
+        map(function(index_value){
+            return _(users.find('twitter_id', index_value)).map(function(user){
+                return {twitter_id: index_value, nick: user.key};
+            });
+        }).
+        flatten().value();
+        twit.following = _(follows).chain().pluck('twitter_id').uniq().value();
+    };
+    updateFollows();
+    
     var stream_end_expected = false;
     
     users.on('twitter follows changed',function(){
         stream_end_expected = true;
-        twit.following = getFollows();
+        updateFollows();
         twit.stream();
     });
     
@@ -41,10 +45,13 @@ var Twitter = exports.Twitter = function(users, settings, respond) {
     on('delete', reset_timeout).
     on('tweet', function(tweet) {
         reset_timeout();
-        if (_(nick_ids).contains(tweet.user.id) && !_(tweet.entities.hashtags).chain().pluck('text').intersect(['irc', 'fb']).isEmpty().value())
+        if (!_(tweet.entities.hashtags).chain().pluck('text').intersect(['irc', 'fb']).isEmpty().value())
         {
-            var nick = nickmap[tweet.user.id];
-            respond(nick + " from twitter: " + tweet.text);
+            _(follows).chain().filter(function(follow) {
+                return follow.twitter_id === tweet.user.id.toString();
+            }).each(function(follow){
+                respond(follow.nick + " from twitter: " + tweet.text);
+            })
         }
     }).
     on('end', function(resp) {

@@ -211,7 +211,7 @@ userdb.deleteMsg = function(nick, number) {
             return true
         } else number -= msgs.length
     });
-}
+};
 
 userdb.clearTells = function(nick) {
     _(this.aliases(nick)).each(function(item){
@@ -227,19 +227,19 @@ userdb.createToken = function(nick) {
     rec["token"] = uuid();
     userdb.set(nick, rec);
     return rec["token"];
-}
+};
 
 userdb.validToken = function(token) {
     if (!token) return;
     return _(userdb.find('token', token)).first();
-}
+};
 
 userdb.setTwitterAccount = function(nick, twitter_id) {
     this.removeTwitterAccount(nick);
     var rec = userdb.get(nick);
     rec.twitter_id = twitter_id;
     userdb.set(nick, rec);
-}
+};
 
 userdb.removeTwitterAccount = function(nick) {
     _(this.aliases(nick)).find(function(item){
@@ -247,7 +247,7 @@ userdb.removeTwitterAccount = function(nick) {
         delete rec.twitter_id;
         userdb.set(item.key, rec);
     });
-}
+};
 
 exports.start = function(fn) {
     userdb.on('load', function(){
