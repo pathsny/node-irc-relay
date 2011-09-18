@@ -44,13 +44,14 @@ var Twitter = exports.Twitter = function(users, settings, respond) {
     twit.on('limit', reset_timeout).
     on('delete', reset_timeout).
     on('tweet', function(tweet) {
+        console.log(tweet.text)
         reset_timeout();
         if (!_(tweet.entities.hashtags).chain().pluck('text').intersect(['irc', 'fb']).isEmpty().value())
         {
             _(follows).chain().filter(function(follow) {
-                return follow.twitter_id === tweet.user.id.toString();
+                return follow.twitter_id === tweet.user.id_str;
             }).each(function(follow){
-                respond(follow.nick + " from twitter: " + tweet.text);
+                respond(follow.nick + " from twitter: " + _(tweet.text).html_as_text());
             })
         }
     }).
