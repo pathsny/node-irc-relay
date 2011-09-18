@@ -3,12 +3,15 @@ var uuid = require('node-uuid');
 var _ = require('underscore');
 require('./utils');
 
-
 userdb.addIndex('nickId', function(k, v){
     return v.nickId;
 });
 userdb.addIndex('token', function(k, v){
     return v.token;
+});
+
+userdb.addIndex('twitter_id', function(k, v){
+    return v.twitter_id;
 });
 
 userdb.listeners = [
@@ -229,6 +232,21 @@ userdb.createToken = function(nick) {
 userdb.validToken = function(token) {
     if (!token) return;
     return _(userdb.find('token', token)).first();
+}
+
+userdb.setTwitterAccount = function(nick, twitter_id) {
+    this.removeTwitterAccount(nick);
+    var rec = userdb.get(nick);
+    rec.twitter_id = twitter_id;
+    userdb.set(nick, rec);
+}
+
+userdb.removeTwitterAccount = function(nick) {
+    _(this.aliases(nick)).find(function(item){
+        var rec = item.val;
+        delete rec.twitter_id;
+        userdb.set(item.key, rec);
+    });
 }
 
 exports.start = function(fn) {

@@ -83,9 +83,11 @@ model.start(function(users){
         bot.addListener(incoming, listener);
     });
     
-    new twitter(settings,function(message){
-        channel_say(misakify("twitter", message));
-    });
+    if (settings['twitter']) {
+        new twitter(users, settings['twitter'],function(message){
+            channel_say(misakify("twitter", message));
+        });
+    }
     
     var misaka_adjectives = JSON.parse(fs.readFileSync('./misaka_adjectives.json',"ascii"));
     var misakify = function(command, result) {

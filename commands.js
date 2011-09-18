@@ -33,7 +33,8 @@ var command_definitions = {
                 map(function(command){
                     return "!" + command;
                     }).
-                    sentence().value() + "\nType !help <command> to know more about any command");
+                    sentence().value());
+                cb("Type !help <command> to know more about any command");
             } else {
                 var command = Commands.prototype[_(tokens).chain().
                 head().
@@ -292,6 +293,52 @@ var command_definitions = {
             }
         },
         _help: "unlink a nickname from an existing group of nicknames"
+    },
+    twitter: {
+        command: function(from, tokens, cb) {
+            var self = this;
+            var follow = function(user, twitter_name) {
+                if (!twitter_name) {
+                    cb('Mention which twitter user to follow. usage !twitter add <twitter id> to start following this id.');
+                    return;
+                }
+                _.request({uri: 
+                    "http://api.twitter.com/1/users/lookup.json?screen_name=" + twitter_name
+                    }, function(error, response, body){
+                        var user_data = _(JSON.parse(body)).find(function(data){
+                            return data.screen_name === twitter_name;
+                        });
+                        if (user_data) {
+                            self.users.setTwitterAccount(from, user_data['id']);
+                            self.users.emit('twitter follows changed');
+                            var msg = 'following user called ' + twitter_name + ' with id ' + user_data['id'];
+                            cb(msg);
+                            if (user_data['status'] && user_data['status']['text']) {
+                                var tweet = user_data['status']['text'].split(/\r/)
+                                cb('whose last tweet was ' + tweet[0]);
+                                _(tweet).chain().tail().each(function(part){
+                                    cb(part);
+                                });
+                            }
+                        } else cb('cannot find the user called ' + twitter_name);
+                    })
+            };
+            var unfollow = function(user) {
+                self.users.removeTwitterAccount(from);
+                self.users.emit('twitter follows changed');
+            };
+            switch (_(tokens).head()) {
+                case 'add':
+                    follow(from, tokens[1]) 
+                    break;
+                case 'remove':
+                    unfollow(from);
+                    break;
+                default:
+                cb('usage !twitter add <twitter id> to start following this id. !twitter remove <twitter id> to stop following this id');
+            }
+        },
+        _help: 'add or remove a twitter account to follow. Usage !twitter add <twitter id> to start following this id. !twitter remove <twitter id> to stop following this id'
     }    
 }
 

@@ -11,7 +11,7 @@ var qs = require('querystring');
 var Server = exports.Server = function(users, nick, port) {
     if (!(this instanceof Server)) return new Server(users, nick, port);
     
-    var views = _(['index', 'login', 'search']).inject(function(views, page){
+    var views = _(['index', 'login', 'search', 'helloworld']).inject(function(views, page){
         return _({}).chain().extend(views).tap(function(views){
             views[page] = fs.readFileSync(__dirname + '/views/' + page + '.ejs', 'utf8');
         }).value();
@@ -92,11 +92,21 @@ var Server = exports.Server = function(users, nick, port) {
                 }));
             });
             app.get('/search', search);
+            app.get('/helloworld', function(req, res, next){
+                res.end(ejs.render(views['helloworld']))
+            })
         })
     );
     console.log("starting webserver on port " + port)
     app.listen(Number(port));
+    var nowjs = require("now");
+    var everyone = nowjs.initialize(app);
+
+    everyone.now.distributeMessage = function(message){
+      everyone.now.receiveMessage(this.now.name, message);
+    };
 }
+
 
 
 

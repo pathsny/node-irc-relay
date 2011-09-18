@@ -9,4 +9,9 @@
     "tinysong_key": "<key for tinysong searches>",
     "catch_all_exceptions": <true or false>,
     "baseURL": "<url with protocol>"
+    "twitter": {
+      "user": <username>,
+      "password": <twitter password>
+    }
+
 }
