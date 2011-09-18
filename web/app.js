@@ -99,12 +99,12 @@ var Server = exports.Server = function(users, nick, port) {
     );
     console.log("starting webserver on port " + port)
     app.listen(Number(port));
-    var nowjs = require("now");
-    var everyone = nowjs.initialize(app);
-
-    everyone.now.distributeMessage = function(message){
-      everyone.now.receiveMessage(this.now.name, message);
-    };
+    // var nowjs = require("now");
+    // var everyone = nowjs.initialize(app);
+    // 
+    // everyone.now.distributeMessage = function(message){
+    //   everyone.now.receiveMessage(this.now.name, message);
+    // };
 }
 
 
