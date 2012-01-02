@@ -20,7 +20,7 @@
       "compress" : ">= 0.1.9",
       "underscore.date": ">=0.4.0 <0.5",
       "dirty": "https://nodeload.github.com/pathsny/node-dirty/tarball/master",
-      "request": "https://nodeload.github.com/pathsny/request/tarball/master",
+      "request": "2.9.3",
       "irc": "https://nodeload.github.com/martynsmith/node-irc/tarball/master",
       "node-uuid": ">= 1.1.0",
       "twitter-node":">= 0.0.2",

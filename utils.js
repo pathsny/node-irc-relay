@@ -7,6 +7,7 @@ var htmlparser = require("htmlparser");
 var qs = require('querystring');
 var domUtils = htmlparser.DomUtils;
 var sanitizer = require('sanitizer');
+var zlib = require('zlib');
 
 _.date().customize({relativeTime : {
         future: "in %s",
@@ -105,19 +106,45 @@ _.mixin({
         if (dd.length === 1) dd = '00' + dd;
         return yyyy + "_" + mm + "_" + dd;
     },
+    _streamToString: function(stream, cb) {
+        var str = '';
+        stream.on('data', function(c){
+            str += c.toString();
+        });
+        stream.on('end', function(){
+            cb(str);
+        });
+    },
+    _compressedReq: function(options, cb) {
+        var r = req(_(options).extend({"headers": {"Accept-Encoding": "gzip, deflate"}}));
+        r.on('response', function(response){
+            var headers = response.headers['content-encoding'];
+            var stream = (headers && (headers.search('gzip') !== -1 || headers.search('deflate') !== -1)) ?
+            r.pipe(zlib.createUnzip()) : r;
+            _._streamToString(stream, function(data){
+                cb(undefined, response, data);
+            });
+        });
+        r.on('error', function(err){
+            cb(err);
+        })
+    },
     request: function(options, cb) {
         var cache;
         if (options.cache) cache = './data/cache/' + options.cache;
+        var handle_resp = function(error, response, body) {
+            if (!error && options.cache) {
+                var encoding = options.encoding || 'utf8';
+                fs.writeFile(cache, JSON.stringify([{
+                    httpVersion: response.httpVersion, 
+                    headers: response.headers, 
+                    statusCode: response.statusCode}, body]));
+            };
+            cb(error, response, body); 
+        };
         var http_req = function() {
-            req(_.extend(options,{unCompress: true}), function(error, response, body){
-                if (!error && options.cache) {
-                    var encoding = options.encoding || 'utf8';
-                    fs.writeFile(cache, JSON.stringify([{
-                        httpVersion: response.httpVersion, 
-                        headers: response.headers, 
-                        statusCode: response.statusCode}, body]));
-                };
-                cb(error, response, body); 
+            _._compressedReq(options, function(error, response, body){
+                handle_resp(error, response, body)
             });
         };
         if (!cache) return http_req();
