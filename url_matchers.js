@@ -17,7 +17,16 @@ exports.matchers =  {
             _.request({uri:url}, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
                     var res = JSON.parse(body).data;
-                    respond("ah " + from + " is talking about " + _(res.category).articleize() + " video of " + res.title + ". The Tags are "  + _(res.tags).sentence() + ".");
+                    // Date() is too hard, let's go shopping
+                    var hour = ~~(res.duration / 3600);
+                    var min = ~~((res.duration - hour*3600) / 60);
+                    var sec = ~~(res.duration - hour*3600 - min*60);
+                    var time_string = "";
+                    if (hour != "0") { time_string += hour + " hours, "; }
+                    if (min != "0") { time_string += min + " min, "; }
+                    if (hour != "0" || min != "0") { time_string += "and "; }
+                    time_string += sec + " secs";
+                    respond("ah " + from + " is talking about " + _(res.category).articleize() + " video of length " + time_string + " called \"" + res.title + "\". The Tags are "  + _(res.tags).sentence() + ".");
                 };
             });
         }
