@@ -1,5 +1,5 @@
 var connect = require('connect');
-var gzip = require('connect-gzip');
+var gzippo = require('gzippo');
 var ejs = require('ejs');
 var fs = require('fs');
 var _ = require('underscore');
@@ -81,7 +81,7 @@ var Server = exports.Server = function(users, nick, port) {
         connect.cookieParser(),
         auth,
         connect.static(__dirname + '/public'),
-        gzip.staticGzip(__dirname + '/../data/irclogs'),
+        gzippo.staticGzip(__dirname + '/../data/irclogs'),
         connect.router(function(app){
             app.get('/', function(req, res, next){
                 res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8;'});

@@ -25,7 +25,7 @@
       "node-uuid": ">= 1.1.0",
       "twitter-node":">= 0.0.2",
       "ejs": ">= 0.4.2",
-      "connect-gzip": ">= 0.1.0",
+      "gzippo": ">=0.1.2",
       "connect": ">= 1.4.1",
       "qs": ">= 0.1",
       "pegjs": ">= 0.6.1",
