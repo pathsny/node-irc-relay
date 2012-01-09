@@ -80,7 +80,7 @@ var Server = exports.Server = function(users, nick, port) {
         connect.bodyParser(),
         connect.cookieParser(),
         auth,
-        connect.static(__dirname + '/public'),
+        gzippo.staticGzip(__dirname + '/public'),
         gzippo.staticGzip(__dirname + '/../data/irclogs'),
         connect.router(function(app){
             app.get('/', function(req, res, next){
