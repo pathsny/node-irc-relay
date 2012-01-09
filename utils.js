@@ -6,7 +6,8 @@ var select = require('soupselect').select;
 var qs = require('querystring');
 var sanitizer = require('sanitizer');
 var zlib = require('zlib');
-var xmlParser = new require('xml2js').Parser({mergeAttrs: true});
+var xmljs = require('xml2js');
+var xmlParser = new xmljs.Parser({mergeAttrs: true});
 
 _.date().customize({relativeTime : {
         future: "in %s",
