@@ -7,7 +7,6 @@ module.exports = {
             if (err) console.error(err);
             else {
                 var desc = data.description.split('\n');
-                console.log('desc', desc)
                 data.splitDescription = _(desc).chain().
                 invoke_('inSlicesOf', 400).
                 flatten().
