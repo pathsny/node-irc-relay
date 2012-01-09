@@ -3,6 +3,7 @@ require('./utils');
 var PEG = require("pegjs");
 var fs = require('fs');
 var parser = PEG.buildParser(fs.readFileSync('log_request.js',"ascii"));
+var anidb = require('./anidb');
 
 
 var Commands = exports.Commands = function(users, settings) {
@@ -138,51 +139,63 @@ var command_definitions = {
            var msg = _(long_tokens).chain().map(function(token){return "+" + token}).concat(
                _(short_tokens).map(function(token){return "%" + token + "%"})).value().join(' ');
 
-           var anidb_info = function(title) {
-               var english_name =  _(title).chain().select('title[lang="en"][type="official"]').text().value() ||
-               _(title).chain().select('title[lang="en"][type="syn"]').first().text().value() ||
-               _(title).chain().select('title[lang="x-jat"][type="syn"]').first().text().value();
-               var main = _(title).chain().select('title[type="main"]').text().value();
-               var exact = _(title).chain().select('title[exact]').first().text().value();
-               var msg = main;
-               if (exact != main) {msg = exact + " offically known as " + msg};
-               if (english_name && english_name != exact) {msg += " (" + english_name + ")"};
-               cb(msg + ". http://anidb.net/perl-bin/animedb.pl?show=anime&aid=" + title.attribs['aid']);
-
+           var anidb_info = function(anime) {
+               var englishNode =  
+               _(anime.title).find(function(t){
+                   return t.lang === 'en' && t.type==='official'
+                  }) ||
+               _(anime.title).find(function(t){
+                   return t.lang === 'en' && t.type === 'syn'
+               }) ||
+               _(anime.title).find(function(t){
+                      return t.lang === 'x-jat' && t.type === 'syn'
+                  });
+               var mainNode = _(anime.title).find(function(t){
+                   return t.type === 'main';
+               });
+               var exactNode = _(anime.title).find(function(t){
+                   return t.exact;
+               });
+               var msg = mainNode['#'];
+               if (exactNode != mainNode) {msg = exactNode['#'] + " offically known as " + msg};
+               if (englishNode && englishNode != exactNode) {msg += " (" + englishNode['#'] + ")"};
+               cb(msg + ". http://anidb.net/perl-bin/animedb.pl?show=anime&aid=" + anime['aid']);
+               anidb.getInfo(anime['aid'], function(data){
+                   cb(data.splitDescription);
+               });
            }
 
-           var parse_results = function(titles, size) {
+           var parse_results = function(animes) {
+               var size = animes.length;
                var extra_msg = size > 7 ? " or others." : ".";
 
                if (size === 0) cb("No Results");
-               else if (size === 1) anidb_info(titles.first().value());
-               else if (number && number <= size) anidb_info(titles.value()[number - 1])
-               else cb(_(search_tokens).join(' ') + " could be " + titles.first(7).numbered().map(function(ttl){
-                   return ttl[0] + ". " + _(ttl[1]).chain().select('title[exact]').first().text().value();
+               else if (size === 1) anidb_info(animes);
+               else if (number && number <= size) anidb_info(animes[number - 1])
+               else cb(_(search_tokens).join(' ') + " could be " + _(animes).chain().first(7).numbered().map(function(ttl){
+                   return ttl[0] + ". " + _(ttl[1].title).find(function(t){return t.exact})['#'];
                }).join(', ').value() + extra_msg);
            }
 
            var inexactMatch = function() {
                var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: msg}).stringify();
-               _.parseRequest({uri:url}, function (error, $) {
-                   if (!error) {
-                       var titles = $('anime');
-                       var size = titles.size().value();
-                       parse_results(titles, size);
+               _.requestXmlAsJson({uri:url}, function (error, data) {
+                   if (error) {console.error(error)}
+                    else {
+                       var animes = data['anime'];
+                       if (animes) parse_results(animes);
                    }
                });
            }
 
            var exact_Match = function() {
                var url = "http://anisearch.outrance.pl/?" + _({task: 'search', query: exact_msg}).stringify();
-               _.parseRequest({uri:url}, function (error, $) {
-                   if (!error) {
-                       var titles = $('anime');
-                       var size = titles.size().value();
-                       if (size > 0) parse_results(titles, size);
-                       else {
-                           inexactMatch();
-                       }
+               _.requestXmlAsJson({uri:url}, function (error, data) {
+                   if (error) {console.error(error)}
+                    else {
+                       var animes = data['anime'];
+                       if (animes) parse_results(animes);
+                       else inexactMatch();
                    }
                });
            }

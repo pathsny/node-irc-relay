@@ -8,6 +8,8 @@ var qs = require('querystring');
 var domUtils = htmlparser.DomUtils;
 var sanitizer = require('sanitizer');
 var zlib = require('zlib');
+var xml2js = require('xml2js');
+var parser = new xml2js.Parser({mergeAttrs: true});
 
 _.date().customize({relativeTime : {
         future: "in %s",
@@ -45,7 +47,7 @@ _.mixin({
     stringify: function(obj) {
         return qs.stringify(obj).replace(/'/g, "%27");
     },
-    select: function(dom, selector){
+    selectDom: function(dom, selector){
         return select(dom, selector);
     },
     firstMatchIfExists: function(string, pattern) {
@@ -65,7 +67,7 @@ _.mixin({
     parse: function(text, cb){
         var parser = new htmlparser.Parser(new htmlparser.DefaultHandler(function(err, dom){
             cb(err, function(selector){ 
-                return _(dom).chain().select(selector);
+                return _(dom).chain().selectDom(selector);
             }, text);
         }));
         parser.parseComplete(text);
@@ -129,6 +131,21 @@ _.mixin({
             cb(err);
         })
     },
+    inSlicesOf: function(items, size) {
+        var slices = Math.ceil(items.length/size);
+        return _(1).range(slices+1).map(function(n){
+            var start = (n-1)*size;
+            return items.slice(start, start + size);
+        });
+    },
+    requestXmlAsJson: function(options, cb) {
+        this.request(options, function(error, response, body){
+          if (error || response.statusCode !== 200) cb(error);
+          else parser.parseString(body, function(err, result){
+                cb(err, result);
+          });  
+        });
+    },
     request: function(options, cb) {
         var cache;
         if (options.cache) cache = './data/cache/' + options.cache;
@@ -172,5 +189,11 @@ _.mixin({
       },
       automated: function(msg) {
           return /\u000311.•\u000310\u0002«\u0002\u000311WB\u000310 \u0002\(\u000f\u0002.+\u000310\)\u0002 \u000311WB\u000310\u0002»\u0002\u000311•. \u000310\u0002-\u000f \u001f/.test(msg)
+      },
+      invoke_: function(list, functionName) {
+          var args = _(arguments).slice(2);
+          return _(list).map(function(item){
+              return this[functionName].apply(this, _([item]).concat(args));
+          }, this);
       }
   })

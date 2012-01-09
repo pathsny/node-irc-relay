@@ -1,5 +1,12 @@
 var _ = require('underscore');
 require('./utils');
+var anidb = require('./anidb');
+
+var _titleMatchers =  [
+    function(t) {return t['xml:lang'] === 'en' && t.type === 'official'},
+    function(t) {return t['xml:lang'] === 'en' && t.type === 'synonym'},
+    function(t) {return t['xml:lang'] === 'x-jat' && t.type === 'synonym'}
+]
 
 exports.matchers =  {
     ytube: {
@@ -20,16 +27,15 @@ exports.matchers =  {
         regexes: [/http:\/\/anidb\.net\/perl-bin\/animedb.pl\?(?:.*)aid=(\d+)(?:.*)/],
 
         responder: function(from, message, match, respond) {
-            var url = "http://api.anidb.net:9001/httpapi?request=anime&client=misakatron&clientver=1&protover=1&aid=" + match[1];
-            _.parseRequest({uri: url, cache: match[1]}, function(err, $){
-                if (!err) {
-                    var english_name =  $('titles title[xml:lang="en"][type="official"]').text().value() ||
-                    $('titles title[xml:lang="en"][type="synonym"]').first().text().value() ||
-                    $('titles title[xml:lang="x-jat"][type="synonym"]').first().text().value();
-                    var msg = $('titles title[type="main"]').text().value();
-                    if (english_name) {msg += " (" + english_name + ")"};
-                    respond("That anidb link is " + msg);
+            anidb.getInfo(match[1], function(data){
+                var titles = data.titles.title;
+                var english_title_node = _(titles).find(_titleMatchers[0]) || _(titles).find(_titleMatchers[1]) || _(titles).find(_titleMatchers[2]);
+                var msg = _(titles).find(function(t){return t.type === 'main'})['#'];
+                if (english_title_node) {
+                    msg += ' (' + english_title_node['#'] + ')';
                 }
+                respond('That anidb link is ' + msg);
+                respond(data.splitDescription);
             });
         }
     },
