@@ -14,8 +14,6 @@
     "node": "*"
   },
   "dependencies": {
-      "htmlparser": ">= 0.2.0",
-      "soupselect": "https://nodeload.github.com/pathsny/node-soupselect/tarball/master",
       "underscore": ">= 1.1.6",
       "compress" : ">= 0.1.9",
       "underscore.date": ">=0.4.0 <0.5",

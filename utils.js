@@ -3,13 +3,10 @@ _.mixin(require('underscore.date'));
 var req = require('request');
 var fs = require('fs');
 var select = require('soupselect').select;
-var htmlparser = require("htmlparser");
 var qs = require('querystring');
-var domUtils = htmlparser.DomUtils;
 var sanitizer = require('sanitizer');
 var zlib = require('zlib');
-var xml2js = require('xml2js');
-var parser = new xml2js.Parser({mergeAttrs: true});
+var xmlParser = new require('xml2js')().Parser({mergeAttrs: true});
 
 _.date().customize({relativeTime : {
         future: "in %s",
@@ -47,9 +44,6 @@ _.mixin({
     stringify: function(obj) {
         return qs.stringify(obj).replace(/'/g, "%27");
     },
-    selectDom: function(dom, selector){
-        return select(dom, selector);
-    },
     firstMatchIfExists: function(string, pattern) {
         var match = pattern.exec(string)
         return match ? match[1] : string;
@@ -63,32 +57,6 @@ _.mixin({
     },
     html_as_text: function(text) {
         return sanitizer.unescapeEntities(text.replace(/<[^>]*>/g, ''));
-    },
-    parse: function(text, cb){
-        var parser = new htmlparser.Parser(new htmlparser.DefaultHandler(function(err, dom){
-            cb(err, function(selector){ 
-                return _(dom).chain().selectDom(selector);
-            }, text);
-        }));
-        parser.parseComplete(text);
-    },
-    parseRequest: function(options, cb) {
-        this.request(options, function(error, response, body){
-          if (error || response.statusCode !== 200) cb(error);
-          else _.parse(body, cb); 
-        })
-    },
-    text: function(elems) {
-        if (!elems) return '';
-        var textContent = function(elem) {
-            return elem.type === 'text' ? elem.data : /\!\[CDATA\[(.*)\]\]/.exec(elem.data)[1]
-        }
-        return _(domUtils.getElements({
-            tag_type: function(type){ 
-                return type === 'text' || type === 'directive'
-                }}, elems)).reduce(function(acc, elem){
-            return acc + textContent(elem);
-        }, '');
     },
     partitionAt: function(list, iterator, context) {
       for (var i=0; i<list.length; i++) {
@@ -141,7 +109,7 @@ _.mixin({
     requestXmlAsJson: function(options, cb) {
         this.request(options, function(error, response, body){
           if (error || response.statusCode !== 200) cb(error);
-          else parser.parseString(body, function(err, result){
+          else xmlParser.parseString(body, function(err, result){
                 cb(err, result);
           });  
         });
