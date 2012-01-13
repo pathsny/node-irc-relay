@@ -2,7 +2,6 @@ var _ = global._  = require('underscore');
 _.mixin(require('underscore.date'));
 var req = require('request');
 var fs = require('fs');
-var select = require('soupselect').select;
 var qs = require('querystring');
 var sanitizer = require('sanitizer');
 var zlib = require('zlib');
