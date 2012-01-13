@@ -40,7 +40,7 @@ var command_definitions = {
                 var command = Commands.prototype[_(tokens).chain().
                 head().
                 firstMatchIfExists(/!(.*)/).value()];
-                var helpCommand = command["_help"] || "I have no help on this command";
+                var helpCommand = command ? (command["_help"] || "I have no help on this command") : "No Such Command";
                 cb((typeof helpCommand === 'function') ? helpCommand.call() : helpCommand);
             }
         }
