@@ -10,7 +10,7 @@ var _titleMatchers =  [
 
 exports.matchers =  {
     ytube: {
-        regexes: [ /https?:\/\/(?:www\.)?youtube\.com\/watch\?(?:[^\s\t]*&?)v=([^\s\t&]*)(?:.*?)/ , /https?:\/\/youtu\.be\/([^\s\t&?\/]*)/],
+        regexes: [ /https?:\/\/(?:www\.)?youtube\.com\/watch\?(?:[^\s\t]*&?)v=([A-Za-z0-9_-]+)(?:.*?)/ , /https?:\/\/youtu\.be\/([A-Za-z0-9_-]+)/],
 
         responder: function(from, message, match, respond) {
             var url = "http://gdata.youtube.com/feeds/api/videos/" + match[1] + "?" + _({v: 2,alt: 'jsonc'}).stringify();
