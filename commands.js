@@ -166,11 +166,11 @@ var command_definitions = {
            }
 
            var parse_results = function(animes) {
+               if (!_(animes).isArray()) animes = [animes];
                var size = animes.length;
                var extra_msg = size > 7 ? " or others." : ".";
-
                if (size === 0) cb("No Results");
-               else if (size === 1) anidb_info(animes);
+               else if (size === 1) anidb_info(animes[0]);
                else if (number && number <= size) anidb_info(animes[number - 1])
                else cb(_(search_tokens).join(' ') + " could be " + _(animes).chain().first(7).numbered().map(function(ttl){
                    return ttl[0] + ". " + _(ttl[1].title).find(function(t){return t.exact})['#'];
