@@ -98,6 +98,7 @@ model.start(function(users){
     bot.conn.setTimeout(180000, function(){
         console.log('timeout');
         bot.conn.end();
+        process.exit();
     });
     
     var compactDB = function(){
