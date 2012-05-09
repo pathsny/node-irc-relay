@@ -14,6 +14,10 @@ userdb.addIndex('twitter_id', function(k, v){
     return v.twitter_id;
 });
 
+userdb.addIndex('GtalkId', function(k, v){
+    return v.GtalkId;
+});
+
 userdb.listeners = [
 {
     type: 'names',

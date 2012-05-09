@@ -30,7 +30,8 @@
       "sanitizer": ">= 0.0.14",
       "now": ">= 0.7.5",
       "xml2js": ">= 0.1.13",
-      "nodemailer": ">= 0.3.20"
+      "nodemailer": ">= 0.3.20",
+      "node-xmpp": ">= 0.3.2"
   },
   "private": true
 }

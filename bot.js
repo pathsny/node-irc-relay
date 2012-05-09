@@ -15,12 +15,13 @@ var channel = settings["channel"];
 var incoming = 'message' + channel;
 var nick = settings["nick"];
 var ircLogger = require('./irc_log').Logger(channel);
+var gtalk = require('./gtalk').gtalk;
 
 
 model.start(function(users){
     var commands = commands_lib.Commands(users, settings);
     var private_commands = private_commands_lib.Commands(users, settings);
-    
+
     function channel_say(message) {
         bot.say(channel, message)
     }
@@ -87,6 +88,14 @@ model.start(function(users){
         // new twitter(users, settings['twitter'],function(message){
         //     channel_say(misakify("twitter", message));
         // });
+    }
+    
+    if (settings.gmail) {
+        gtalk.configure_with(users, function(message){
+            console.log(message)
+            channel_say(misakify("gtalk", message));
+        });
+        gtalk.login(settings.gmail) 
     }
     
     var misaka_adjectives = JSON.parse(fs.readFileSync('./misaka_adjectives.json',"ascii"));
