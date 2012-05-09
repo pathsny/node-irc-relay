@@ -316,7 +316,7 @@ var command_definitions = {
                 cb("alert <nick> message");
             } else if (!user) {
                 cb("alert requires the nick of a valid user in the channel");
-            } else if (!email) {
+            } else if (!email_address) {
                 cb(nick + " has not configured an email address for alerts");
             } else {
                 if (!this._email) {
