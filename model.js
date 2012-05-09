@@ -249,10 +249,18 @@ userdb.setProperty = function(propName, nick, propValue) {
     userdb.set(nick, rec);
 };
 
+userdb.getProperty = function(propName, nick) {
+    var rec = _(this.aliases(nick)).find(function(item){
+        return item.val[propName];
+    });
+    return rec && rec.val[propName];
+}
+
 
 _(["PhoneNumber", "TwitterAccount", "EmailAddress"]).each(function(thing){
     userdb["clear" + thing] = _.bind(userdb.clearProperty, userdb, thing);
     userdb["set" + thing] = _.bind(userdb.setProperty, userdb, thing);
+    userdb["get" + thing] = _.bind(userdb.getProperty, userdb, thing);
 });
 
 exports.start = function(fn) {

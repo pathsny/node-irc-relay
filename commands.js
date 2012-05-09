@@ -311,11 +311,12 @@ var command_definitions = {
         command: function(from, tokens, cb) {
             var nick = _(tokens).head();
             var user = this.users.get(nick);
+            var email_address = this.users.getEmailAddress(nick);
             if (!nick || tokens.length <= 1) {
                 cb("alert <nick> message");
             } else if (!user) {
                 cb("alert requires the nick of a valid user in the channel");
-            } else if (!user.EmailAddress) {
+            } else if (!email) {
                 cb(nick + " has not configured an email address for alerts");
             } else {
                 if (!this._email) {
@@ -327,7 +328,7 @@ var command_definitions = {
                 }
                 this._email.send({
                     text: _(tokens).tail().join(' '),
-                    to: nick + " <" + user.EmailAddress + ">",
+                    to: nick + " <" + email_address + ">",
                     subject: "Alert Email from " + from
                 }, function(err){
                     if (err) cb("sorry an error occured");
