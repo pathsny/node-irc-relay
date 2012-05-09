@@ -257,7 +257,7 @@ userdb.getProperty = function(propName, nick) {
 }
 
 
-_(["PhoneNumber", "TwitterAccount", "EmailAddress"]).each(function(thing){
+_(["PhoneNumber", "TwitterAccount", "EmailAddress", "GtalkId"]).each(function(thing){
     userdb["clear" + thing] = _.bind(userdb.clearProperty, userdb, thing);
     userdb["set" + thing] = _.bind(userdb.setProperty, userdb, thing);
     userdb["get" + thing] = _.bind(userdb.getProperty, userdb, thing);

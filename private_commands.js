@@ -44,30 +44,36 @@ Commands.prototype.del = function(from, tokens, cb) {
     } else cb('delete requires a message number to delete');
 }
 
-Commands.prototype.phone = function(from, tokens, cb) {
-    if (!this.users.get(from)) return;
-    var first = _(tokens).head();
-    if (first && /^\d+$/.test(first)) {
-        this.users.setPhoneNumber(from, first);
-        cb('your phone number has been recorded as ' + first);
-    } else if (first && first === 'clear') {
-        this.users.clearPhoneNumber(from);
-        cb('your phone number has been cleared');
-    } else {
-        cb('number <actual number only digits> to set your number. number clear to clear your number');
+contact_points = {
+    phone: {
+        property: "PhoneNumber",
+        regex: /^\d+$/,
+        help: 'number <actual number only digits> to set your number. number clear it'
+    },
+    email: {
+        property: "EmailAddress",
+        regex: /^[^@]+@[^@]+$/,
+        help: 'email <email address> to set your email address. email clear to clear it'
+    },
+    gtalk: {
+        property: "GtalkId",
+        regex: /^[^@]+@gmail.com$/,
+        help: 'gtalk <gtalkid> to set your gtalk id. gtalk clear to clear it' 
     }
-}
+};
 
-Commands.prototype.email = function(from, tokens, cb) {
-    if (!this.users.get(from)) return;
-    var first = _(tokens).head();
-    if (first && /^[^@]+@[^@]+$/.test(first)) {
-        this.users.setEmailAddress(from, first);
-        cb('your email address has been recorded as ' + first);
-    } else if (first && first === 'clear') {
-        this.users.clearEmailAddress(from);
-        cb('your email address has been cleared');
-    } else {
-        cb('email <email address> to set your email address. email clear to clear your it');
+_(contact_points).each(function(params, command){
+    Commands.prototype[command] = function(from, tokens, cb) {
+        if (!this.users.get(from)) return;
+        var first = _(tokens).head();
+        if (first && params.regex.test(first)) {
+            this.users['set' + params.property](from, first);
+            cb('your ' + params.property + ' has been recorded as ' + first);
+        } else if (first && first === 'clear') {
+            this.users['clear' + params.property](from);
+            cb('your ' + params.property + ' has been cleared');
+        } else {
+            cb(params.help);
+        }
     }
-}
+});
