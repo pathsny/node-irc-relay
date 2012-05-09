@@ -44,7 +44,7 @@ Commands.prototype.del = function(from, tokens, cb) {
     } else cb('delete requires a message number to delete');
 }
 
-Commands.prototype.number = function(from, tokens, cb) {
+Commands.prototype.phone = function(from, tokens, cb) {
     if (!this.users.get(from)) return;
     var first = _(tokens).head();
     if (first && /^\d+$/.test(first)) {
