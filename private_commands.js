@@ -43,3 +43,31 @@ Commands.prototype.del = function(from, tokens, cb) {
         } else cb('there is no message number ' + number);
     } else cb('delete requires a message number to delete');
 }
+
+Commands.prototype.number = function(from, tokens, cb) {
+    if (!this.users.get(from)) return;
+    var first = _(tokens).head();
+    if (first && /^\d+$/.test(first)) {
+        this.users.setPhoneNumber(from, first);
+        cb('your phone number has been recorded as ' + first);
+    } else if (first && first === 'clear') {
+        this.users.clearPhoneNumber(from);
+        cb('your phone number has been cleared');
+    } else {
+        cb('number <actual number only digits> to set your number. number clear to clear your number');
+    }
+}
+
+Commands.prototype.email = function(from, tokens, cb) {
+    if (!this.users.get(from)) return;
+    var first = _(tokens).head();
+    if (first && /^[^@]+@[^@]+$/.test(first)) {
+        this.users.setEmailAddress(from, first);
+        cb('your email address has been recorded as ' + first);
+    } else if (first && first === 'clear') {
+        this.users.clearEmailAddress(from);
+        cb('your email address has been cleared');
+    } else {
+        cb('email <email address> to set your email address. email clear to clear your it');
+    }
+}

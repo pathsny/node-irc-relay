@@ -4,7 +4,7 @@ var PEG = require("pegjs");
 var fs = require('fs');
 var parser = PEG.buildParser(fs.readFileSync('log_request.js',"ascii"));
 var anidb = require('./anidb');
-
+var email = require('./email');
 
 var Commands = exports.Commands = function(users, settings) {
     if (!(this instanceof Commands)) return new Commands(users, settings);
@@ -307,6 +307,36 @@ var command_definitions = {
         },
         _help: "unlink a nickname from an existing group of nicknames"
     },
+    alert: {
+        command: function(from, tokens, cb) {
+            var nick = _(tokens).head();
+            var user = this.users.get(nick);
+            if (!nick || tokens.length <= 1) {
+                cb("alert <nick> message");
+            } else if (!user) {
+                cb("alert requires the nick of a valid user in the channel");
+            } else if (!user.EmailAddress) {
+                cb(nick + " has not configured an email address for alerts");
+            } else {
+                if (!this._email) {
+                    this._email = new email.Email({
+                        user: this.settings.gmail.user,
+                        pass: this.settings.gmail.password,
+                        clientName: 'Misaka Alerts'
+                    });
+                }
+                this._email.send({
+                    text: _(tokens).tail().join(' '),
+                    to: nick + " <" + user.EmailAddress + ">",
+                    subject: "Alert Email from " + from
+                }, function(err){
+                    if (err) cb("sorry an error occured");
+                        else cb('sent an alert to ' + nick);
+                })
+            }
+        },
+        _help: "send an alert to a member of the group who has added their email address to me. alert <nick> message"
+    },
     twitter: {
         command: function(from, tokens, cb) {
             var self = this;
@@ -337,7 +367,7 @@ var command_definitions = {
                     })
             };
             var unfollow = function(user) {
-                self.users.removeTwitterAccount(from);
+                self.users.clearTwitterAccount(from);
                 self.users.emit('twitter follows changed');
             };
             switch (_(tokens).head()) {

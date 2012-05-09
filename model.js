@@ -234,20 +234,26 @@ userdb.validToken = function(token) {
     return _(userdb.find('token', token)).first();
 };
 
-userdb.setTwitterAccount = function(nick, twitter_id) {
-    this.removeTwitterAccount(nick);
-    var rec = userdb.get(nick);
-    rec.twitter_id = twitter_id;
-    userdb.set(nick, rec);
-};
-
-userdb.removeTwitterAccount = function(nick) {
+userdb.clearProperty = function(propName, nick) {
     _(this.aliases(nick)).find(function(item){
         var rec = item.val;
-        delete rec.twitter_id;
+        delete rec[propName];
         userdb.set(item.key, rec);
     });
 };
+
+userdb.setProperty = function(propName, nick, propValue) {
+    userdb.clearProperty(propName, nick);
+    var rec = userdb.get(nick);
+    rec[propName] = propValue;
+    userdb.set(nick, rec);
+};
+
+
+_(["PhoneNumber", "TwitterAccount", "EmailAddress"]).each(function(thing){
+    userdb["clear" + thing] = _.bind(userdb.clearProperty, userdb, thing);
+    userdb["set" + thing] = _.bind(userdb.setProperty, userdb, thing);
+});
 
 exports.start = function(fn) {
     userdb.on('load', function(){
