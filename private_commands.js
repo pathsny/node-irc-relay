@@ -13,6 +13,8 @@ Commands.prototype.help = function(from, tokens, cb) {
     cb('token : gives you a token for the web history at www.got-rice.asia:8008');
     cb('list : lists all messages left for you');
     cb('del <x> : deletes the xth message');
+    cb('email <emailaddress> : sets an alert email address. email clear : clears the alert email address');
+    cb('gtalk <gtalkid> : sets a gtalk id. gtalk clear : clears the gtalk id')
 }
 
 Commands.prototype.token = function(from, tokens, cb) {
