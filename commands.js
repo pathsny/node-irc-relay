@@ -5,6 +5,7 @@ var fs = require('fs');
 var parser = PEG.buildParser(fs.readFileSync('log_request.js',"ascii"));
 var anidb = require('./anidb');
 var email = require('./email');
+var gtalk = require('./gtalk').gtalk;
 
 var Commands = exports.Commands = function(users, settings) {
     if (!(this instanceof Commands)) return new Commands(users, settings);
@@ -312,28 +313,36 @@ var command_definitions = {
             var nick = _(tokens).head();
             var user = this.users.get(nick);
             var email_address = this.users.getEmailAddress(nick);
+            var message = '<' + from + '> ' + _(tokens).tail().join(' ');
             if (!nick || tokens.length <= 1) {
                 cb("alert <nick> message");
             } else if (!user) {
                 cb("alert requires the nick of a valid user in the channel");
             } else if (!email_address) {
-                cb(nick + " has not configured an email address for alerts");
+                if (gtalk.tryAlert(nick, message)) cb('sent a gtalk alert to ' + nick);
+                else cb(nick + " has not configured any alert options");
             } else {
-                if (!this._email) {
-                    this._email = new email.Email({
-                        user: this.settings.gmail.user,
-                        pass: this.settings.gmail.password,
-                        clientName: 'Misaka Alerts'
+                gtalk.tryActiveAlert(nick, message, _(function(result){
+                    if (result) {
+                        cb('sent a gtalk alert to ' + nick);
+                        return;
+                    }
+                    if (!this._email) {
+                        this._email = new email.Email({
+                            user: this.settings.gmail.user,
+                            pass: this.settings.gmail.password,
+                            clientName: 'Misaka Alerts'
+                        });
+                    }
+                    this._email.send({
+                        text: message,
+                        to: nick + " <" + email_address + ">",
+                        subject: "Alert Email from " + from
+                    }, function(err){
+                        if (err) cb("sorry an error occured");
+                            else cb('sent an email alert to ' + nick);
                     });
-                }
-                this._email.send({
-                    text: '<' + from + '> ' + _(tokens).tail().join(' '),
-                    to: nick + " <" + email_address + ">",
-                    subject: "Alert Email from " + from
-                }, function(err){
-                    if (err) cb("sorry an error occured");
-                        else cb('sent an alert to ' + nick);
-                })
+                }).bind(this));
             }
         },
         _help: "send an alert to a member of the group who has added their email address to me. alert <nick> message"

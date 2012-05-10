@@ -1,4 +1,3 @@
-var baseXmpp = require('node-xmpp');
 var xmpp = require('simple-xmpp');
 var _ = require('underscore');
 require('./utils');
@@ -28,15 +27,27 @@ Gtalk.prototype._getId = function() {
     return this._idNo; 
 };
 
-Gtalk.prototype.canAlert = function(jid, cb) {
-    if (!this._configured) {
+Gtalk.prototype.tryActiveAlert = function(nick, message, cb) {
+    var gtalk_id = this._users.getGtalkId(nick);
+    if (!this._configured || !gtalk_id) {
         cb(false);
         return
     }
-    xmpp.probe(jid, function(state){
-        console.log(state);
+    xmpp.probe(gtalk_id, function(state){
+        if (state !== 'online' && state !== 'dnd') cb(false)
+        else {
+            xmpp.send(gtalk_id, message);
+            cb(true);
+        }
     })
 };
+
+Gtalk.prototype.tryAlert = function(nick, message) {
+    var gtalk_id = this._users.getGtalkId(nick);
+    if (!gtalk_id || !this._configured) return false;
+    xmpp.send(gtalk_id, message);
+    return true;
+}
 
 Gtalk.prototype._makeIq = function(attrs) {
     var iqId = this._getId().toString();
@@ -102,12 +113,16 @@ Gtalk.prototype.login = function(options) {
         self.relay(from, message);
     });
     
+    xmpp.on('online', function(){
+        console.log('online on gtalk');
+        self._configured = true;
+    });
+    
     xmpp.on('error', function(e) {
     	  console.error('gtalk error ' + e);
     });
     
     xmpp.on('stanza', function(s){
-        console.log(s.toString());
         if (s.is('iq') && self._iqHash[s.attrs['id']]) {
             var fn = self._iqHash[s.attrs['id']];
             delete self._iqHash[s.attrs['id']];
