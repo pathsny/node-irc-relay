@@ -59,7 +59,7 @@ contact_points = {
     },
     gtalk: {
         property: "GtalkId",
-        regex: /^[^@]+@gmail.com$/,
+        regex: /^[^@]+@[^@]+$/,
         help: 'gtalk <gtalkid> to set your gtalk id. gtalk clear to clear it',
         custom_fn: _(gtalk.addAccount).bind(gtalk)
     }
