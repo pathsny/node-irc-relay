@@ -327,7 +327,7 @@ var command_definitions = {
                     });
                 }
                 this._email.send({
-                    text: _(tokens).tail().join(' '),
+                    text: '<' + from + '> ' + _(tokens).tail().join(' '),
                     to: nick + " <" + email_address + ">",
                     subject: "Alert Email from " + from
                 }, function(err){
