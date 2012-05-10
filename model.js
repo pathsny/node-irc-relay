@@ -240,7 +240,7 @@ userdb.validToken = function(token) {
 
 userdb.clearProperty = function(propName, nick) {
     _(this.aliases(nick)).find(function(item){
-        var rec = item.val;
+        var rec = _(item.val).clone();
         delete rec[propName];
         userdb.set(item.key, rec);
     });
@@ -248,7 +248,7 @@ userdb.clearProperty = function(propName, nick) {
 
 userdb.setProperty = function(propName, nick, propValue) {
     userdb.clearProperty(propName, nick);
-    var rec = userdb.get(nick);
+    var rec = _(userdb.get(nick)).clone();
     rec[propName] = propValue;
     userdb.set(nick, rec);
 };
