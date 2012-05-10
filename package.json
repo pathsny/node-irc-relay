@@ -31,7 +31,7 @@
       "now": ">= 0.7.5",
       "xml2js": ">= 0.1.13",
       "nodemailer": ">= 0.3.20",
-      "node-xmpp": ">= 0.3.2"
+      "simple-xmpp": ">= 0.1.5beta"
   },
   "private": true
 }

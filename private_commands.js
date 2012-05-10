@@ -1,4 +1,6 @@
 var _ = require('underscore');
+var gtalk = require('./gtalk').gtalk;
+
 require('./utils');
 
 var Commands = exports.Commands = function(users, settings) {
@@ -58,7 +60,8 @@ contact_points = {
     gtalk: {
         property: "GtalkId",
         regex: /^[^@]+@gmail.com$/,
-        help: 'gtalk <gtalkid> to set your gtalk id. gtalk clear to clear it' 
+        help: 'gtalk <gtalkid> to set your gtalk id. gtalk clear to clear it',
+        custom_fn: _(gtalk.addAccount).bind(gtalk)
     }
 };
 
@@ -67,8 +70,11 @@ _(contact_points).each(function(params, command){
         if (!this.users.get(from)) return;
         var first = _(tokens).head();
         if (first && params.regex.test(first)) {
-            this.users['set' + params.property](from, first);
-            cb('your ' + params.property + ' has been recorded as ' + first);
+            if (!params.custom_fn) {
+                this.users['set' + params.property](from, first);
+                cb('your ' + params.property + ' has been recorded as ' + first);
+            }
+            else params.custom_fn(from, first, cb);
         } else if (first && first === 'clear') {
             this.users['clear' + params.property](from);
             cb('your ' + params.property + ' has been cleared');
