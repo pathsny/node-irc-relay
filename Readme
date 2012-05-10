@@ -6,3 +6,8 @@ then
   npm install
 
 copy settings.json.bak to data/settings.json and put in the right data! 
+
+
+other dependencies by now
+libicu-dev
+libexpat1-dev
