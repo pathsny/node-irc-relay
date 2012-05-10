@@ -312,13 +312,18 @@ var command_definitions = {
         command: function(from, tokens, cb) {
             var nick = _(tokens).head();
             var user = this.users.get(nick);
-            var email_address = this.users.getEmailAddress(nick);
-            var message = '<' + from + '> ' + _(tokens).tail().join(' ');
             if (!nick || tokens.length <= 1) {
                 cb("alert <nick> message");
+                return;
             } else if (!user) {
                 cb("alert requires the nick of a valid user in the channel");
-            } else if (!email_address) {
+                return;
+            } 
+
+            var email_address = this.users.getEmailAddress(nick);
+            var message = '<' + from + '> ' + _(tokens).tail().join(' ');
+            
+            if (!email_address) {
                 if (gtalk.tryAlert(nick, message)) cb('sent a gtalk alert to ' + nick);
                 else cb(nick + " has not configured any alert options");
             } else {
