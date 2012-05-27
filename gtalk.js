@@ -33,13 +33,18 @@ Gtalk.prototype.tryActiveAlert = function(nick, message, cb) {
         cb(false);
         return
     }
-    xmpp.probe(gtalk_id, function(state){
+    var probe_function = function(state) {
+        if (probe_function.fired) return;
         if (state !== 'online' && state !== 'dnd') cb(false)
         else {
             xmpp.send(gtalk_id, message);
             cb(true);
         }
-    })
+        probe_function.fired = true;
+    }
+    
+    xmpp.probe(gtalk_id, probe_function);
+    setTimeout(probe_function, 10000);
 };
 
 Gtalk.prototype.tryAlert = function(nick, message) {
