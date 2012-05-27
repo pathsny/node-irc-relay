@@ -7,11 +7,12 @@ require('../utils');
 var exec = require('child_process').exec;
 var url = require('url');
 var qs = require('querystring');
+var socket_io = require('socket.io');
 
 var Server = exports.Server = function(users, nick, port) {
     if (!(this instanceof Server)) return new Server(users, nick, port);
     
-    var views = _(['index', 'login', 'search', 'helloworld']).inject(function(views, page){
+    var views = _(['index', 'login', 'search', 'video']).inject(function(views, page){
         return _({}).chain().extend(views).tap(function(views){
             views[page] = fs.readFileSync(__dirname + '/views/' + page + '.ejs', 'utf8');
         }).value();
@@ -92,19 +93,60 @@ var Server = exports.Server = function(users, nick, port) {
                 }));
             });
             app.get('/search', search);
-            app.get('/helloworld', function(req, res, next){
-                res.end(ejs.render(views['helloworld']))
+            app.get('/video', function(req, res, next){
+                var aliases = users.aliases(users.validToken(req.cookies['mtoken']).key);
+                if (_(aliases).any(function(item){
+                    return item.val.status === 'online';
+                })) {
+                    res.end(ejs.render(views['video']))
+                } else {
+                    res.end(ejs.render("You must be in the channel to participate"))
+                }
             })
         })
     );
     console.log("starting webserver on port " + port)
     app.listen(Number(port));
-    // var nowjs = require("now");
-    // var everyone = nowjs.initialize(app);
-    // 
-    // everyone.now.distributeMessage = function(message){
-    //   everyone.now.receiveMessage(this.now.name, message);
-    // };
+
+    var io = socket_io.listen(app)
+    io.configure( function(){
+        io.enable('browser client minification');  
+        io.enable('browser client etag');          
+        io.enable('browser client gzip');
+        io.set('log level', 3);
+    });
+    
+    var peers = {};
+    var id = 0;
+    var getNick = function(socket) {
+        var cookie_string = socket.handshake.headers.cookie;
+        var parsed_cookies = connect.utils.parseCookie(cookie_string);
+        var nick = users.validToken(parsed_cookies['mtoken']).key;
+        id ++;
+        return nick + ' ' + id;
+    }
+    
+    io.sockets.on('connection', function(socket){
+        var nick = getNick(socket);
+        socket.broadcast.emit('user connected',  nick);
+        socket.emit('existing users', _(peers).keys());
+        peers[nick] = socket;
+        socket.on('disconnect', function(){
+            delete peers[nick];
+            socket.broadcast.emit('user disconnected', nick);
+        });
+        socket.on('signalling message', function(data){
+            var otherSocket = peers[data.user];
+            if (!otherSocket) {
+                console.log('cannot find socket of user ', data.user)
+                return
+            }
+            otherSocket.emit('signalling message', {
+                user: nick,
+                data: data.data
+            })
+        })
+    })
 }
 
 

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>video chat</title>
+<link rel="stylesheet" type="text/css" href="stylesheets/style.css" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="javascripts/video.js"></script>	
+<style>
+video {
+	opacity: 0;
+	-webkit-transition-property: opacity;
+	-webkit-transition-duration: 2;
+}
+</style>
+
+</head>
+	
+<body>
+  <div id="container">
+	  <div id="local">
+		<span>you</span>
+	    <video id="localVideo" autoplay="autoplay">
+	    </video>
+  </div>
+</body>
+</html>

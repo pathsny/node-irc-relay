@@ -31,7 +31,8 @@
       "now": ">= 0.7.5",
       "xml2js": ">= 0.1.13",
       "nodemailer": ">= 0.3.20",
-      "simple-xmpp": ">= 0.1.5beta"
+      "simple-xmpp": ">= 0.1.5beta",
+      "socket.io": ">= 0.9.6"
   },
   "private": true
 }
