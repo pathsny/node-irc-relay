@@ -8,7 +8,10 @@ var startSocket = function() {
     socket.on('user connected', function(name){
     });
     socket.on('user disconnected', function(name){
-        delete users[name];
+        if (users[name]) {
+            users[name].close();
+            delete users[name];            
+        }
     });
     
     socket.on('signalling message',function(data){
@@ -83,9 +86,14 @@ createPeerConnection = function(name, onSignallingMessage) {
       video.style.opacity = 1;
       video.src = url;
     }
-    onRemoteStreamRemoved = function(event) {
+    pc.onremovestream = function(event) {
       $('#video_'+sid).html('');
     };
+    var oldClose = pc.close
+    pc.close = function() {
+        $('#video_'+sid).html('');
+        oldClose();
+    }
     pc.addStream(localStream);
     return pc;
 }
