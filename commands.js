@@ -46,6 +46,12 @@ var command_definitions = {
             }
         }
     },
+   video: {
+       command: function(from, tokens, cb) {
+           cb(this.settings["baseURL"] + ":" + this.settings["port"] + '/video');
+       },
+       _help: "Video chat with other people in the channel"
+   },
    logs: {
        command: function(from, tokens, cb) {
            var url = this.settings["baseURL"] + ":" + this.settings["port"];
