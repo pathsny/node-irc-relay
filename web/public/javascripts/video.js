@@ -92,7 +92,7 @@ createPeerConnection = function(name, onSignallingMessage) {
     var oldClose = pc.close
     pc.close = function() {
         $('#video_'+sid).html('');
-        oldClose();
+        oldClose.call(pc);
     }
     pc.addStream(localStream);
     return pc;
