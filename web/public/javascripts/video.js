@@ -2,6 +2,82 @@ var users = {}
 
 var localStream;
 
+// $('#drop_video')
+
+var inGroupsOf = function(list, count) {
+    return list.reduce(function(acc, item){
+        if (acc.length === 0 || acc[acc.length - 1].length === count) {
+            acc.push([item]);
+        } else {
+            acc[acc.length-1].push(item);
+        }
+        return acc;
+    }, []);
+}
+
+var Videos = (function() {
+        var tmpl;
+        var template = function () {
+            if (tmpl) return tmpl;
+            tmpl = $("#VideoTemplate");
+            return tmpl;
+        }
+        var video_list = [];
+        var container_container = $('#container_container');
+        var container = $('#peer_container');
+        var dummy = function(size) {
+            return '<div class="span' + size + '"></div>'
+        };
+        
+        var render_row = function() {
+            var row = $('<div class="row-fluid"/>').appendTo(container);
+            $(arguments).each(function(i, item){
+                if (!item.length) {
+                    row.append(dummy(item))
+                } else {
+                    var video = item[1][1];
+                    row.append(video);
+                    video.removeClass();
+                    video.addClass('span' + item[0]);
+                }
+            })
+        }
+        
+        var render = function() {
+            container.html('');
+            if (video_list.length === 1) {
+                render_row(3, [6, video_list[0]], 3);
+            } else if (video_list.length === 2) {
+                render_row(1, [5, video_list[0]], [5, video_list[1]], 1);
+            } else {
+                var video_groups = inGroupsOf(video_list, 3);
+                $(video_groups).each(function(i, group){
+                    if (group.length === 3) {
+                        render_row([4, group[0]], [4, group[1]], [4, group[2]]);
+                    } else if (group.length === 2){
+                        render_row(1, [4, group[0], 2, [4, group[1]], 1]);
+                    } else if (group.length === 1) {
+                        render_row(4, [4, group[0], 4]);
+                    }
+                })
+            }
+        };
+        
+    return {
+        add: function(sid, name, stream) {
+            video_list.push([sid, template().tmpl({sid: sid, nick: name.split(' ')[0], src: webkitURL.createObjectURL(stream)})]);
+            render();
+        },
+        remove: function(sid) {
+            video_list = $.grep(video_list, function(video_item) {
+                return video_item[0] != sid;
+            });
+            render(); 
+        }
+    }
+    
+})(); 
+
 var startSocket = function() {
     var socket = io.connect('/');
 
@@ -78,20 +154,15 @@ createPeerConnection = function(name, onSignallingMessage) {
     var sid = name.replace(/[^A-Za-z0-9]/g, '_')
     pc.onaddstream = onRemoteStreamAdded = function(event) {
       console.log("Remote stream added with ", name);
-      $('#container').append("<div id='video_" + sid +  "'/>");
-      $('#video_'+sid).append('<span>'+name+'</span>');
-      $('#video_'+sid).append("<video autoplay='autoplay'/>");
-      var video = $('#video_'+sid + ' video')[0]
-      var url = webkitURL.createObjectURL(event.stream);
-      video.style.opacity = 1;
-      video.src = url;
+      Videos.add(sid, name, event.stream);
     }
     pc.onremovestream = function(event) {
-      $('#video_'+sid).html('');
+        console.log("Remote stream removed with ", name);
+        Videos.remove(sid);
     };
     var oldClose = pc.close
     pc.close = function() {
-        $('#video_'+sid).html('');
+        Videos.remove(sid);
         oldClose.call(pc);
     }
     pc.addStream(localStream);

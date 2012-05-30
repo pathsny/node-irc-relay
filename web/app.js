@@ -98,7 +98,11 @@ var Server = exports.Server = function(users, nick, port) {
                 if (_(aliases).any(function(item){
                     return item.val.status === 'online';
                 })) {
-                    res.end(ejs.render(views['video']))
+                    res.end(ejs.render(views['video'], {
+                        locals: {
+                            nick: users.validToken(req.cookies['mtoken']).key
+                        }
+                    }))
                 } else {
                     res.end(ejs.render("You must be in the channel to participate"))
                 }
