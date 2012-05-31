@@ -47,12 +47,14 @@
 
 			<div class="container-fluid">
 				<div class="row-fluid">
-					<div class="span4"/></div> 
 					<div class="span4">
 						<h3>You</h3>
 						<video id="localVideo" autoplay="autoplay"/>
 					</div>
-					<div class="span4"></div>
+					<div class="span8">
+						<div id='chatArea'></div>
+						<input id='chatLine' type='text' placeholder='write your text here...'/>
+					</div>
 				</div>
 			</div>
 
@@ -64,6 +66,7 @@
 	<script type="text/javascript" src="javascripts/video.js"></script>	
 	<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>	
 	<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+	<script src="javascripts/moment.min.js"></script>	
 	<script id="VideoTemplate" type="text/x-jquery-tmpl"> 
 		<div id="video_container_${sid}">
 			<h3>${nick}</h3>

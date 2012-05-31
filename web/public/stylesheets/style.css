@@ -19,3 +19,13 @@ video {
 	height: 100%;
 	width: 100%;
 }
+
+
+#chatArea {
+    border:1px solid #aaa; 
+    width:500px; 
+    height:400px; 
+    overflow:auto;
+    background-color: white;
+    color: black;
+}

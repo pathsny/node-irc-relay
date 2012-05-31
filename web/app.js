@@ -9,9 +9,7 @@ var url = require('url');
 var qs = require('querystring');
 var socket_io = require('socket.io');
 
-var Server = exports.Server = function(users, nick, port) {
-    if (!(this instanceof Server)) return new Server(users, nick, port);
-    
+var Server = exports.Server = function(users, nick, port, textEmittor) {
     var views = _(['index', 'login', 'search', 'video']).inject(function(views, page){
         return _({}).chain().extend(views).tap(function(views){
             views[page] = fs.readFileSync(__dirname + '/views/' + page + '.ejs', 'utf8');
@@ -117,7 +115,7 @@ var Server = exports.Server = function(users, nick, port) {
         io.enable('browser client minification');  
         io.enable('browser client etag');          
         io.enable('browser client gzip');
-        io.set('log level', 3);
+        io.set('log level', 1);
     });
     
     var peers = {};
@@ -150,7 +148,8 @@ var Server = exports.Server = function(users, nick, port) {
                 data: data.data
             })
         })
-    })
+    });
+    textEmittor.on('text', _(io.sockets.emit).bind(io.sockets, 'text'));
 }
 
 

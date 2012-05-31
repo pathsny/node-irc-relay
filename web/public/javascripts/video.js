@@ -111,6 +111,12 @@ var startSocket = function() {
             users[name] = createPeerConnection(name, createSignallingCallback(name));
         })
     });
+    
+    var chatArea = $('#chatArea');
+    socket.on('text', function(m){
+        chatArea.append('<br/>');
+        chatArea.append($('<span/>').text('['+ moment().format('HH:MM') +']'+m));
+    })
 }
 
 onUserMediaSuccess = function(stream) {

@@ -5,7 +5,7 @@ var model = require('./model.js');
 var commands_lib = require('./commands');
 var private_commands_lib = require('./private_commands');
 var twitter = require('./twitter').Twitter;
-var weblog = require('./web/app').Server;
+var webserver = require('./web/app').Server;
 
 var fs = require('fs');
 var settings = JSON.parse(fs.readFileSync('./data/settings.json',"ascii"));
@@ -14,7 +14,8 @@ var server = settings["server"];
 var channel = settings["channel"];
 var incoming = 'message' + channel;
 var nick = settings["nick"];
-var ircLogger = require('./irc_log').Logger(channel);
+var ircToText = require('./irc_to_text').IrcToText(channel);
+var ircLogger = require('./irc_log').Logger(ircToText);
 var gtalk = require('./gtalk').gtalk;
 
 
@@ -25,7 +26,6 @@ model.start(function(users){
     function channel_say(message) {
         bot.say(channel, message)
     }
-
     function make_client() {
         return _(new irc.Client(server, nick, {
             channels: [channel]
@@ -74,7 +74,7 @@ model.start(function(users){
             });
     });
     
-    _(users.listeners).chain().concat(ircLogger.listeners()).each(function(model_listener){
+    _(users.listeners).chain().concat(ircToText.listeners()).each(function(model_listener){
         bot.addListener(model_listener.type, model_listener.listener);
     });
 
@@ -120,7 +120,8 @@ model.start(function(users){
     };
     
     setTimeout(compactDB,60000);
-    weblog(users, nick, settings["port"]);
+    var web = webserver(users, nick, settings["port"], ircToText);
+    
     
     exit_conditions = ['SIGHUP', 'SIGQUIT', 'SIGKILL', 'SIGINT', 'SIGTERM']
     if (settings["catch_all_exceptions"]) {
