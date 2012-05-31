@@ -95,8 +95,7 @@ model.start(function(users){
     
     if (settings.gmail) {
         gtalk.configure_with(users, function(message){
-            console.log(message)
-            channel_say(misakify("gtalk", message));
+            channel_say(message);
         });
         gtalk.login(settings.gmail) 
     }
@@ -124,7 +123,7 @@ model.start(function(users){
     
     setTimeout(compactDB,60000);
     var web = webserver(users, nick, settings["port"], ircToText, function(from, message){
-        channel_say(misakify('video', from + message));
+        channel_say(from + message);
         detectCommand(from, message);
     });
     
