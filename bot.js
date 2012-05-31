@@ -55,14 +55,17 @@ model.start(function(users){
     });
 
     var last_msg_time = new Date().getTime();
-    bot.addListener(incoming, function(from, message) {
+    
+    var detectCommand = function(from, message) {
         last_msg_time = new Date().getTime();
         var tokens = message.split(' ');
         var match = /^!(.*)/.exec(_(tokens).head());
         if (match) {
             dispatch(match[1], from, _(tokens).tail())
         };
-    });
+    }
+    
+    bot.addListener(incoming, detectCommand);
     
     bot.addListener("pm", function(from, message) {
         last_msg_time = new Date().getTime();
@@ -120,7 +123,10 @@ model.start(function(users){
     };
     
     setTimeout(compactDB,60000);
-    var web = webserver(users, nick, settings["port"], ircToText);
+    var web = webserver(users, nick, settings["port"], ircToText, function(from, message){
+        channel_say(misakify('video', from + message));
+        detectCommand(from, message);
+    });
     
     
     exit_conditions = ['SIGHUP', 'SIGQUIT', 'SIGKILL', 'SIGINT', 'SIGTERM']

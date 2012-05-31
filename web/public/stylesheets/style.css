@@ -21,11 +21,20 @@ video {
 }
 
 
-#chatArea {
+.chatAreaWrapper {
     border:1px solid #aaa; 
     width:500px; 
-    height:400px; 
+    height:300px; 
     overflow:auto;
     background-color: white;
     color: black;
+    position: relative;
+}
+
+#chatArea {
+    bottom: 0px;
+    overflow-y: scroll;
+    position: absolute;
+    max-height: 100%;
+    width: 100%;
 }

@@ -9,7 +9,7 @@ var url = require('url');
 var qs = require('querystring');
 var socket_io = require('socket.io');
 
-var Server = exports.Server = function(users, nick, port, textEmittor) {
+var Server = exports.Server = function(users, nick, port, textEmittor, sendChat) {
     var views = _(['index', 'login', 'search', 'video']).inject(function(views, page){
         return _({}).chain().extend(views).tap(function(views){
             views[page] = fs.readFileSync(__dirname + '/views/' + page + '.ejs', 'utf8');
@@ -136,6 +136,9 @@ var Server = exports.Server = function(users, nick, port, textEmittor) {
         socket.on('disconnect', function(){
             delete peers[nick];
             socket.broadcast.emit('user disconnected', nick);
+        });
+        socket.on('chat_message', function(m){
+            sendChat('<' + nick.split(' ')[0] + '|Video>: ', m);
         });
         socket.on('signalling message', function(data){
             var otherSocket = peers[data.user];

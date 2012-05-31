@@ -51,8 +51,14 @@ IrcToText.prototype.listeners = function(){
         type: 'message',
         listener: function(from, to, message) {
             if (self.channel === to) {
-                emit(_.displayChatMsg(from, message));
+                emit("<" + from + "> " + message);
             }
+        }
+    },
+    {
+        type: 'action',
+        listener: function(from, to, message) {
+            emit('*' + from + ' ' + message);
         }
     },
     {

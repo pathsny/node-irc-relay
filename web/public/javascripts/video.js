@@ -46,9 +46,9 @@ var Videos = (function() {
         var render = function() {
             container.html('');
             if (video_list.length === 1) {
-                render_row(3, [6, video_list[0]], 3);
+                render_row(4, [4, video_list[0]], 4);
             } else if (video_list.length === 2) {
-                render_row(1, [5, video_list[0]], [5, video_list[1]], 1);
+                render_row(2, [4, video_list[0]], [4, video_list[1]], 2);
             } else {
                 var video_groups = inGroupsOf(video_list, 3);
                 $(video_groups).each(function(i, group){
@@ -76,13 +76,26 @@ var Videos = (function() {
         }
     }
     
-})(); 
+})();
 
-var startSocket = function() {
+ var startSocket = function() {
     var socket = io.connect('/');
-
-    socket.on('user connected', function(name){
+    
+    socket.on('connect', function(){
+        $('#chatLine').attr('disabled', false);
     });
+    
+    (function(chatLine){
+        chatLine.keypress(function(e){
+            if(e.which == 13){
+                if (chatLine.val().trim() !== '') {
+                    socket.emit('chat_message', chatLine.val());
+                    chatLine.val('');
+                }  
+            }
+        });
+    })($('#chatLine'));
+
     socket.on('user disconnected', function(name){
         if (users[name]) {
             users[name].close();
@@ -115,7 +128,9 @@ var startSocket = function() {
     var chatArea = $('#chatArea');
     socket.on('text', function(m){
         chatArea.append('<br/>');
-        chatArea.append($('<span/>').text('['+ moment().format('HH:MM') +']'+m));
+        var newElement = $('<span/>').text('['+ moment().format('HH:MM') +']'+m);
+        chatArea.append(newElement);
+        newElement[0].scrollIntoView();
     })
 }
 
