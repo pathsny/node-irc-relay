@@ -31,6 +31,10 @@ video {
     position: relative;
 }
 
+#chatLine {
+    width: 500px;
+}
+
 #chatArea {
     bottom: 0px;
     overflow-y: scroll;
