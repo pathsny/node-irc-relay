@@ -44,8 +44,8 @@ model.start(function(users){
 
     function dispatch(command, from, tokens) {
         if (typeof(commands[command]) === 'function') {
-            commands[command](from, tokens, function(result) {
-                if (result) channel_say(misakify(command, result));
+            commands[command](from, tokens, function(result, dont_misakify) {
+                if (result) channel_say(dont_misakify ? result : misakify(command, result));
             });
         }
     };

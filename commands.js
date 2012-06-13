@@ -358,6 +358,27 @@ var command_definitions = {
         },
         _help: "send an alert to a member of the group who has added their email address to me. alert <nick> message"
     },
+    
+    count: {
+        command: function(from, tokens, cb) {
+            var number = Number(_(tokens).first() || 5);
+            if (_(number).isFinite()) {
+                if (number > 7) { 
+                    cb("please be reasonable. I do not have enought sticks and stones to count down from " + number);
+                } else if (number < 0) {
+                    cb('I can only count from numbers greater than 0');
+                }  else {
+                    var count = function(i) {
+                        cb(i > 0 ? i : 'GO!', true);
+                        if (i > 0) setTimeout(function(){count(i-1)}, 1000);
+                    }
+                    count(number);
+                }
+            } else cb('I need a valid number to countdown from');
+        },
+        _help: "counts down from n to zero. usage !count n"
+    },
+    
     twitter: {
         command: function(from, tokens, cb) {
             var self = this;
