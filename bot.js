@@ -103,7 +103,7 @@ model.start(function(users){
     var misaka_adjectives = JSON.parse(fs.readFileSync('./misaka_adjectives.json',"ascii"));
     var misakify = function(command, result) {
         var adjectives = misaka_adjectives[command] || misaka_adjectives['generic'];
-        return result + " said " + bot.nick + ' ' + _(adjectives).rand();
+        return result + ", said " + bot.nick + ' ' + _(adjectives).rand();
     }
     
     bot.conn.setTimeout(180000, function(){
