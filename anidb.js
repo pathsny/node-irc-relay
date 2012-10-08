@@ -7,7 +7,8 @@ module.exports = {
             if (err) console.error(err);
             else {
                 if (!data.description) {
-                    cb("no description provided");
+                    data.splitDescription = "no data provided";
+                    cb(data);
                     return;
                 }
                 var desc = data.description.split('\n');
