@@ -138,8 +138,10 @@ _.mixin({
                 fs.readFile(cache, function (err, data) {
                     if (err) http_req()
                     else {
-                        var result = JSON.parse(data);
-                        cb(undefined,result[0], result[1]);
+                        try {
+                            var result = JSON.parse(data);
+                            cb(undefined,result[0], result[1]);
+                        } catch(e) {}
                     }
                 });
             } else {
