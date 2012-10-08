@@ -6,6 +6,7 @@ module.exports = {
         _.requestXmlAsJson({uri: url, cache: aid}, function(err, data){
             if (err) console.error(err);
             else {
+                if (!data.description) return;
                 var desc = data.description.split('\n');
                 data.splitDescription = _(desc).chain().
                 invoke_('inSlicesOf', 400).
