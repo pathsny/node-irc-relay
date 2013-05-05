@@ -49,13 +49,13 @@ model.start(function(users){
             });
         }
     };
-    
+
     bot.addListener("registered", function(){
         bot.say("nickserv", "identify " + settings["server_password"]);
     });
 
     var last_msg_time = new Date().getTime();
-    
+
     var detectCommand = function(from, message) {
         last_msg_time = new Date().getTime();
         var tokens = message.split(' ');
@@ -64,9 +64,9 @@ model.start(function(users){
             dispatch(match[1], from, _(tokens).tail())
         };
     }
-    
+
     bot.addListener(incoming, detectCommand);
-    
+
     bot.addListener("pm", function(from, message) {
         last_msg_time = new Date().getTime();
         var tokens = message.split(' ');
@@ -76,7 +76,7 @@ model.start(function(users){
                 bot.say(from, reply);
             });
     });
-    
+
     _(users.listeners).chain().concat(ircToText.listeners()).each(function(model_listener){
         bot.addListener(model_listener.type, model_listener.listener);
     });
@@ -86,32 +86,32 @@ model.start(function(users){
     })).each(function(listener){
         bot.addListener(incoming, listener);
     });
-    
+
     if (settings['twitter']) {
         // new twitter(users, settings['twitter'],function(message){
         //     channel_say(misakify("twitter", message));
         // });
     }
-    
+
     if (settings.gmail) {
         gtalk.configure_with(users, function(message){
             channel_say(message);
         });
-        gtalk.login(settings.gmail) 
+        gtalk.login(settings.gmail)
     }
-    
+
     var misaka_adjectives = JSON.parse(fs.readFileSync('./misaka_adjectives.json',"ascii"));
     var misakify = function(command, result) {
         var adjectives = misaka_adjectives[command] || misaka_adjectives['generic'];
         return result + ", said " + bot.nick + ' ' + _(adjectives).rand();
     }
-    
+
     bot.conn.setTimeout(180000, function(){
         console.log('timeout');
         bot.conn.end();
         process.exit();
     });
-    
+
     var compactDB = function(){
         var idle_time = new Date().getTime() - last_msg_time;
         if (users.redundantLength > 200 && idle_time > 60000) {
@@ -120,15 +120,16 @@ model.start(function(users){
         }
         setTimeout(compactDB,60000)
     };
-    
+
     setTimeout(compactDB,60000);
     var web = webserver(users, nick, settings["port"], ircToText, function(from, message){
         channel_say(from + message);
         detectCommand(from, message);
     });
-    
-    
-    exit_conditions = ['SIGHUP', 'SIGQUIT', 'SIGKILL', 'SIGINT', 'SIGTERM']
+
+
+    // exit_conditions = ['SIGHUP', 'SIGQUIT', 'SIGKILL', 'SIGINT', 'SIGTERM']
+    exit_conditions = ['SIGHUP', 'SIGQUIT', 'SIGINT', 'SIGTERM']
     if (settings["catch_all_exceptions"]) {
         exit_conditions.push('uncaughtException')
     };

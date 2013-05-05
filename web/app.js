@@ -1,4 +1,5 @@
 var connect = require('connect');
+var connectRouter = require('connect-route');
 var gzippo = require('gzippo');
 var ejs = require('ejs');
 var fs = require('fs');
@@ -15,19 +16,19 @@ var Server = exports.Server = function(users, nick, port, textEmittor, sendChat)
             views[page] = fs.readFileSync(__dirname + '/views/' + page + '.ejs', 'utf8');
         }).value();
     },{});
-    
+
     var auth = function(req, res, next) {
         if (users.validToken(req.cookies['mtoken'])) {
             next()
-            return 
+            return
         }
         else if (users.validToken(req.body && req.body['mtoken'])) {
             var cookieString = ejs.render('mtoken=<%=mtoken%>; Max-Age=3153600000', {
                 locals: {
                     mtoken: req.body['mtoken']
                 }
-            }); 
-            res.writeHead(302, {Location: (req.body['ReturnUrl'] || '/'), 
+            });
+            res.writeHead(302, {Location: (req.body['ReturnUrl'] || '/'),
             'Set-Cookie': cookieString});
             res.end();
             return
@@ -38,16 +39,16 @@ var Server = exports.Server = function(users, nick, port, textEmittor, sendChat)
                 ReturnUrl: req.url,
                 nick: nick
             }
-        }));    
+        }));
     };
-    
+
     var search = function(req, res, next){
         var parsedUrl = qs.parse(url.parse(req.url).query);
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8;'});
         var search = parsedUrl['q'];
         var render = function(res, search, results) {
             res.end(ejs.render(views['search'], {
-                locals : { 
+                locals : {
                     title: 'MISAKA logs',
                     search: search,
                     results: results
@@ -56,7 +57,7 @@ var Server = exports.Server = function(users, nick, port, textEmittor, sendChat)
         }
         if (search) {
             var cmd = "egrep -h -m 10 '\\b(" + _(search.split(' ')).join('|') + ")\\b' data/irclogs/*.log";
-            exec(cmd, function(error, stdout, stderr) { 
+            exec(cmd, function(error, stdout, stderr) {
                 var results = stdout === '' ? [] : _(stdout.split('\n')).map(function(l){
                     var t = l.indexOf(',');
                     var timestamp = Number(l.slice(1,t));
@@ -73,7 +74,7 @@ var Server = exports.Server = function(users, nick, port, textEmittor, sendChat)
             render(res, '', []);
         }
     };
-    
+
     var app = connect.createServer(
         connect.favicon(__dirname + '/public/favicon.ico'),
         connect.bodyParser(),
@@ -81,11 +82,11 @@ var Server = exports.Server = function(users, nick, port, textEmittor, sendChat)
         auth,
         gzippo.staticGzip(__dirname + '/public'),
         gzippo.staticGzip(__dirname + '/../data/irclogs'),
-        connect.router(function(app){
+        connectRouter(function(app){
             app.get('/', function(req, res, next){
                 res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8;'});
                 res.end(ejs.render(views['index'], {
-                    locals : { 
+                    locals : {
                         title: 'MISAKA logs'
                     }
                 }));
@@ -112,12 +113,12 @@ var Server = exports.Server = function(users, nick, port, textEmittor, sendChat)
 
     var io = socket_io.listen(app)
     io.configure( function(){
-        io.enable('browser client minification');  
-        io.enable('browser client etag');          
+        io.enable('browser client minification');
+        io.enable('browser client etag');
         io.enable('browser client gzip');
         io.set('log level', 1);
     });
-    
+
     var peers = {};
     var id = 0;
     var getNick = function(socket) {
@@ -127,7 +128,7 @@ var Server = exports.Server = function(users, nick, port, textEmittor, sendChat)
         id ++;
         return nick + ' ' + id;
     }
-    
+
     io.sockets.on('connection', function(socket){
         var nick = getNick(socket);
         socket.broadcast.emit('user connected',  nick);
