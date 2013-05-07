@@ -1,8 +1,5 @@
 _ = require("underscore")
 require "./utils"
-PEG = require("pegjs")
-fs = require("fs")
-parser = PEG.buildParser(fs.readFileSync("log_request.pegjs", "ascii"))
 anidb = require("./anidb")
 Email = require("./email")
 gtalk = require("./gtalk").gtalk
@@ -27,51 +24,18 @@ directedMessage = (from, tokens, cb, users, success) ->
 
     cb from + ": Message Noted"
 
+commands = fs.readdirSync("./Commands")
+_(commands).
+chain().
+select((f) -> f.match(/.*\.coffee/)).
+each (f) ->
+  console.log(f)
+  commandData = require("./Commands/#{f}")
+  name = commandData['name']
+  Commands::[name] = commandData['command']
+  Commands::[name]._help = commandData['help']
+
 command_definitions =
-  help:
-    command: (from, tokens, cb) ->
-      if _(tokens).isEmpty()
-        cb "I know " + _(Commands::).chain().keys().difference(["listeners", "private", "commands", "help"]).map((command) ->
-          "!" + command
-        ).sentence().value()
-        cb "Type !help <command> to know more about any command"
-      else
-        command = Commands::[_(tokens).chain().head().firstMatchIfExists(/!(.*)/).value()]
-        helpCommand = (if command then (command["_help"] or "I have no help on this command") else "No Such Command")
-        cb (if (typeof helpCommand is "function") then helpCommand.call() else helpCommand)
-
-  video:
-    command: (from, tokens, cb) ->
-      cb @settings["baseURL"] + ":" + @settings["port"] + "/video"
-
-    _help: "Video chat with other people in the channel"
-
-  logs:
-    command: (from, tokens, cb) ->
-      url = @settings["baseURL"] + ":" + @settings["port"]
-      if _(tokens).head() is "now"
-        cb url + "/#" + _.now(true)
-      else if _(tokens).head() is "q"
-        cb url + "/search?q=" + _(tokens).tail().join("+")
-      else if _(tokens).last() is "ago"
-        try
-          time = parser.parse(_(tokens).join(" "))
-          time_hash = _(time).inject((hsh, item) ->
-            return  if (not hsh) or (item[1] of hsh)
-            hsh[item[1]] = item[0]
-            hsh
-          , {})
-          if time_hash
-            cb url + "/#" + _.now().subtract(time_hash).date.getTime()
-          else
-            cb "that makes no sense"
-        catch err
-          cb "that makes no sense"
-      else
-        cb "usage: !logs <x days, y hours, z mins ago> or !logs now or !logs q <search terms>"
-
-    _help: "Display logs for the channel for some point in time. usage: !logs <x days, y hours, z mins ago> or !logs now or !logs q <search terms>"
-
   g:
     command: (from, tokens, cb) ->
       if /^\d+/.test(_(tokens).head())
