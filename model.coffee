@@ -201,7 +201,6 @@ userdb.clearProperty = (propName, nick) ->
   _(@aliases(nick)).find (item) ->
     rec = _(item.val).clone()
     delete rec[propName]
-
     userdb.set item.key, rec
 
 

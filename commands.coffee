@@ -139,41 +139,6 @@ command_definitions =
 
     _help: "stores a message in a user's message box for him/her to retrieve later at leisure. Ideal for links/images that cannot be opened on phones"
 
-  seen:
-    command: (from, tokens, cb) ->
-      person = _(tokens).head()
-      unless person
-        cb "!seen needs a person to have been seen"
-      else unless @users.get(person)
-        cb person + " is not known"
-      else
-        aliases = @users.aliases(person)
-        online_aliases = _(aliases).filter((item) ->
-          item.val.status is "online"
-        )
-        if online_aliases.length > 0
-          msg = person + " is online"
-          msg += " as " + _(online_aliases).chain().pluck("key").sentence().value()  if online_aliases.length > 1 or _(online_aliases).first().key isnt person
-        else
-          lastOnline = _(aliases).max((item) ->
-            item.val.lastSeen
-          )
-          msg = person + " was last seen online"
-          msg += " as " + lastOnline.key  if person isnt lastOnline.key
-          msg += " " + _.date(lastOnline.val.lastSeen).fromNow()
-          msg += " and quit saying " + lastOnline.val.quitMsg  if lastOnline.val.quitMsg
-        lastSpoke = _(aliases).max((item) ->
-          return 0  unless item.val.lastMessage
-          item.val.lastMessage.time
-        )
-        if lastSpoke and lastSpoke.val.lastMessage
-          lastMessage = lastSpoke.val.lastMessage
-          msg += " and " + _.date(lastMessage.time).fromNow() + " I saw "
-          msg += _.displayChatMsg(lastSpoke.key, lastMessage.msg)
-        cb msg
-
-    _help: "let's you know when a user was last seen online and last spoke in the channel. Also should end up triggering his/her nick alert ;) "
-
   nick:
     command: (from, tokens, cb) ->
       user = _(tokens).head()
