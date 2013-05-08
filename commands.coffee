@@ -3,6 +3,7 @@ require "./utils"
 anidb = require("./anidb")
 Email = require("./email")
 gtalk = require("./gtalk").gtalk
+fs = require("fs")
 
 class Commands
   constructor: (@users, @settings) ->
@@ -24,74 +25,7 @@ directedMessage = (from, tokens, cb, users, success) ->
 
     cb from + ": Message Noted"
 
-commands = fs.readdirSync("./Commands")
-_(commands).
-chain().
-select((f) -> f.match(/.*\.coffee/)).
-each (f) ->
-  console.log(f)
-  commandData = require("./Commands/#{f}")
-  name = commandData['name']
-  Commands::[name] = commandData['command']
-  Commands::[name]._help = commandData['help']
-
 command_definitions =
-  g:
-    command: (from, tokens, cb) ->
-      if /^\d+/.test(_(tokens).head())
-        number = _(tokens).head()
-        msg = _(tokens).tail().join(" ")
-      else
-        number = "1"
-        msg = tokens.join(" ")
-      requestNumber = Math.floor((Number(number) - 1) / 4) * 4
-      resultIndex = Number(number) - requestNumber - 1
-      url = "https://ajax.googleapis.com/ajax/services/search/web?" + _(
-        q: msg
-        v: "1.0"
-        key: @settings["google_key"]
-        start: requestNumber
-      ).stringify()
-      _.request
-        uri: url
-      , (error, response, body) ->
-        if not error and response.statusCode is 200
-          responseJson = JSON.parse(body)
-          if responseJson.responseStatus isnt 200
-            cb "google error '" + responseJson.responseDetails + "' "
-            return
-          res = responseJson.responseData
-          results = res.results
-          resultIndex = results.length - 1  unless results[resultIndex]
-          if resultIndex is -1
-            cb "no results! "
-            return
-          result = results[resultIndex]
-          resNumber = res.cursor.currentPageIndex * 4 + resultIndex + 1
-          cb result.titleNoFormatting + "   " + result.unescapedUrl + "  " + _(result.content).html_as_text() + " ... Result " + resNumber + " out of " + res.cursor.estimatedResultCount
-
-
-    _help: "search google for the terms you're looking for. !g <terms> for the first result. !g x <terms> for the xth result"
-
-  m:
-    command: (from, tokens, cb) ->
-      query = tokens.join(" ").replace(/^\s+|\s+$/g, "")
-      url = "http://tinysong.com/b/" + encodeURIComponent(query) + "?" + _(
-        format: "json"
-        key: @settings["tinysong_key"]
-      ).stringify()
-      _.request
-        uri: url
-      , (error, response, body) ->
-        if not error and response.statusCode is 200
-          responseJson = JSON.parse(body)
-          unless responseJson.Url is `undefined`
-            cb "Listen to " + responseJson.ArtistName + " - " + responseJson.SongName + " at " + responseJson.Url
-          else
-            cb "No song found for: " + query
-
-
-    _help: "searches tinysong and provides a url to grooveshark to listen to the song"
 
   a:
     command: (from, tokens, cb) ->

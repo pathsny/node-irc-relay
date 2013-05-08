@@ -43,10 +43,6 @@ _.mixin
   stringify: (obj) ->
     qs.stringify(obj).replace /'/g, "%27"
 
-  firstMatchIfExists: (string, pattern) ->
-    match = pattern.exec(string)
-    (if match then match[1] else string)
-
   invoke_: (obj, method) ->
     args = _(arguments).slice(2)
     _.map obj, (value) ->
@@ -165,3 +161,4 @@ _.mixin
       this[functionName].apply this, _([item]).concat(args)
     ), this
 
+module.exports = _

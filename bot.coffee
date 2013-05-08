@@ -16,6 +16,7 @@ IrcToText = require("./irc_to_text")
 ircToText = new IrcToText(channel)
 ircLogger = require("./irc_log").Logger(ircToText)
 gtalk = require("./gtalk").gtalk
+Modules = require('./modules')
 model.start (users) ->
   channel_say = (message) ->
     bot.say channel, message
@@ -36,7 +37,8 @@ model.start (users) ->
       commands[command] from, tokens, (result, dont_misakify) ->
         channel_say (if dont_misakify then result else misakify(command, result))  if result
 
-  commands = new Commands(users, settings)
+  modules = new Modules(users, settings)
+  commands = _({}).extend(new Commands(users, settings), modules.commands)
   private_commands = new PrivateCommands(users, settings)
   bot = make_client()
   bot.addListener "registered", ->
@@ -66,7 +68,6 @@ model.start (users) ->
     channel_say misakify(command, message)
   )).each (listener) ->
     bot.addListener incoming, listener
-
 
   # if (settings['twitter']) {
   #     // new twitter(users, settings['twitter'],function(message){
