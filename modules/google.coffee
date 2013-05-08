@@ -1,7 +1,7 @@
 _ = require('../utils')
 
 class Google
-  constructor: (@users, @settings) ->
+  constructor: (users, @settings) ->
     @commands = {g: @command}
     @command._help = "search google for the terms you're looking for. !g <terms> for the first result. !g x <terms> for the xth result"
 

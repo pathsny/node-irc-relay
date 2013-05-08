@@ -1,7 +1,7 @@
 _ = require('../utils')
 
 class Seen
-  constructor: (@users, settings, @emittor) ->
+  constructor: (@users, settings, @emitter) ->
     @commands = {seen: @command}
     # @listeners = [@listener]
     @command._help = "let's you know when a user was last seen online and last spoke in the channel. Also should end up triggering his/her nick alert ;) "
