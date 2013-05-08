@@ -2,10 +2,10 @@ _ = require('../utils')
 
 class Google
   constructor: (@users, @settings) ->
-    @commands = {g: @search}
-    @search._help = "search google for the terms you're looking for. !g <terms> for the first result. !g x <terms> for the xth result"
+    @commands = {g: @command}
+    @command._help = "search google for the terms you're looking for. !g <terms> for the first result. !g x <terms> for the xth result"
 
-  search: (from, tokens, cb) =>
+  command: (from, tokens, cb) =>
     [number, msg] = @extract_params(tokens)
     _.request {uri: @url(number, msg)}, (error, response, body) =>
       if error or response.statusCode isnt 200

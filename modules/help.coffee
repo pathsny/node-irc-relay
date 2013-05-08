@@ -14,9 +14,9 @@ help_string = (commandFn) ->
 
 class Help
   constructor: ->
-    @commands = {help: @help}
+    @commands = {help: @command}
 
-  help: (from, tokens, cb) ->
+  command: (from, tokens, cb) ->
     if _(tokens).isEmpty()
       names = _(this).chain().
         keys().

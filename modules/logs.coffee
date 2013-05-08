@@ -5,11 +5,11 @@ parser = PEG.buildParser(fs.readFileSync("#{__dirname}/logs/log_request.pegjs", 
 
 class Logs
   constructor: (users, settings) ->
-    @commands = {logs: @logs}
-    @logs._help = "Display logs for the channel for some point in time. usage: !logs <x days, y hours, z mins ago> or !logs now or !logs q <search terms>"
+    @commands = {logs: @command}
+    @command._help = "Display logs for the channel for some point in time. usage: !logs <x days, y hours, z mins ago> or !logs now or !logs q <search terms>"
     @url = "#{settings["baseURL"]}:#{settings["port"]}"
 
-  logs: (from, tokens, cb) =>
+  command: (from, tokens, cb) =>
     cb @parse(tokens)
 
   parse: (tokens) =>
@@ -21,7 +21,7 @@ class Logs
   check_time_in_past: (tokens) =>
     try
       time = parser.parse(_(tokens).join(" "))
-      time_hash = _(time).inject((hsh, item) ->
+      time_hash = _(time).inject((hsh, item) =>
         return if (not hsh) or (item[1] of hsh)
         hsh[item[1]] = item[0]
         hsh

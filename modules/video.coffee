@@ -1,9 +1,9 @@
 class Video
   constructor: (users, settings) ->
-    fn = (from, tokens, cb) ->
+    command = (from, tokens, cb) ->
       cb "#{settings["baseURL"]}:#{settings["port"]}/video"
-    fn._help = "Video chat with other people in the channel"
-    @commands = {video: fn}
+    command._help = "Video chat with other people in the channel"
+    @commands = {video: command}
 
 module.exports = Video
 

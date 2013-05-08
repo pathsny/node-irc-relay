@@ -130,15 +130,6 @@ command_definitions =
 
     _help: "search anidb for the anime that matches the terms. !a <name> lists all the matches, or the show if there is only one match. !a x <name> gives you the xth match."
 
-  tell:
-    command: (from, tokens, cb) ->
-      users = @users
-      directedMessage from, tokens, cb, users, (nick, data) ->
-        users.addTell nick, data
-
-
-    _help: "publically passes a message to a user whenever he/she next speaks. usage: !tell <user> <message>"
-
   msg:
     command: (from, tokens, cb) ->
       users = @users
@@ -352,18 +343,6 @@ Commands::listeners = (respond) ->
 
   # convey messages
   [(from, message) ->
-    return  if _(message).automated()
-    rec = self.users.get(from)
-    if rec
-      tells = self.users.getTells(from)
-      if tells.length > 0
-        _(tells).forEach (item) ->
-          msg = from + ": " + item.from + " said '" + item.msg + "'"
-          msg += " " + _.date(item.time).fromNow()  if item.time
-          respond "tell", msg
-
-        self.users.clearTells from
-  , (from, message) ->
     return  if _(message).automated()
     respond "tell", from + ": There are new Messages for you. Msg me to retrieve them"  if self.users.unSetNewMsgFlag(from)
   , (from, message) ->

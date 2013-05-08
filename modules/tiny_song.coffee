@@ -3,8 +3,8 @@ _ = require('../utils')
 class TinySong
   constructor: (users, settings) ->
     @params = _({format: "json", key: settings["tinysong_key"]}).stringify()
-    @commands = {m: @search}
-    @search._help = "searches tinysong and provides a url to grooveshark to listen to the song"
+    @commands = {m: @command}
+    @command._help = "searches tinysong and provides a url to grooveshark to listen to the song"
 
   url: (query) =>
     "http://tinysong.com/b/#{encodeURIComponent(query)}?#{@params}"
@@ -16,7 +16,7 @@ class TinySong
     else
       "No song found for: #{query}"
 
-  search: (from, tokens, cb) =>
+  command: (from, tokens, cb) =>
     query = tokens.join(" ").replace(/^\s+|\s+$/g, "")
     _.request {uri: @url(query)}, (error, response, body) =>
       if error or response.statusCode isnt 200
