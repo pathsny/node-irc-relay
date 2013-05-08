@@ -33,7 +33,8 @@
       "nodemailer": "~ 0.4.1",
       "simple-xmpp": "~ 0.1.10",
       "socket.io": "~ 0.9.14",
-      "connect-route": "~0.1.3"
+      "connect-route": "~0.1.3",
+	  "coffee-script": "~ 1.6.2"
   },
   "private": true
 }
