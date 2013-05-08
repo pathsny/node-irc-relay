@@ -2,3 +2,4 @@
 MY_PATH="`( cd \"$MY_PATH\" && pwd )`"
 mkdir -p $MY_PATH/data
 cp -n $MY_PATH/bin/settings.json.bak $MY_PATH/data/settings.json
+mkdir -p $MY_PATH/data/irclogs
