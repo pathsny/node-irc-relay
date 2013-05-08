@@ -37,12 +37,23 @@ model.start (users) ->
       commands[command] from, tokens, (result, dont_misakify) ->
         channel_say (if dont_misakify then result else misakify(command, result))  if result
 
-  modules = new Modules(users, settings)
+  misaka_adjectives = JSON.parse(fs.readFileSync("./misaka_adjectives.json", "ascii"))
+  misakify = (command, result) ->
+    adjectives = misaka_adjectives["generic"]
+    result + ", said " + bot.nick + " " + _(adjectives).rand()
+
+  misaka_say = (msg) -> channel_say misakify('', msg)
+
+  modules = new Modules(users, settings, misaka_say)
+
   commands = _({}).extend(new Commands(users, settings), modules.commands)
   private_commands = new PrivateCommands(users, settings)
   bot = make_client()
   bot.addListener "registered", ->
     bot.say "nickserv", "identify " + settings["server_password"]
+
+  _(modules.listeners).each (listener) ->
+    bot.addListener(incoming, listener)
 
   last_msg_time = new Date().getTime()
   detectCommand = (from, message) ->
@@ -79,10 +90,6 @@ model.start (users) ->
       channel_say message
 
     gtalk.login settings.gmail
-  misaka_adjectives = JSON.parse(fs.readFileSync("./misaka_adjectives.json", "ascii"))
-  misakify = (command, result) ->
-    adjectives = misaka_adjectives[command] or misaka_adjectives["generic"]
-    result + ", said " + bot.nick + " " + _(adjectives).rand()
 
   bot.conn.setTimeout 180000, ->
     console.log "timeout"

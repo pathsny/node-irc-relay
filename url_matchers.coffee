@@ -21,7 +21,7 @@ exports.matchers =
       , (error, response, body) ->
         if not error and response.statusCode is 200
           res = JSON.parse(body).data
-          
+
           # Date() is too hard, let's go shopping
           hour = ~~(res.duration / 3600)
           min = ~~((res.duration - hour * 3600) / 60)
@@ -46,16 +46,4 @@ exports.matchers =
         msg += " (" + english_title_node["#"] + ")"  if english_title_node
         respond "That anidb link is " + msg
         respond data.splitDescription
-
-
-  imdb:
-    regexes: [/http:\/\/www\.imdb\.com\/title\/(.*)\//]
-    responder: (from, message, match, respond) ->
-      url = "http://www.imdbapi.com/?i=" + match[1]
-      _.request
-        uri: url
-      , (error, response, body) ->
-        if not error and response.statusCode is 200
-          res = JSON.parse(body)
-          respond "ah " + from + " is talking about " + res["Title"] + "(" + res["Year"] + ") which is about " + res["Plot"]
 

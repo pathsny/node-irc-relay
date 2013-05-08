@@ -29,7 +29,7 @@ class Google
   parse: (number, respJson) =>
     return "google error '#{respJson.responseDetails}'" if respJson.responseStatus isnt 200
     resultIndex = number - @requestNumber(number) - 1
-    {cursor: cursor, results: results} = respJson.responseData
+    {cursor, results} = respJson.responseData
     resultIndex = results.length - 1  unless results[resultIndex]
     return "no results!" if resultIndex is -1
 
