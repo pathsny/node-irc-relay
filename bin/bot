@@ -1,0 +1,3 @@
+#!/bin/bash
+MY_PATH="`( cd \"$MY_PATH\" && pwd )`"
+exec $MY_PATH/node_modules/coffee-script/bin/coffee $MY_PATH/bot.coffee
