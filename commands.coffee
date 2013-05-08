@@ -139,53 +139,6 @@ command_definitions =
 
     _help: "stores a message in a user's message box for him/her to retrieve later at leisure. Ideal for links/images that cannot be opened on phones"
 
-  nick:
-    command: (from, tokens, cb) ->
-      user = _(tokens).head()
-      unless user
-        cb "it's nick! <username> "
-      else
-        aliases = @users.aliasedNicks(user)
-        unless aliases
-          cb user + " is not known"
-        else
-          if aliases.length is 1
-            cb user + " has only one known nick"
-          else
-            cb "known nicks of " + user + " are " + _(aliases).sentence()
-
-    _help: "lists all the nicknames a user has used in the past"
-
-  link:
-    command: (from, tokens, cb) ->
-      nick = _(tokens).head()
-      group = _(tokens).chain().tail().head().value()
-      unless nick and group
-        cb "link <nick> <group>"
-      else
-        result = @users.link(nick, group)
-        if result
-          cb nick + " has been linked with " + group
-        else
-          cb "link only known UNLINKED nicks with other nicks"
-
-    _help: "links a nickname to any nickname from an existing set of nicknames. You can only link an unlinked nickname to other nicknames. usage !link nick1 nick2"
-
-  unlink:
-    command: (from, tokens, cb) ->
-      nick = _(tokens).head()
-      group = _(tokens).chain().tail().head().value()
-      unless nick and group
-        cb "unlink <nick> <group>"
-      else
-        result = @users.unlink(nick, group)
-        if result
-          cb nick + " has been unlinked from " + group
-        else
-          cb "unlink linked nicks"
-
-    _help: "unlink a nickname from an existing group of nicknames"
-
   alert:
     command: (from, tokens, cb) ->
       nick = _(tokens).head()

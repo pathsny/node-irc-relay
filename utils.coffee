@@ -64,6 +64,8 @@ _.mixin
   numbered: (list) ->
     _(1).chain().range(list.length + 1).zip(list).value()
 
+  second: (list) -> list[1]
+
   gmtDate: (date) ->
     date = date.date  if date.date
     yyyy = "" + date.getUTCFullYear()
