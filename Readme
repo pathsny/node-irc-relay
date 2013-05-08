@@ -1,12 +1,14 @@
-Simple IRC relay that connects two irc channels.
+Irc bot written in coffeescript
 
-To install, install node.js and npm
+setup instructions
+install node.js
+clone the repo
+npm install
+./scripts/setup
+edit data/settings.json and fill in the settings
 
-then
-  npm install
-
-copy settings.json.bak to data/settings.json and put in the right data! 
-
+modules sit inside the modules directory
+check the Readme there to create new modules
 
 other dependencies by now
 libicu-dev
