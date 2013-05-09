@@ -181,32 +181,6 @@ command_definitions =
 
     _help: "send an alert to a member of the group who has added their email address to me. alert <nick> message"
 
-  count:
-    command: (from, tokens, cb) ->
-      number = Number(_(tokens).first() or 5)
-      if _(number).isFinite()
-        if number > 7
-          cb "Please be reasonable. I do not have enought sticks and stones to count down from " + number
-        else if number < 0
-          cb "I can only count from numbers greater than 0"
-        else unless Commands::count._countLock
-          Commands::count._countLock = true
-          count = (i) ->
-            cb (if i > 0 then i else "GO!"), true
-            if i > 0
-              setTimeout (->
-                count i - 1
-              ), 1000
-            else
-              Commands::count._countLock = false
-
-          count number
-      else
-        cb "I need a valid number to countdown from"
-
-    _countLock: false
-    _help: "counts down from n to zero. usage !count n"
-
   twitter:
     command: (from, tokens, cb) ->
       self = this

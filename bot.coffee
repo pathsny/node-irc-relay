@@ -42,7 +42,9 @@ model.start (users) ->
     adjectives = misaka_adjectives["generic"]
     result + ", said " + bot.nick + " " + _(adjectives).rand()
 
-  misaka_say = (msg) -> channel_say misakify('', msg)
+  misaka_say = (msg, dont_misakify) ->
+    return unless msg
+    channel_say (if dont_misakify then msg else misakify('', msg))
 
   modules = new Modules(users, settings, misaka_say)
 
