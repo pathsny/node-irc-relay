@@ -17,7 +17,7 @@ class Tell
     tells = @users.getTells(from)
     return if _(tells).isEmpty()
     _(tells).each (item) =>
-      @emitter "#{from}:#{item.from} said '#{item.msg}' #{_.date(item.time).fromNow()}"
+      @emitter "#{from}: #{item.from} said '#{item.msg}' #{_.date(item.time).fromNow()}"
     @users.clearTells from
 
 module.exports = Tell
