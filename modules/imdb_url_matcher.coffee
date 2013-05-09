@@ -1,7 +1,6 @@
 # Prints out details about an IMDB url
 _ = require('../utils')
 RegexUrlMatcher = require("#{__dirname}/base/regex_url_matcher")
-param_string = _({v: 2,alt: "jsonc"}).stringify()
 
 class ImdbUrlMatcher extends RegexUrlMatcher
   regexes: [/http:\/\/www\.imdb\.com\/title\/(.*)\//]
