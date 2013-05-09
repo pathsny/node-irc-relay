@@ -1,5 +1,5 @@
 class RegexUrlMatcher
-  constructor: (users, settings, @emittor) ->
+  constructor: (users, settings, @emitter) ->
     @listeners = [@listener]
 
   listener: (from, msg) =>
