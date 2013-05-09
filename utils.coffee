@@ -118,15 +118,16 @@ _.mixin
 
   request: (options, cb) ->
     cache = undefined
-    cache = "./data/cache/" + options.cache  if options.cache
+    cache = "#{__dirname}/data/cache/" + options.cache  if options.cache
     handle_resp = (error, response, body) ->
       if not error and options.cache
         encoding = options.encoding or "utf8"
-        fs.writeFile cache, JSON.stringify([
+        cacheData = JSON.stringify([
           httpVersion: response.httpVersion
           headers: response.headers
           statusCode: response.statusCode
         , body])
+        fs.writeFile cache, cacheData
       cb error, response, body
 
     http_req = ->
