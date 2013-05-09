@@ -52,9 +52,9 @@ model.start (users) ->
   bot.addListener "registered", ->
     bot.say "nickserv", "identify " + settings["server_password"]
 
-  _(modules.listeners).each (listener) ->
-    bot.addListener(incoming, listener)
-    bot.addListener("action", (from, to, msg) => listener(from, msg) if to is channel)
+  _(modules.message_listeners).each (l) ->
+    bot.addListener(incoming, l)
+    bot.addListener("action", (from, to, msg) => l(from, msg) if to is channel)
 
   last_msg_time = new Date().getTime()
   detectCommand = (from, message) ->

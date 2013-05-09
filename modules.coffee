@@ -5,8 +5,8 @@ class Modules
   constructor: (users, settings, emitter) ->
     instances = modules.map (Module_x) -> new Module_x(users, settings, emitter)
     @_commands = _({}).extend(_(instances).pluck('commands')...)
-    @_listeners = _(instances).chain().
-      pluck('listeners').
+    @_message_listeners = _(instances).chain().
+      pluck('message_listeners').
       compact().
       flatten().
       value()
@@ -14,7 +14,7 @@ class Modules
   Object.defineProperties @prototype,
       commands:
         get: -> @_commands
-      listeners:
-        get: -> @_listeners
+      message_listeners:
+        get: -> @_message_listeners
 
 module.exports = Modules

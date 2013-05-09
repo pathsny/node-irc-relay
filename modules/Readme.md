@@ -43,11 +43,11 @@ types *!help &lt;command_name&gt;*
 
 TBD
 
-### Listeners ###
+### Message Listeners ###
 
-* listeners get a copy of every message and can react to them if necessary. When invoked a
-listener receives
+* message_listeners get a copy of every message and action and can react to them if necessary. When invoked a
+message_listener receives
 	1. the nick of the person who sent the message
 	2. the remaining text on that line
-* the listener does not receive messages emitted by the bot.
+* the messages_listener does not receive messages emitted by the bot.
 * for examples look at the modules **imdb\_url\_identifier** or **tell**

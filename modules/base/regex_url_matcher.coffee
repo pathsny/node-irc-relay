@@ -1,8 +1,8 @@
 class RegexUrlMatcher
   constructor: (users, settings, @emitter) ->
-    @listeners = [@listener]
+    @message_listeners = [@message_listener]
 
-  listener: (from, msg) =>
+  message_listener: (from, msg) =>
       r = _(@regexes).find (r) => r.test(msg)
       @on_match from, r.exec(msg) if r
 
