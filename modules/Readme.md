@@ -45,8 +45,8 @@ TBD
 
 ### Message Listeners ###
 
-* message_listeners get a copy of every message and action and can react to them if necessary. When invoked a
-message_listener receives
+* message\_listeners get a copy of every message and action and can react to them if necessary. When invoked a
+message\_listener receives
 	1. the nick of the person who sent the message
 	2. the remaining text on that line
 * the messages_listener does not receive messages emitted by the bot.
