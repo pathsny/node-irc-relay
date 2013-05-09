@@ -54,6 +54,7 @@ model.start (users) ->
 
   _(modules.listeners).each (listener) ->
     bot.addListener(incoming, listener)
+    bot.addListener("action", (from, to, msg) => listener(from, msg) if to is channel)
 
   last_msg_time = new Date().getTime()
   detectCommand = (from, message) ->
