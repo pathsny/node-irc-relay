@@ -6,7 +6,7 @@ qs = require("querystring")
 sanitizer = require("sanitizer")
 zlib = require("zlib")
 xmljs = require("xml2js")
-xmlParser = new xmljs.Parser(mergeAttrs: true)
+xmlParser = new xmljs.Parser(mergeAttrs: true, charkey: '#')
 _.date().customize relativeTime:
   future: "in %s"
   past: "%s ago"
