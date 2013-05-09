@@ -231,21 +231,9 @@ _(command_definitions).chain().keys().each (commandName) ->
 
 Commands::listeners = (respond) ->
   self = this
-  matchers = require("./url_matchers").matchers
 
   # convey messages
   [(from, message) ->
     return  if _(message).automated()
     respond "tell", from + ": There are new Messages for you. Msg me to retrieve them"  if self.users.unSetNewMsgFlag(from)
-  , (from, message) ->
-    _(matchers).chain().keys().detect (type) ->
-      matching_regex = _(matchers[type].regexes).detect((regex) ->
-        regex.test message
-      )
-      if matching_regex
-        matchers[type].responder from, message, matching_regex.exec(message), (msg) ->
-          respond type + "_metadata", msg
-
-        true
-
   ]
