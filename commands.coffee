@@ -1,6 +1,5 @@
 _ = require("underscore")
 require "./utils"
-anidb = require("./anidb")
 Email = require("./email")
 gtalk = require("./gtalk").gtalk
 fs = require("fs")
@@ -26,109 +25,6 @@ directedMessage = (from, tokens, cb, users, success) ->
     cb from + ": Message Noted"
 
 command_definitions =
-
-  a:
-    command: (from, tokens, cb) ->
-      search_tokens = undefined
-      if /^\d+$/.test(_(tokens).head())
-        number = _(tokens).head()
-        search_tokens = _(tokens).tail()
-      else
-        number = `undefined`
-        search_tokens = tokens
-      if search_tokens.length is 0
-        cb "a! <anime name>"
-        return
-      exact_msg = "\\" + search_tokens.join(" ")
-      long_tokens = _(search_tokens).filter((token) ->
-        token.length >= 4
-      )
-      short_tokens = _(search_tokens).filter((token) ->
-        token.length < 4
-      )
-      msg = _(long_tokens).chain().map((token) ->
-        "+" + token
-      ).concat(_(short_tokens).map((token) ->
-        "%" + token + "%"
-      )).value().join(" ")
-      anidb_info = (anime) ->
-        englishNode = _(anime.title).find((t) ->
-          t.lang is "en" and t.type is "official"
-        ) or _(anime.title).find((t) ->
-          t.lang is "en" and t.type is "syn"
-        ) or _(anime.title).find((t) ->
-          t.lang is "x-jat" and t.type is "syn"
-        )
-        mainNode = _(anime.title).find((t) ->
-          t.type is "main"
-        )
-        exactNode = _(anime.title).find((t) ->
-          t.exact
-        )
-        msg = mainNode["#"]
-        msg = exactNode["#"] + " offically known as " + msg  unless exactNode is mainNode
-        msg += " (" + englishNode["#"] + ")"  if englishNode and englishNode isnt exactNode
-        cb msg + ". http://anidb.net/perl-bin/animedb.pl?show=anime&aid=" + anime["aid"]
-        anidb.getInfo anime["aid"], (data) ->
-          cb data.splitDescription
-
-
-      parse_results = (animes) ->
-        animes = [animes]  unless _(animes).isArray()
-        size = animes.length
-        extra_msg = (if size > 7 then " or others." else ".")
-        if size is 0
-          cb "No Results"
-        else if size is 1
-          anidb_info animes[0]
-        else if number and number <= size
-          anidb_info animes[number - 1]
-        else
-          cb _(search_tokens).join(" ") + " could be " + _(animes).chain().first(7).numbered().map((ttl) ->
-            ttl[0] + ". " + _(ttl[1].title).find((t) ->
-              t.exact
-            )["#"]
-          ).join(", ").value() + extra_msg
-
-      inexactMatch = ->
-        url = "http://anisearch.outrance.pl/?" + _(
-          task: "search"
-          query: msg
-        ).stringify()
-        _.requestXmlAsJson
-          uri: url
-        , (error, data) ->
-          if error
-            console.error error
-          else
-            animes = data["anime"]
-            parse_results animes  if animes
-
-
-      exact_Match = ->
-        url = "http://anisearch.outrance.pl/?" + _(
-          task: "search"
-          query: exact_msg
-        ).stringify()
-        _.requestXmlAsJson
-          uri: url
-        , (error, data) ->
-          if error
-            console.error error
-          else
-            animes = data["anime"]
-            if animes
-              parse_results animes
-            else
-              inexactMatch()
-
-
-      if /^~$/.test(search_tokens[0]) and search_tokens.length > 1
-        inexactMatch()
-      else
-        exact_Match()
-
-    _help: "search anidb for the anime that matches the terms. !a <name> lists all the matches, or the show if there is only one match. !a x <name> gives you the xth match."
 
   msg:
     command: (from, tokens, cb) ->
