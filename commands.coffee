@@ -45,7 +45,7 @@ command_definitions =
       else unless user
         cb "alert requires the nick of a valid user in the channel"
         return
-      email_address = @users.getEmailAddress(nick)
+      email_address = @users.get_EmailAddress(nick)
       message = "<" + from + "> " + _(tokens).tail().join(" ")
       unless email_address
         if gtalk.tryAlert(nick, message)
@@ -91,7 +91,7 @@ command_definitions =
             data.screen_name is twitter_name
           )
           if user_data
-            self.users.setTwitterAccount from, user_data["id"]
+            self.users.set_TwitterAccount from, user_data["id"]
             self.users.emit "twitter follows changed"
             msg = "following user called " + twitter_name + " with id " + user_data["id"]
             cb msg
@@ -106,7 +106,7 @@ command_definitions =
 
 
       unfollow = (user) ->
-        self.users.clearTwitterAccount from
+        self.users.clear_TwitterAccount from
         self.users.emit "twitter follows changed"
 
       switch _(tokens).head()

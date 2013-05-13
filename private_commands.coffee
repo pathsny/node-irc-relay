@@ -66,12 +66,12 @@ _(contact_points).each (params, command) ->
     first = _(tokens).head()
     if first and params.regex.test(first)
       unless params.custom_fn
-        @users["set" + params.property] from, first
+        @users["set_" + params.property] from, first
         cb "your " + params.property + " has been recorded as " + first
       else
         params.custom_fn from, first, cb
     else if first and first is "clear"
-      @users["clear" + params.property] from
+      @users["clear_" + params.property] from
       cb "your " + params.property + " has been cleared"
     else
       cb params.help

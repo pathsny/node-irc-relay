@@ -2,6 +2,7 @@ userdb = require("dirty")("./data/user.db")
 uuid = require("node-uuid")
 _ = require("underscore")
 require "./utils"
+inflection = require 'inflection'
 userdb.addIndex "nickId", (k, v) ->
   v.nickId
 
@@ -143,20 +144,6 @@ userdb.aliasedNicks = (nick) ->
   return `undefined`  unless userdb.get(nick)
   _(userdb.aliases(nick)).pluck "key"
 
-_(["msg", "tell"]).each (type) ->
-  userdb["add" + _(type).capitalize()] = (nick, data) ->
-    rec = userdb.get(nick)
-    collection = rec[type + "s"] or []
-    collection.push data
-    rec[type + "s"] = collection
-    rec.newMsgs = true  if type is "msg"
-    userdb.set nick, rec
-
-_(["msgs", "tells"]).each (type) ->
-  userdb["get" + _(type).capitalize()] = (nick) ->
-    _(@aliases(nick)).chain().map((item) ->
-      item.val[type] or []
-    ).flatten().value()
 
 userdb.unSetNewMsgFlag = (nick) ->
   newMsgExists = false
@@ -179,13 +166,6 @@ userdb.deleteMsg = (nick, number) ->
       number -= msgs.length
 
 
-userdb.clearTells = (nick) ->
-  _(@aliases(nick)).each (item) ->
-    rec = item.val
-    rec.tells = []
-    userdb.set item.key, rec
-
-
 userdb.createToken = (nick) ->
   rec = userdb.get(nick)
   return  if rec.status isnt "online"
@@ -197,29 +177,66 @@ userdb.validToken = (token) ->
   return  unless token
   _(userdb.find("token", token)).first()
 
-userdb.clearProperty = (propName, nick) ->
-  _(@aliases(nick)).find (item) ->
-    rec = _(item.val).clone()
-    delete rec[propName]
-    userdb.set item.key, rec
+userdb.clearProperty = (prop_name, nick) ->
+  _(@aliases(nick)).
+  chain().
+  filter((item) -> _(item.val).has(prop_name)).
+  each (item) ->
+    delete item.val[prop_name]
+    userdb.set item.key, item.val
 
-
-userdb.setProperty = (propName, nick, propValue) ->
-  userdb.clearProperty propName, nick
-  rec = _(userdb.get(nick)).clone()
-  rec[propName] = propValue
+userdb.setProperty = (prop_name, nick, propValue) ->
+  userdb.clearProperty prop_name, nick
+  rec = userdb.get(nick)
+  rec[prop_name] = propValue
   userdb.set nick, rec
 
-userdb.getProperty = (propName, nick) ->
-  rec = _(@aliases(nick)).find((item) ->
-    item.val[propName]
-  )
-  rec and rec.val[propName]
+userdb.getProperty = (prop_name, nick) ->
+  rec = _(@aliases(nick)).find (item) -> _(item.val).has(prop_name)
+  rec?.val[prop_name]
+
+userdb.getArrayProperty = (prop_name, nick) ->
+  _(@aliases(nick)).
+  chain().
+  map((item) -> item.val[prop_name] or []).
+  flatten().
+  value()
+
+userdb.addArrayProperty = (prop_name, nick, prop_value) ->
+  rec = userdb.get(nick)
+  rec[prop_name] = _(rec[prop_name] or []).push(prop_value)
+  userdb.set nick, rec
+
+userdb.defineScalarProperty = (prop_name) ->
+  userdb["clear_#{prop_name}"] = _.bind(userdb.clearProperty, userdb, prop_name)
+  userdb["set_#{prop_name}"] = _.bind(userdb.setProperty, userdb, prop_name)
+  userdb["get_#{prop_name}"] = _.bind(userdb.getProperty, userdb, prop_name)
+
+userdb.defineArrayProperty = (prop_name) ->
+  multi_name = inflection.pluralize prop_name
+  userdb["clear_#{multi_name}"] = _.bind(userdb.clearProperty, userdb, multi_name)
+  userdb["get_#{multi_name}"] = _.bind(userdb.getArrayProperty, userdb, multi_name)
+  userdb["add_#{prop_name}"] = _.bind(userdb.addArrayProperty, userdb, multi_name)
+
+_(["msg"]).each (type) ->
+  userdb["add" + _(type).capitalize()] = (nick, data) ->
+    rec = userdb.get(nick)
+    collection = rec[type + "s"] or []
+    collection.push data
+    rec[type + "s"] = collection
+    rec.newMsgs = true  if type is "msg"
+    userdb.set nick, rec
+
+_(["msgs"]).each (type) ->
+  userdb["get" + _(type).capitalize()] = (nick) ->
+    _(@aliases(nick)).chain().map((item) ->
+      item.val[type] or []
+    ).flatten().value()
 
 _(["PhoneNumber", "TwitterAccount", "EmailAddress", "GtalkId"]).each (thing) ->
-  userdb["clear" + thing] = _.bind(userdb.clearProperty, userdb, thing)
-  userdb["set" + thing] = _.bind(userdb.setProperty, userdb, thing)
-  userdb["get" + thing] = _.bind(userdb.getProperty, userdb, thing)
+  userdb.defineScalarProperty thing
+
+
 
 exports.start = (fn) ->
   userdb.on "load", ->
