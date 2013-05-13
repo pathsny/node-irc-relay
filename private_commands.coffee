@@ -8,36 +8,9 @@ class Commands
 module.exports = Commands
 
 Commands::help = (from, tokens, cb) ->
-  cb "token : gives you a token for the web history at www.got-rice.asia:8008"
-  cb "list : lists all messages left for you"
-  cb "del <x> : deletes the xth message"
   cb "email <emailaddress> : sets an alert email address. email clear : clears the alert email address"
   cb "gtalk <gtalkid> : sets a gtalk id. gtalk clear : clears the gtalk id"
 
-Commands::list = (from, tokens, cb) ->
-  return  unless @users.get(from)
-  msgs = @users.getMsgs(from)
-  if msgs.length > 0
-    _(msgs).chain().zipWithIndex().forEach (item) ->
-      msg = item[0]
-      reply = (item[1] + 1) + ". " + msg.from + " said '" + msg.msg + "'"
-      reply += " " + _.date(msg.time).fromNow()  if msg.time
-      cb reply
-
-  else
-    cb "There are no messages for you"
-
-Commands::del = (from, tokens, cb) ->
-  return  unless @users.get(from)
-  first = _(tokens).head()
-  if first and /^\d+$/.test(first)
-    number = Number(first)
-    if @users.deleteMsg(from, number - 1)
-      cb "message number " + number + " has been deleted"
-    else
-      cb "there is no message number " + number
-  else
-    cb "delete requires a message number to delete"
 
 contact_points =
   phone:

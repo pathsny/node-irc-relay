@@ -26,14 +26,6 @@ directedMessage = (from, tokens, cb, users, success) ->
 
 command_definitions =
 
-  msg:
-    command: (from, tokens, cb) ->
-      users = @users
-      directedMessage from, tokens, cb, users, (nick, data) ->
-        users.addMsg nick, data
-
-
-    _help: "stores a message in a user's message box for him/her to retrieve later at leisure. Ideal for links/images that cannot be opened on phones"
 
   alert:
     command: (from, tokens, cb) ->
@@ -124,12 +116,3 @@ _(command_definitions).chain().keys().each (commandName) ->
   command_definition = command_definitions[commandName]
   Commands::[commandName] = command_definition["command"]
   Commands::[commandName]._help = command_definition["_help"]
-
-Commands::listeners = (respond) ->
-  self = this
-
-  # convey messages
-  [(from, message) ->
-    return  if _(message).automated()
-    respond "tell", from + ": There are new Messages for you. Msg me to retrieve them"  if self.users.unSetNewMsgFlag(from)
-  ]

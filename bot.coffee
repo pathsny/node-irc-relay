@@ -78,11 +78,6 @@ model.start (users) ->
   _(users.listeners).chain().concat(ircToText.listeners()).each (model_listener) ->
     bot.addListener model_listener.type, model_listener.listener
 
-  _(commands.listeners((command, message) ->
-    channel_say misakify(command, message)
-  )).each (listener) ->
-    bot.addListener incoming, listener
-
   # if (settings['twitter']) {
   #     // new twitter(users, settings['twitter'],function(message){
   #     //     channel_say(misakify("twitter", message));
