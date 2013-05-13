@@ -1,8 +1,8 @@
 _ = require('../utils')
 
 class TinySong
-  constructor: ({settings}) ->
-    @params = _({format: "json", key: settings["tinysong_key"]}).stringify()
+  constructor: ({settings: {modules: {tiny_song: {key}}}}) ->
+    @params = _({format: "json", key: key}).stringify()
     @commands = {m: @command}
     @command._help = "searches tinysong and provides a url to grooveshark to listen to the song"
 

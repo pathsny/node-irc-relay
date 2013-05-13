@@ -1,7 +1,7 @@
 _ = require('../utils')
 
 class Google
-  constructor: ({@settings}) ->
+  constructor: ({settings: {modules: {google: {@key}}}}) ->
     @commands = {g: @command}
     @command._help = "search google for the terms you're looking for. !g <terms> for the first result. !g x <terms> for the xth result"
 
@@ -23,7 +23,7 @@ class Google
     Math.floor((n - 1) / 4) * 4
 
   url: (number, msg) =>
-    params = {q: msg, v: "1.0", key: @settings["google_key"], start: @requestNumber(number)}
+    params = {q: msg, v: "1.0", key: @key, start: @requestNumber(number)}
     "https://ajax.googleapis.com/ajax/services/search/web?" + _(params).stringify()
 
   parse: (number, respJson) =>

@@ -5,17 +5,22 @@
     "google_key": "<needed>",
     "server_password": "<needed>",
     "port": "<needed>",
-    "tinysong_key": "<key for tinysong searches>",
     "catch_all_exceptions": <true or false>,
     "baseURL": "<url with protocol>"
-    "twitter": {
-      "user": "<username>",
-      "password": "<twitter password>"
-    },
 	"load_modules" : {
 		"restriction": "<none|whitelist|blacklist>",
 		"modules": []
+	},
+	"modules": {
+		"google": {
+			"key": "<needed if google module is loaded>"
+		},
+		"tiny_song": {
+			"key": "<needed if tiny_song module is loaded>"
+		},
+	    "twitter": {
+	      "user": "<username>",
+	      "password": "<twitter password>"
+	    }
 	}
-
-
 }
