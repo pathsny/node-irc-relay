@@ -9,3 +9,4 @@ module.exports = (from, tokens, cb, users, success) ->
     cb to + " is not known"
   else
     success to, {from: from, msg: msg, time: Date.now()}
+    cb "#{from}: Message Noted"
