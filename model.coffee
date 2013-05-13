@@ -144,28 +144,6 @@ userdb.aliasedNicks = (nick) ->
   return `undefined`  unless userdb.get(nick)
   _(userdb.aliases(nick)).pluck "key"
 
-
-userdb.unSetNewMsgFlag = (nick) ->
-  newMsgExists = false
-  _(@aliases(nick)).each (item) ->
-    rec = item.val
-    newMsgExists = true  if rec.newMsgs
-    rec.newMsgs = false
-    userdb.set item.key, rec
-
-  newMsgExists
-
-userdb.deleteMsg = (nick, number) ->
-  _(@aliases(nick)).any (item) ->
-    msgs = item.val.msgs or []
-    if msgs.length > number
-      msgs.splice number, 1
-      userdb.set item.key, item.val
-      true
-    else
-      number -= msgs.length
-
-
 userdb.createToken = (nick) ->
   rec = userdb.get(nick)
   return  if rec.status isnt "online"
@@ -207,6 +185,16 @@ userdb.addArrayProperty = (prop_name, nick, prop_value) ->
   rec[prop_name] = _(rec[prop_name] or []).push(prop_value)
   userdb.set nick, rec
 
+userdb.delArrayProperty = (prop_name, nick, number) ->
+  found = _(@aliases(nick)).reduce((count, item) ->
+    prop_values = item.val[prop_name] or []
+    return count - prop_values.length if prop_values.length < count + 1
+    prop_values.splice(count, 1)
+    userdb.set item.key, item.val
+    true
+  , number)
+  found is true
+
 userdb.defineScalarProperty = (prop_name) ->
   userdb["clear_#{prop_name}"] = _.bind(userdb.clearProperty, userdb, prop_name)
   userdb["set_#{prop_name}"] = _.bind(userdb.setProperty, userdb, prop_name)
@@ -217,25 +205,10 @@ userdb.defineArrayProperty = (prop_name) ->
   userdb["clear_#{multi_name}"] = _.bind(userdb.clearProperty, userdb, multi_name)
   userdb["get_#{multi_name}"] = _.bind(userdb.getArrayProperty, userdb, multi_name)
   userdb["add_#{prop_name}"] = _.bind(userdb.addArrayProperty, userdb, multi_name)
-
-_(["msg"]).each (type) ->
-  userdb["add" + _(type).capitalize()] = (nick, data) ->
-    rec = userdb.get(nick)
-    collection = rec[type + "s"] or []
-    collection.push data
-    rec[type + "s"] = collection
-    rec.newMsgs = true  if type is "msg"
-    userdb.set nick, rec
-
-_(["msgs"]).each (type) ->
-  userdb["get" + _(type).capitalize()] = (nick) ->
-    _(@aliases(nick)).chain().map((item) ->
-      item.val[type] or []
-    ).flatten().value()
+  userdb["del_#{prop_name}"] = _.bind(userdb.delArrayProperty, userdb, multi_name)
 
 _(["PhoneNumber", "TwitterAccount", "EmailAddress", "GtalkId"]).each (thing) ->
   userdb.defineScalarProperty thing
-
 
 
 exports.start = (fn) ->
