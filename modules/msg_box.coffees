@@ -1,0 +1,22 @@
+directed_message = require "#{__dirname}/base/directed_message"
+_ = require "../utils"
+
+class MsgBox
+  # constructor: ({@users}) ->
+  #   @commands = {msg: @command}
+  #   @command._help = "stores a message in a user's message box for him/her to retrieve later at leisure. Ideal for links/images that cannot be opened on phones"
+  #   @private_commands = {list: @msg_list, del: @msg_del}
+  #   @message_listeners = [@message_listener]
+  #
+  #   command: (from, tokens, cb) =>
+  #     directedMessage from, tokens, cb, users, (nick, data) =>
+  #       @users.addMsg nick, data
+  #
+  #   @message_listener: (from, message) =>
+  #     return if _(message).automated()
+  #     respond "tell", from + ": There are new Messages for you. Msg me to retrieve them"  if self.users.unSetNewMsgFlag(from)
+  #
+  #   msg:
+  #     command: (from, tokens, cb) ->
+
+module.exports = MsgBox

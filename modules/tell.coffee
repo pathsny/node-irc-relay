@@ -2,7 +2,7 @@ directed_message = require "#{__dirname}/base/directed_message"
 _ = require('../utils')
 
 class Tell
-  constructor: (@users, settings, @emitter) ->
+  constructor: ({@users, @emitter}) ->
     @users.defineArrayProperty 'tell'
     @commands = {tell: @command}
     @message_listeners = [@message_listener]

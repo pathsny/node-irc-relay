@@ -4,7 +4,7 @@ PEG = require("pegjs")
 parser = PEG.buildParser(fs.readFileSync("#{__dirname}/log_request/log_request.pegjs", "ascii"))
 
 class LogRequest
-  constructor: (users, settings) ->
+  constructor: ({settings}) ->
     @commands = {logs: @command}
     @command._help = "Display logs for the channel for some point in time. usage: !logs <x days, y hours, z mins ago> or !logs now or !logs q <search terms>"
     @url = "#{settings["baseURL"]}:#{settings["port"]}"

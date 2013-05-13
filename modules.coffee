@@ -3,7 +3,8 @@ modules = (require("./modules/#{f}") for f in fs.readdirSync("./modules") when f
 
 class Modules
   constructor: (users, settings, emitter) ->
-    instances = modules.map (Module_x) -> new Module_x(users, settings, emitter)
+    options = {users: users, settings: settings, emitter: emitter}
+    instances = modules.map (Module_x) -> new Module_x(options)
     @_commands = _({}).extend(_(instances).pluck('commands')...)
     @_private_commands = _({}).extend(_(instances).pluck('private_commands')...)
     @_message_listeners = _(instances).chain().

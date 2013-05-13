@@ -10,7 +10,7 @@ param_string = _({
 }).stringify()
 
 class Anidb extends RegexUrlMatcher
-  constructor: (users, settings, @emitter) ->
+  constructor: ({@emitter}) ->
     super
     @commands = {a: @command}
     @command._help = "search anidb for the anime that matches the terms. !a <name> lists all the matches, or the show if there is only one match. !a x <name> gives you the xth match."

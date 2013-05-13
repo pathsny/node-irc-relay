@@ -7,13 +7,13 @@ Modules provide various pieces of functionality.
 To create a module, you have to create a new file.
 Each javascript or coffeescript file in this directory defines a new module.
 every module should export a constructor.
-your constructor will get called with
+your constructor will get called with a map containing the keys
 
-* a reference to the user database which you can use to store and retrieve data
+* users: a reference to the user database which you can use to store and retrieve data
 
-* the settings so you can retrieve specific settings for your plugin
+* settings: the settings so you can retrieve specific settings for your plugin
 
-* an emitter which you can use to emit text onto the channel
+* emitter: an emitter which you can use to emit text onto the channel
 
 ## Functionality ##
 	Any module can provide any combination of the following types of functionality.

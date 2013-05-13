@@ -1,7 +1,7 @@
 _ = require('../utils')
 
 class Count
-  constructor: (users, settings, emitter) ->
+  constructor: () ->
     @commands = {count: @command}
     @command._help = "counts down from n to zero. usage !count n"
     @_lock = false

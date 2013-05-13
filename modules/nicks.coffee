@@ -1,7 +1,7 @@
 #exposes information about the nickname tracking the bot does and allows users to manipulate it.
 
 class Nicks
-  constructor: (@users, settings, emitter) ->
+  constructor: ({@users}) ->
     @commands = ['nick', 'link', 'unlink'].reduce (c_list, name) =>
       c_list[name] = (from, tokens, cb) => cb @[name](tokens...)
       c_list[name]._help = @help[name]
