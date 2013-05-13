@@ -14,10 +14,6 @@ Commands::help = (from, tokens, cb) ->
   cb "email <emailaddress> : sets an alert email address. email clear : clears the alert email address"
   cb "gtalk <gtalkid> : sets a gtalk id. gtalk clear : clears the gtalk id"
 
-Commands::token = (from, tokens, cb) ->
-  token = @users.createToken(from)
-  cb token  if token
-
 Commands::list = (from, tokens, cb) ->
   return  unless @users.get(from)
   msgs = @users.getMsgs(from)
@@ -65,6 +61,7 @@ _(contact_points).each (params, command) ->
     return  unless @users.get(from)
     first = _(tokens).head()
     if first and params.regex.test(first)
+      console.log('got a request for ', params.property, from, tokens, cb)
       unless params.custom_fn
         @users["set_" + params.property] from, first
         cb "your " + params.property + " has been recorded as " + first

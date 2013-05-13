@@ -5,6 +5,7 @@ class Modules
   constructor: (users, settings, emitter) ->
     instances = modules.map (Module_x) -> new Module_x(users, settings, emitter)
     @_commands = _({}).extend(_(instances).pluck('commands')...)
+    @_private_commands = _({}).extend(_(instances).pluck('private_commands')...)
     @_message_listeners = _(instances).chain().
       pluck('message_listeners').
       compact().
@@ -16,5 +17,7 @@ class Modules
         get: -> @_commands
       message_listeners:
         get: -> @_message_listeners
+      private_commands:
+        get: -> @_private_commands
 
 module.exports = Modules
