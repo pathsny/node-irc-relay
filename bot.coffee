@@ -25,8 +25,7 @@ model.start (users) ->
       channels: [channel]
     )).tap (client) ->
       client.addListener "error", (message) ->
-        console.error "ERROR: " + server + " : " + message.command + ": " + message.args.join(" ")
-
+        console.error "ERROR: #{server} : #{message.command} : #{message.args.join(' ')}"
       client.say = _.wrap(client.say, (say) ->
         say.apply client, _(arguments).slice(1)
         client.emit "message", client.nick, arguments[1], arguments[2]
@@ -102,8 +101,10 @@ model.start (users) ->
 
   COMPACT_TIME_LIMIT = 60000
   compactDB = ->
+    console.log('trying to compact');
     idle_time = new Date().getTime() - last_msg_time
-    if users.redundantLength > 5 and idle_time > COMPACT_TIME_LIMIT
+    if users.redundantLength > 200 and idle_time > COMPACT_TIME_LIMIT
+      console.log('compacting');
       users.once('compacted', -> setTimeout(compactDB, COMPACT_TIME_LIMIT))
       users.compact()
     else
