@@ -50,6 +50,7 @@ model.start (users) ->
 
   commands = _({}).extend(new Commands(users, settings), modules.commands)
   private_commands = new PrivateCommands(users, settings)
+  _(private_commands).extend(modules.private_commands)
   bot = make_client()
   bot.addListener "registered", ->
     bot.say "nickserv", "identify " + settings["server_password"]
@@ -99,14 +100,16 @@ model.start (users) ->
     bot.conn.end()
     process.exit()
 
+  COMPACT_TIME_LIMIT = 60000
   compactDB = ->
     idle_time = new Date().getTime() - last_msg_time
-    if users.redundantLength > 200 and idle_time > 60000
-      console.log "compacting"
+    if users.redundantLength > 5 and idle_time > COMPACT_TIME_LIMIT
+      users.once('compacted', -> setTimeout(compactDB, COMPACT_TIME_LIMIT))
       users.compact()
-    setTimeout compactDB, 60000
+    else
+      setTimeout(compactDB, COMPACT_TIME_LIMIT)
 
-  setTimeout compactDB, 60000
+  setTimeout compactDB, COMPACT_TIME_LIMIT
   web = webserver(users, nick, settings["port"], ircToText, (from, message) ->
     channel_say from + message
     detectCommand from, message
