@@ -1,10 +1,16 @@
 fs = require("fs")
-modules = (require("./modules/#{f}") for f in fs.readdirSync("./modules") when f.match /\.(?:js|coffee)$/)
 
 class Modules
   constructor: (users, settings, emitter) ->
     options = {users: users, settings: settings, emitter: emitter}
-    instances = modules.map (Module_x) -> new Module_x(options)
+    instances = _(fs.readdirSync("./modules")).
+      chain().
+      map((f) -> f.match(/^(.*)\.(?:js|coffee)$/)?[1]).
+      compact().
+      filter(@module_filter(settings['load_modules'])).
+      map((f) -> require("./modules/#{f}")).
+      map((Module_x) -> new Module_x(options)).
+      value();
     @_commands = _({}).extend(_(instances).pluck('commands')...)
     @_private_commands = _({}).extend(_(instances).pluck('private_commands')...)
     @_message_listeners = _(instances).chain().
@@ -12,6 +18,12 @@ class Modules
       compact().
       flatten().
       value()
+
+  module_filter: ({restriction, modules}) ->
+    return (-> true) if restriction is 'none'
+    return ((f) -> _(modules).contains(f)) if restriction is 'whitelist'
+    return ((f) -> !_(modules).contains(f)) if restriction is 'blacklist'
+    throw "unrecognised setting for load_modules"
 
   Object.defineProperties @prototype,
       commands:

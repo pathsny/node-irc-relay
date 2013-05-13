@@ -11,6 +11,11 @@
     "twitter": {
       "user": "<username>",
       "password": "<twitter password>"
-    }
+    },
+	"load_modules" : {
+		"restriction": "<none|whitelist|blacklist>",
+		"modules": []
+	}
+
 
 }
