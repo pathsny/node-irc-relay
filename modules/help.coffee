@@ -18,19 +18,9 @@ class Help
     @private_commands = {help: @private_command}
 
   private_command: (from, tokens, cb) ->
-    if _(tokens).isEmpty()
-      names = _(this).chain().
-        keys().
-        difference(["commands", "help"]).
-        map((c) -> "!#{c}").
-        sentence().
-        value()
-      cb "I know #{names}";
-      cb "Type !help <command> to know more about any command"
-    else
-      command = this[command_or_string(tokens[0])]
-      cb help_string(command)
-
+    _(this).chain().
+      values().
+      each (pc) -> cb(pc._help)
 
   command: (from, tokens, cb) ->
     if _(tokens).isEmpty()
