@@ -1,9 +1,7 @@
 irc = require("irc")
 _ = require("underscore")
 require("./utils")
-model = require("./model")
 Commands = require("./commands")
-PrivateCommands = require("./private_commands")
 twitter = require("./twitter").Twitter
 webserver = require("./web/app").Server
 fs = require("fs")
@@ -15,9 +13,12 @@ nick = settings["nick"]
 IrcToText = require("./irc_to_text")
 ircToText = new IrcToText(channel)
 ircLogger = require("./irc_log").Logger(ircToText)
-gtalk = require("./gtalk").gtalk
 Modules = require('./modules')
-model.start (users) ->
+users = require("./model")
+dummy = {}
+modules = new Modules(users, settings, dummy.misaka_say)
+console.log('calling load')
+users.on 'load', ->
   channel_say = (message) ->
     bot.say channel, message
   make_client = ->
@@ -41,15 +42,11 @@ model.start (users) ->
     adjectives = misaka_adjectives["generic"]
     result + ", said " + bot.nick + " " + _(adjectives).rand()
 
-  misaka_say = (msg, dont_misakify) ->
+  dummy.misaka_say = (msg, dont_misakify) ->
     return unless msg
     channel_say (if dont_misakify then msg else misakify('', msg))
 
-  modules = new Modules(users, settings, misaka_say)
-
   commands = _({}).extend(new Commands(users, settings), modules.commands)
-  private_commands = new PrivateCommands(users, settings)
-  _(private_commands).extend(modules.private_commands)
   bot = make_client()
   bot.addListener "registered", ->
     bot.say "nickserv", "identify " + settings["server_password"]
@@ -70,8 +67,8 @@ model.start (users) ->
     last_msg_time = new Date().getTime()
     tokens = message.split(" ")
     command = _(tokens).head()
-    if typeof (private_commands[command]) is "function"
-      private_commands[command] from, _(tokens).tail(), (reply) ->
+    if typeof (modules.private_commands[command]) is "function"
+      modules.private_commands[command] from, _(tokens).tail(), (reply) ->
         bot.say from, reply
 
 
@@ -83,11 +80,6 @@ model.start (users) ->
   #     //     channel_say(misakify("twitter", message));
   #     // });
   # }
-  if settings.gmail
-    gtalk.configure_with users, (message) ->
-      channel_say message
-
-    gtalk.login settings.gmail
 
   bot.conn.setTimeout 180000, ->
     console.log "timeout"

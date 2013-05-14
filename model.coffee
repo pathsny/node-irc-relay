@@ -12,9 +12,6 @@ userdb.addIndex "token", (k, v) ->
 userdb.addIndex "twitter_id", (k, v) ->
   v.twitter_id
 
-userdb.addIndex "GtalkId", (k, v) ->
-  v.GtalkId
-
 userdb.listeners = [
   type: "names"
   listener: (channel, given_nicks) ->
@@ -210,8 +207,4 @@ userdb.defineArrayProperty = (prop_name) ->
 _(["PhoneNumber", "TwitterAccount", "EmailAddress", "GtalkId"]).each (thing) ->
   userdb.defineScalarProperty thing
 
-
-exports.start = (fn) ->
-  userdb.on "load", ->
-    fn userdb
-
+module.exports = userdb
