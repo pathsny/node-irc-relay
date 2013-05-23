@@ -16,8 +16,7 @@ ircLogger = require("./irc_log").Logger(ircToText)
 Modules = require('./modules')
 users = require("./model")
 dummy = {}
-modules = new Modules(users, settings, dummy.misaka_say)
-console.log('calling load')
+modules = new Modules(users, settings, (args...) -> dummy.misaka_say(args...))
 users.on 'load', ->
   channel_say = (message) ->
     bot.say channel, message

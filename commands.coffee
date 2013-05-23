@@ -1,28 +1,11 @@
 _ = require("underscore")
 require "./utils"
-Email = require("./email")
-gtalk = require("./gtalk").gtalk
 fs = require("fs")
 
 class Commands
   constructor: (@users, @settings) ->
 
 module.exports = Commands
-
-directedMessage = (from, tokens, cb, users, success) ->
-  to = _(tokens).head()
-  msg = _(tokens).tail().join(" ")
-  unless to and msg
-    cb "Message not understood"
-  else unless users.get(to)
-    cb to + " is not known"
-  else
-    success to,
-      from: from
-      msg: msg
-      time: Date.now()
-
-    cb from + ": Message Noted"
 
 command_definitions =
 
@@ -31,43 +14,6 @@ command_definitions =
     command: (from, tokens, cb) ->
       nick = _(tokens).head()
       user = @users.get(nick)
-      if not nick or tokens.length <= 1
-        cb "alert <nick> message"
-        return
-      else unless user
-        cb "alert requires the nick of a valid user in the channel"
-        return
-      email_address = @users.get_EmailAddress(nick)
-      message = "<" + from + "> " + _(tokens).tail().join(" ")
-      unless email_address
-        if gtalk.tryAlert(nick, message)
-          cb "sent a gtalk alert to " + nick
-        else
-          cb nick + " has not configured any alert options"
-      else
-        gtalk.tryActiveAlert nick, message, _((result) ->
-          if result
-            cb "sent a gtalk alert to " + nick
-            return
-          unless @_email
-            @_email = new Email(
-              user: @settings.gmail.user
-              pass: @settings.gmail.password
-              clientName: "Misaka Alerts"
-            )
-          @_email.send
-            text: message
-            to: nick + " <" + email_address + ">"
-            subject: "Alert Email from " + from
-          , (err) ->
-            if err
-              cb "sorry an error occured"
-            else
-              cb "sent an email alert to " + nick
-
-        ).bind(this)
-
-    _help: "send an alert to a member of the group who has added their email address to me. alert <nick> message"
 
   twitter:
     command: (from, tokens, cb) ->
