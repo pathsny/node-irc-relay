@@ -17,7 +17,7 @@
   "dependencies": {
       "underscore": "~ 1.4.4",
       "underscore.date": ">=0.4.0 <0.5",
-      "dirty": "https://github.com/pathsny/node-dirty/archive/master.tar.gz",
+      "dirty": "https://github.com/pathsny/node-dirty/archive/18c522ad19936ce12e1d27fd709f37659f715b8e.tar.gz",
       "request": "~ 2.21.0",
       "irc": "~ 0.3.6",
       "node-uuid": "~ 1.4.0",
