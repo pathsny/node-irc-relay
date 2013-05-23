@@ -37,7 +37,7 @@ class Anidb extends RegexUrlMatcher
   get_info: (aid, cb) =>
     url = "http://api.anidb.net:9001/httpapi?#{param_string}&aid=#{aid}"
     _.requestXmlAsJson {uri: url, cache: aid}, (err, {anime}) ->
-      cb(anime) unless err
+      cb(anime) unless err or !anime
 
   split_description: (description) =>
     return "no description provided" unless description
