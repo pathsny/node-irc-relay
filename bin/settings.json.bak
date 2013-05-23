@@ -20,6 +20,12 @@
 	    "twitter": {
 	      "user": "<username>",
 	      "password": "<twitter password>"
-	    }
+	    },
+		"alerts": {
+			"gmail": {
+			 	"user": "<username>",
+			    "password": "<password>"
+			}
+		}
 	}
 }
