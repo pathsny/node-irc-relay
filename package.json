@@ -16,7 +16,6 @@
   },
   "dependencies": {
       "underscore": "~ 1.4.4",
-      "compress" : "~ 0.1.9",
       "underscore.date": ">=0.4.0 <0.5",
       "dirty": "https://github.com/pathsny/node-dirty/archive/master.tar.gz",
       "request": "~ 2.21.0",
@@ -29,7 +28,6 @@
       "qs": "~ 0.6.3",
       "pegjs": "~ 0.7.0",
       "sanitizer": "~ 0.0.15",
-      "now": "~ 0.8.1",
       "xml2js": "~ 0.2.6",
       "nodemailer": "~ 0.4.1",
       "simple-xmpp": "~ 0.1.11",
