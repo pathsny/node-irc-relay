@@ -204,7 +204,4 @@ userdb.defineArrayProperty = (prop_name) ->
   userdb["add_#{prop_name}"] = _.bind(userdb.addArrayProperty, userdb, multi_name)
   userdb["del_#{prop_name}"] = _.bind(userdb.delArrayProperty, userdb, multi_name)
 
-_(["PhoneNumber", "TwitterAccount", "EmailAddress", "GtalkId"]).each (thing) ->
-  userdb.defineScalarProperty thing
-
 module.exports = userdb
