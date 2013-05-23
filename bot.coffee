@@ -1,7 +1,6 @@
 irc = require("irc")
 _ = require("underscore")
 require("./utils")
-Commands = require("./commands")
 twitter = require("./twitter").Twitter
 webserver = require("./web/app").Server
 fs = require("fs")
@@ -47,7 +46,7 @@ users.on 'load', ->
     return unless msg
     channel_say (if dont_misakify then msg else misakify('', msg))
 
-  commands = _({}).extend(new Commands(users, settings), modules.commands)
+  commands = modules.commands
   bot = make_client()
   bot.addListener "registered", ->
     bot.say "nickserv", "identify " + settings["server_password"]
