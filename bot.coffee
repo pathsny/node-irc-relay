@@ -22,7 +22,9 @@ users.on 'load', ->
     bot.say channel, message
   make_client = ->
     _(new irc.Client(server, nick,
-      channels: [channel]
+      channels: [channel],
+      floodProtection: true,
+      floodProtectionDelay: 500,
     )).tap (client) ->
       client.addListener "error", (message) ->
         console.error "ERROR: #{server} : #{message.command} : #{message.args.join(' ')}"

@@ -21,7 +21,7 @@ class Anidb extends RegexUrlMatcher
       english_title = @get_english_title(t_list)
       title_string = _(t_list).find(({type}) => type is 'main')['#']
       title_string += " (#{english_title})" if english_title
-      @emitter "That anidb link is #{title_string} #{@split_description(description)}"
+      @emitter "That anidb link is #{title_string} #{description}"
 
   get_english_title: (t_list, extract) =>
     match = (lang_name, type_name) =>
@@ -38,16 +38,6 @@ class Anidb extends RegexUrlMatcher
     url = "http://api.anidb.net:9001/httpapi?#{param_string}&aid=#{aid}"
     _.requestXmlAsJson {uri: url, cache: aid}, (err, {anime}) ->
       cb(anime) unless err or !anime
-
-  split_description: (description) =>
-    return "no description provided" unless description
-    _(description).chain().
-    invoke("split", "\n").
-    first().
-    invoke_("inSlicesOf", 400).
-    flatten().
-    join("\n").
-    value()
 
   command: (from, tokens, cb) =>
     @parse_query tokens, (error, number, search_tokens) =>
@@ -117,7 +107,7 @@ class Anidb extends RegexUrlMatcher
     msg += " (#{english_name})" unless english_name is exact_name
     cb "#{msg}. http://anidb.net/perl-bin/animedb.pl?show=anime&aid=#{aid}"
     @get_info aid, ({description}) =>
-      cb @split_description(description)
+      cb description
 
   display_options: (search_tokens, animes, cb) =>
     list_str = _(animes).chain().

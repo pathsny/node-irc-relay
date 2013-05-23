@@ -43,13 +43,6 @@ _.mixin
   stringify: (obj) ->
     qs.stringify(obj).replace /'/g, "%27"
 
-  invoke_: (obj, method) ->
-    args = _(arguments).slice(2)
-    _.map obj, (value) ->
-      value = _(value)
-      ((if method then value[method] else value)).apply value, args
-
-
   html_as_text: (text) ->
     sanitizer.unescapeEntities text.replace(/<[^>]*>/g, "")
 
@@ -97,13 +90,6 @@ _.mixin
 
     r.on "error", (err) ->
       cb err
-
-
-  inSlicesOf: (items, size) ->
-    slices = Math.ceil(items.length / size)
-    _(1).range(slices + 1).map (n) ->
-      start = (n - 1) * size
-      items.slice start, start + size
 
 
   requestXmlAsJson: (options, cb) ->
@@ -157,11 +143,5 @@ _.mixin
 
   automated: (msg) ->
     /\u000311.•\u000310\u0002«\u0002\u000311WB\u000310 \u0002\(\u000f\u0002.+\u000310\)\u0002 \u000311WB\u000310\u0002»\u0002\u000311•. \u000310\u0002-\u000f \u001f/.test msg
-
-  invoke_: (list, functionName) ->
-    args = _(arguments).slice(2)
-    _(list).map ((item) ->
-      this[functionName].apply this, _([item]).concat(args)
-    ), this
 
 module.exports = _
