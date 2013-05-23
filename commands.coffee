@@ -9,12 +9,6 @@ module.exports = Commands
 
 command_definitions =
 
-
-  alert:
-    command: (from, tokens, cb) ->
-      nick = _(tokens).head()
-      user = @users.get(nick)
-
   twitter:
     command: (from, tokens, cb) ->
       self = this
