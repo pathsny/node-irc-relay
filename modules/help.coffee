@@ -14,7 +14,7 @@ help_string = (commandFn) ->
 
 class Help
   constructor: ->
-    @commands = {help: @command}
+    @commands = {help: @command, commands: @command}
     @private_commands = {help: @private_command}
 
   private_command: (from, tokens, cb) ->
