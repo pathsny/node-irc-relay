@@ -2,7 +2,6 @@
     "nick": "raquel",
     "channel": "#animestan-hell",
     "server": "irc.immortal-anime.net",
-    "google_key": "<needed>",
     "server_password": "<needed>",
     "port": "<needed>",
     "catch_all_exceptions": <true or false>,
