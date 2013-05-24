@@ -16,6 +16,7 @@ Modules = require('./modules')
 users = require("./model")
 dummy = {}
 modules = new Modules(users, settings, (args...) -> dummy.misaka_say(args...))
+
 users.on 'load', ->
   channel_say = (message) ->
     bot.say channel, message
@@ -74,12 +75,6 @@ users.on 'load', ->
 
   _(users.listeners).chain().concat(ircToText.listeners()).each (model_listener) ->
     bot.addListener model_listener.type, model_listener.listener
-
-  # if (settings['twitter']) {
-  #     // new twitter(users, settings['twitter'],function(message){
-  #     //     channel_say(misakify("twitter", message));
-  #     // });
-  # }
 
   bot.conn.setTimeout 180000, ->
     console.log "timeout"
