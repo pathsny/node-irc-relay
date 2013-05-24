@@ -3,14 +3,8 @@ uuid = require("node-uuid")
 _ = require("underscore")
 require "./utils"
 inflection = require 'inflection'
-userdb.addIndex "nickId", (k, v) ->
-  v.nickId
-
-userdb.addIndex "token", (k, v) ->
-  v.token
-
-userdb.addIndex "twitter_id", (k, v) ->
-  v.twitter_id
+userdb.addIndex "nickId", (k, v) -> [v.nickId]
+userdb.addIndex "token", (k, v) -> if v.token then [v.token] else []
 
 userdb.listeners = [
   type: "names"
@@ -75,7 +69,6 @@ userdb.linkAll = (nickgroup1, nickgroup2) ->
     rec = item.val
     rec.nickId = rec2.nickId
     userdb.set item.key, rec
-
   true
 
 userdb.addNick = (nick) ->

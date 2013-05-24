@@ -19,7 +19,7 @@ class Alert
     @users.defineScalarProperty "GtalkId"
     @users.defineScalarProperty "EmailAddress"
     @users.defineScalarProperty "PhoneNumber"
-    @users.addIndex "GtalkId", (k, v) -> v.GtalkId
+    @users.addIndex "GtalkId", (k, v) -> if v.GtalkId then [v.GtalkId] else []
 
   command: (from, tokens, cb) =>
     nick = _(tokens).head()
