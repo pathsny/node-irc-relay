@@ -59,7 +59,7 @@ users.on 'load', ->
   last_msg_time = new Date().getTime()
   detectCommand = (from, message) ->
     last_msg_time = new Date().getTime()
-    tokens = message.split(" ")
+    tokens = _(message.split(" ")).compact()
     match = /^!(.*)/.exec(_(tokens).head())
     dispatch match[1], from, _(tokens).tail()  if match
 
