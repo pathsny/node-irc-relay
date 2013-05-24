@@ -1,7 +1,7 @@
 _ = require('../utils')
 
-class Google
-  constructor: ({settings: {modules: {google: {@key}}}}) ->
+class GoogleSearch
+  constructor: ({settings: {modules: {google_search: {@key}}}}) ->
     @commands = {g: @command}
     @command._help = "search google for the terms you're looking for. !g <terms> for the first result. !g x <terms> for the xth result"
 
@@ -38,4 +38,4 @@ class Google
     return "#{result.titleNoFormatting} #{result.unescapedUrl} #{_(result.content).html_as_text()} ... Result #{resNumber} out of #{cursor.estimatedResultCount}"
 
 
-module.exports = Google
+module.exports = GoogleSearch

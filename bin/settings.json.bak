@@ -11,7 +11,7 @@
 		"modules": []
 	},
 	"modules": {
-		"google": {
+		"google_search": {
 			"key": "<needed if google module is loaded>"
 		},
 		"tiny_song": {
