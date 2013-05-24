@@ -2,14 +2,14 @@ fs = require("fs")
 
 class Modules
   constructor: (users, settings, emitter) ->
-    options = {users: users, settings: settings, emitter: emitter}
+    @options = {users: users, settings: settings, emitter: emitter}
     instances = _(fs.readdirSync("./modules")).
       chain().
-      map((f) -> f.match(/^(.*)\.(?:js|coffee)$/)?[1]).
+      map((f) => f.match(/^(.*)\.(?:js|coffee)$/)?[1]).
       compact().
       filter(@module_filter(settings['load_modules'])).
-      map((f) -> require("./modules/#{f}")).
-      map((Module_x) -> new Module_x(options)).
+      map(@create_module).
+      compact().
       value();
     @_commands = _({}).extend(_(instances).pluck('commands')...)
     @_private_commands = _({}).extend(_(instances).pluck('private_commands')...)
@@ -24,6 +24,15 @@ class Modules
     return ((f) -> _(modules).contains(f)) if restriction is 'whitelist'
     return ((f) -> !_(modules).contains(f)) if restriction is 'blacklist'
     throw "unrecognised setting for load_modules"
+
+  create_module: (file) =>
+    try
+      ModuleKlass = require "./modules/#{file}"
+      new ModuleKlass(@options)
+    catch error
+      console.log("could not load module #{file} because #{error}")
+      null
+
 
   Object.defineProperties @prototype,
       commands:
