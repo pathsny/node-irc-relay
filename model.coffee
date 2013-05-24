@@ -175,6 +175,21 @@ userdb.addArrayProperty = (prop_name, nick, prop_value) ->
   rec[prop_name] = _(rec[prop_name] or []).push(prop_value)
   userdb.set nick, rec
 
+userdb.addSetProperty = (prop_name, nick, prop_value) ->
+  exists = _(@aliases(nick)).any (item) ->
+    _(item.val[prop_name] or []).include(prop_value)
+  return if exists
+  this.addArrayProperty(prop_name, nick, prop_value)
+
+userdb.removeSetProperty = (prop_name, nick, prop_value) ->
+  itemToModify = _(@aliases(nick)).find (item) ->
+    _(item.val[prop_name] or []).include(prop_value)
+  return unless itemToModify
+  values = _(itemToModify.val[prop_name]).without(prop_value)
+  itemToModify.val[prop_name] = values
+  userdb.set itemToModify.key, itemToModify.val
+
+
 userdb.delArrayProperty = (prop_name, nick, number) ->
   found = _(@aliases(nick)).reduce((count, item) ->
     prop_values = item.val[prop_name] or []
@@ -196,5 +211,13 @@ userdb.defineArrayProperty = (prop_name) ->
   userdb["get_#{multi_name}"] = _.bind(userdb.getArrayProperty, userdb, multi_name)
   userdb["add_#{prop_name}"] = _.bind(userdb.addArrayProperty, userdb, multi_name)
   userdb["del_#{prop_name}"] = _.bind(userdb.delArrayProperty, userdb, multi_name)
+
+userdb.defineSetProperty = (prop_name) ->
+  multi_name = inflection.pluralize prop_name
+  userdb["clear_#{multi_name}"] = _.bind(userdb.clearProperty, userdb, multi_name)
+  userdb["get_#{multi_name}"] = _.bind(userdb.getArrayProperty, userdb, multi_name)
+  userdb["add_#{prop_name}"] = _.bind(userdb.addSetProperty, userdb, multi_name)
+  userdb["remove_#{prop_name}"] = _.bind(userdb.removeSetProperty, userdb, multi_name)
+
 
 module.exports = userdb
