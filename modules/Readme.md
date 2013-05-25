@@ -28,12 +28,12 @@ of the above types but any combination that makes sense as a whole.
 
 ### Commands ###
 
-to expose commands your module must expose a property called *commands* which is a mapping from
-the command_name to functions that are invoked when the command is called.
+	to expose commands your module must expose a property called *commands* which is a mapping from
+	the command_name to functions that are invoked when the command is called.
 
 * the command gets these parameters
 	1. receives the nick of the person who invoked it.
-	2. the remaining text on that line.
+	2. the remaining text on that line as a list of tokens.
 	3. a function that can be invoked to respond to the command.
 * if the command function has a property called *_help*, it is automatically displayed when someone
 types *!help &lt;command_name&gt;*
@@ -41,7 +41,15 @@ types *!help &lt;command_name&gt;*
 
 ### Private Commands ###
 
-TBD
+	to expose private commands your module must expose a property called *private_commands* which is a mapping from
+	the command name to functions that are invoked when the command is invoked.
+
+* the private command gets these parameters
+	1. receives the nick of the person who invoked it.
+	2. the remaining text on that line as a list of tokens.
+	3. a function that can be invoked to respond to the command.
+* if the command function has a property called *_help*, it is automatically displayed when someone types help in private chat.
+* for examples look at the modules **alert** or **msg_box**.
 
 ### Message Listeners ###
 
