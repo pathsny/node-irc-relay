@@ -1,11 +1,18 @@
 _ = require('../utils')
+# NTwitter = require('ntwitter');
 help = "add or remove a twitter account to follow. Usage !twitter add <twitter id> to start following this id. !twitter remove <twitter id> to stop following this id"
 
 class Twitter
   constructor: ({@users, @emitter}) ->
     @users.defineScalarProperty "TwitterAccount"
+    @users.addIndex "twitter", (k,v) -> if v.TwitterAccount then [v.TwitterAccount] else []
     @commands = {twitter: @command}
     @command._help = help
+
+  on_data_load: =>
+    _(@users.indexValues("twitter")).
+    chain().
+    map((twitter_id) => @users.find('twitter', twitter_id))
 
   command: (from, tokens, cb) =>
     switch _(tokens).head()
