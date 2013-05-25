@@ -30,9 +30,12 @@ class Tell
     else if _(@users.find('topics', topic)).isEmpty()
       cb "#{topic} is not a known topic"
     else
-      followers = @users.find('topics', topic)
-      _(followers).each (f) => @utell(from, _([f.key]).concat(tokens), -> )
-      cb "#{from}: Message Noted and passed on to all followers of #{topic}"
+      followers = _(@users.find('topics', topic)).reject (f) => @users.isAliasOf from, f.key
+      if (followers.length > 0)
+        _(followers).each (f) => @utell(from, _([f.key]).concat(tokens), -> )
+        cb "#{from}: Message Noted and passed on to all followers of #{topic}"
+      else
+        cb "No one but you is following topic #{topic}"
 
   message_listener: (from, message) =>
     rec = @users.get(from)

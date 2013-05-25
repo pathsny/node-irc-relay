@@ -61,6 +61,11 @@ userdb.unlink = (nick, nickgroup) ->
   userdb.set nick, rec
   true
 
+userdb.isAliasOf = (nick1, nick2) ->
+  rec1 = userdb.get(nick1)
+  rec2 = userdb.get(nick2)
+  rec1.nickId is rec2.nickId
+
 userdb.linkAll = (nickgroup1, nickgroup2) ->
   rec1 = userdb.get(nickgroup1)
   rec2 = userdb.get(nickgroup2)
