@@ -10,7 +10,7 @@ class Tell
     @commands = {tell: @tell, topic: @topic}
     @message_listeners = [@message_listener]
     @tell._help = "publically passes a message to a user or all followers of a topic whenever they next speak. usage: !tell <user> <message> or !tell #<topic> <message>.\nsee !help topic"
-    @topic._help = "subscribes or unsubscribes a user to a topic. !topic add <topic> adds you to topic <topic>, !topic remove <topic> removes you from topic <topic>, !topic add <topic> <user> adds user to the topic. !topic list lists all topics. !topic list <topic> lists all followers of a topic.\nsee !help tell."
+    @topic._help = "subscribes or unsubscribes a user to a topic. !topic add <topic> adds you to topic <topic>, !topic remove <topic> removes you from topic <topic>, !topic add <topic> <user1> <user2> ... adds users to the topic. You are also added to the topic if you aren't following it. !topic list lists all topics. !topic list <topic> lists all followers of a topic.\nsee !help tell."
 
 
   tell: (from, tokens, cb) =>
@@ -57,16 +57,13 @@ class Tell
       cb(@topic._help)
 
   topic_add: (from, topic, tokens, cb) =>
-    nick = _(tokens).first()
-    if nick
-      if @users.get(nick)
-        @users.add_topic nick, topic
-        cb "#{nick} is now following the topic #{topic}"
-      else
-        cb "I do not know a user called #{nick}."
+    {known_nicks, unknown_nicks} = @users.dedupNicks(tokens.concat(from))
+    if unknown_nicks.length > 0
+      cb "I do not know the following users: #{_(unknown_nicks).sentence()}"
+    if known_nicks.length > 1
+      cb "#{_(known_nicks).join(', ')} are following the topic #{topic}"
     else
-      @users.add_topic from, topic
-      cb "you are now following the topic #{topic}"
+      cb "you are following the topic #{topic}"
 
   topic_remove: (from, topic, tokens, cb) =>
     nick = _(tokens).first()

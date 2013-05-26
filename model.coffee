@@ -139,6 +139,15 @@ userdb.aliasedNicks = (nick) ->
   return `undefined`  unless userdb.get(nick)
   _(userdb.aliases(nick)).pluck "key"
 
+userdb.dedupNicks = (nicks) ->
+  groups = _(nicks).groupBy (n) -> userdb.get(n)?.nickId
+  unknown_nicks = groups['undefined']
+  delete groups['undefined']
+  {
+    unknown_nicks: unknown_nicks or []
+    known_nicks: _(groups).chain().values().map((a) -> a[0]).value()
+  }
+
 userdb.createToken = (nick) ->
   rec = userdb.get(nick)
   return  if rec.status isnt "online"
