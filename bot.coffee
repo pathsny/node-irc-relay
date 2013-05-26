@@ -4,7 +4,7 @@ require("./utils")
 twitter = require("./twitter").Twitter
 webserver = require("./web/app").Server
 fs = require("fs")
-settings = JSON.parse(fs.readFileSync("./data/settings.json", "ascii"))
+settings = JSON.parse(fs.readFileSync("#{__dirname}/data/settings.json", "ascii"))
 server = settings["server"]
 channel = settings["channel"]
 incoming = "message" + channel
@@ -38,7 +38,7 @@ users.on 'load', ->
       commands[command] from, tokens, (result, dont_misakify) ->
         channel_say (if dont_misakify then result else misakify(command, result))  if result
 
-  misaka_adjectives = JSON.parse(fs.readFileSync("./misaka_adjectives.json", "ascii"))
+  misaka_adjectives = JSON.parse(fs.readFileSync("#{__dirname}/misaka_adjectives.json", "ascii"))
   misakify = (command, result) ->
     adjectives = misaka_adjectives["generic"]
     result + ", said " + bot.nick + " " + _(adjectives).rand()

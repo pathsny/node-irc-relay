@@ -11,7 +11,7 @@ class Logger
     return @_ws  if @_gmtDate and @_gmtDate is gmtDate
     @_ws.end()  if @_ws
     @_gmtDate = gmtDate
-    @_ws = fs.createWriteStream("./data/irclogs/" + gmtDate + ".log",
+    @_ws = fs.createWriteStream("#{__dirname}/data/irclogs/" + gmtDate + ".log",
       encoding: "utf-8"
       flags: "a"
     )

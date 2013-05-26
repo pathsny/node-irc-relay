@@ -1,4 +1,4 @@
-userdb = require("dirty")("./data/user.db")
+userdb = require("dirty")("#{__dirname}/data/user.db")
 uuid = require("node-uuid")
 _ = require("underscore")
 require "./utils"

@@ -3,7 +3,7 @@ fs = require("fs")
 class Modules
   constructor: (users, settings, emitter) ->
     @options = {users: users, settings: settings, emitter: emitter}
-    instances = _(fs.readdirSync("./modules")).
+    instances = _(fs.readdirSync("#{__dirname}/modules")).
       chain().
       map((f) => f.match(/^(.*)\.(?:js|coffee)$/)?[1]).
       compact().
