@@ -38,7 +38,7 @@ class Seen
     msg = "#{msg} as #{last_online.key}" if last_online.key isnt person
     msg = "#{msg} #{_.date(last_online.val.lastSeen).fromNow()}"
     return msg if (!last_online.val.quitMsg)
-    "#{msg} and quit saying #{lastOnline.val.quitMsg}"
+    "#{msg} and quit saying #{last_online.val.quitMsg}"
 
   last_spoke: (aliases) =>
     lastSpoke = _(aliases).max((item) => item.val.lastMessage?.time ? 0)
