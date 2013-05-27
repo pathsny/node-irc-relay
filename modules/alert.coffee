@@ -7,7 +7,7 @@ class Alert
   constructor: ({@users, settings: {nick, modules: {alerts: {gmail}}}, @emitter}) ->
     @gtalk = new Gtalk(gmail, @on_gtalk_message)
     @email = new Email(gmail, nick)
-    @setup_db
+    @setup_db()
     @commands = {alert: @command}
     @command._help = "send an alert to a member of the group who has added an alert option (gtalk id or email address) to me. !alert <nick> message"
     @private_commands = {}
