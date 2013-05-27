@@ -60,10 +60,8 @@ class Tell
     {known_nicks, unknown_nicks} = @users.dedupNicks(tokens.concat(from))
     if unknown_nicks.length > 0
       cb "I do not know the following users: #{_(unknown_nicks).sentence()}"
-    if known_nicks.length > 1
-      cb "#{_(known_nicks).join(', ')} are following the topic #{topic}"
-    else
-      cb "you are following the topic #{topic}"
+    _(known_nicks).each (n) => @users.add_topic n, topic
+    @topic_list from, topic, [], cb
 
   topic_remove: (from, topic, [nick], cb) =>
     if nick
