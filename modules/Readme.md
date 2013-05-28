@@ -52,6 +52,7 @@ types *!help &lt;command_name&gt;*
 * for examples look at the modules **alert** or **msg_box**.
 
 ### Message Listeners ###
+	to expose message_listeners your module must expose a property called *message_listeners* which is an array of functions.
 
 * message\_listeners get a copy of every message and action and can react to them if necessary. When invoked a
 message\_listener receives
@@ -59,3 +60,9 @@ message\_listener receives
 	2. the remaining text on that line
 * the messages_listener does not receive messages emitted by the bot.
 * for examples look at the modules **imdb\_url\_identifier** or **tell**
+
+### Private Listeners ###
+	to expose private_listeners your module must expose a property called *message_listeners* which is an array of functions. private_listeners get a copy of every message sent via pm. When invoked a private_listener receives
+
+1. the nick of the person who sent the message
+2. the remaining text on that line

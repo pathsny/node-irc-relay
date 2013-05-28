@@ -1,8 +1,15 @@
 fs = require("fs")
 
+extract_array_prop = (list, prop) ->
+  _(list).chain().
+  pluck(prop).
+  compact().
+  flatten().
+  value()
+
 class Modules
-  constructor: (users, settings, emitter) ->
-    @options = {users: users, settings: settings, emitter: emitter}
+  constructor: (users, settings) ->
+    @options = {users: users, settings: settings, emitter: @emitter}
     instances = _(fs.readdirSync("#{__dirname}/modules")).
       chain().
       map((f) => f.match(/^(.*)\.(?:js|coffee)$/)?[1]).
@@ -13,11 +20,25 @@ class Modules
       value();
     @_commands = _({}).extend(_(instances).pluck('commands')...)
     @_private_commands = _({}).extend(_(instances).pluck('private_commands')...)
-    @_message_listeners = _(instances).chain().
-      pluck('message_listeners').
-      compact().
-      flatten().
-      value()
+    @_message_listeners = extract_array_prop instances, 'message_listeners'
+    @_private_listeners = extract_array_prop instances, 'private_listeners'
+
+
+  initialize: (@misaka) =>
+    @misaka.on 'channel_msg', (from, msg) =>
+      _(@_message_listeners).each (l) -> l(from, msg)
+      [first, rest...] = _(msg.split(" ")).compact()
+      command = /^!(.*)/.exec(first)?[1]
+      if command and typeof (@_commands[command]) is "function"
+        @_commands[command] from, rest, @misaka.channel_say
+
+    @misaka.on 'pm', (from, msg, cb) =>
+      _(@_private_listeners).each (l) -> l(from, msg)
+      [command, rest...] = _(msg.split(" ")).compact()
+      if command and typeof (@_private_commands[command]) is "function"
+        @_private_commands[command] from, rest, cb
+
+  emitter: (args...) => @misaka.channel_say(args...)
 
   module_filter: ({restriction, modules}) ->
     return (-> true) if restriction is 'none'
@@ -32,14 +53,5 @@ class Modules
     catch error
       console.log("could not load module #{file} because #{error}")
       null
-
-
-  Object.defineProperties @prototype,
-      commands:
-        get: -> @_commands
-      message_listeners:
-        get: -> @_message_listeners
-      private_commands:
-        get: -> @_private_commands
 
 module.exports = Modules
