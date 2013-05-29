@@ -45,7 +45,7 @@ function displayAbove(hash) {
 
 function displayBelow(hash) {
     if (bottomMarker.lock) return;
-    
+
     bottomMarker.lock = true;
     bottomData(bottomMarker, 200, function(rows, newBottomMarker){
         bottomMarker = newBottomMarker;
@@ -112,20 +112,18 @@ function init() {
     logTemplate = $("#logTemplate");
     var url = document.location.toString();
     var match = /.*#(.*)/.exec(url);
-    if (match) {
-        var timestamp = Number(match[1]);
-        var date = _(timestamp).chain().date().gmtDate().value();
-        getLog(date,function(data){
-            var location = _(data).sortedIndex({timestamp: timestamp}, function(log){
-                return log.timestamp;
-            });
-            topMarker = {date: date, location: location};
-            bottomMarker = {date: date, location: location};
-            logTemplate.tmpl({Logs: [data[location]]}).appendTo("#content");
-            displayAbove();
-            displayBelow(data[location].timestamp);
-        });
-    };
+    var timestamp = match ? Number(match[1]) : new Date().getTime();
+    var date = _(timestamp).chain().date().gmtDate().value();
+    getLog(date,function(data){
+      var location = _(data).sortedIndex({timestamp: timestamp}, function(log){
+        return log.timestamp;
+      });
+      topMarker = {date: date, location: location};
+      bottomMarker = {date: date, location: location};
+      logTemplate.tmpl({Logs: [data[location]]}).appendTo("#content");
+      displayAbove();
+      displayBelow(data[location].timestamp);
+    });
 }
 
 var logs = {};
@@ -137,7 +135,7 @@ function getLog(dateString, cb) {
     } else {
         $.get("/" + dateString + ".log", function(data){
             logs[dateString] = _(data.split('\n')).chain().
-            reject(function(l) { 
+            reject(function(l) {
                 return l === ''
                 }).
                 map(function(l) {

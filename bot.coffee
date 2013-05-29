@@ -3,6 +3,7 @@ _ = require("underscore")
 require("./utils")
 twitter = require("./twitter").Twitter
 webserver = require("./web/app").Server
+Web = require("./web/app2")
 fs = require("fs")
 settings = JSON.parse(fs.readFileSync("#{__dirname}/data/settings.json", "ascii"))
 server = settings["server"]
@@ -46,7 +47,6 @@ users.on 'load', ->
     channel_say from + message
     detectCommand from, message
   )
-
   # exit_conditions = ['SIGHUP', 'SIGQUIT', 'SIGKILL', 'SIGINT', 'SIGTERM']
   exit_conditions = ["SIGHUP", "SIGQUIT", "SIGINT", "SIGTERM"]
   exit_conditions.push "uncaughtException"  if settings["catch_all_exceptions"]
