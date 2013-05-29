@@ -3,7 +3,6 @@ _ = require("underscore")
 require("./utils")
 twitter = require("./twitter").Twitter
 webserver = require("./web/app").Server
-Web = require("./web/app2")
 fs = require("fs")
 settings = JSON.parse(fs.readFileSync("#{__dirname}/data/settings.json", "ascii"))
 server = settings["server"]
@@ -11,7 +10,7 @@ channel = settings["channel"]
 incoming = "message" + channel
 nick = settings["nick"]
 IrcToText = require("./irc_to_text")
-ircToText = new IrcToText(channel)
+ircToText = new IrcToText(channel, nick)
 ircLogger = require("./irc_log").Logger(ircToText)
 Modules = require('./modules')
 users = require("./model")

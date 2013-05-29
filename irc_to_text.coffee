@@ -23,7 +23,7 @@ channel_modes = {
 }
 
 class IrcToText extends EventEmitter
-  constructor: (@channel) ->
+  constructor: (@channel, @selfNick) ->
 
   text: (t) =>
     @emit 'text', t
@@ -52,6 +52,10 @@ class IrcToText extends EventEmitter
       type: "message"
       listener: (from, to, message) =>
         @text "<#{from}>#{message}" if @channel is to
+    },{
+      type: "selfMessage"
+      listener: (to, message) =>
+        @text "<#{@selfNick}> #{message}" if @channel is to
     },{
       type: "action"
       listener: (from, to, message) =>
