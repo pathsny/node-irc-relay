@@ -16,7 +16,7 @@ your constructor will get called with a map containing the keys
 * emitter: an emitter which you can use to emit text onto the channel
 
 ## Functionality ##
-	Any module can provide any combination of the following types of functionality.
+Any module can provide any combination of the following types of functionality.
 
 1. any number of commands executed by typing *!&lt;command_name&gt; &lt;arguments&gt;* on the channel.
 2. any number of private commands executed by pming the bot.
@@ -28,8 +28,7 @@ of the above types but any combination that makes sense as a whole.
 
 ### Commands ###
 
-	to expose commands your module must expose a property called *commands* which is a mapping from
-	the command_name to functions that are invoked when the command is called.
+to expose commands your module must expose a property called *commands* which is a mapping from the command_name to functions that are invoked when the command is called.
 
 * the command gets these parameters
 	1. receives the nick of the person who invoked it.
@@ -41,8 +40,7 @@ types *!help &lt;command_name&gt;*
 
 ### Private Commands ###
 
-	to expose private commands your module must expose a property called *private_commands* which is a mapping from
-	the command name to functions that are invoked when the command is invoked.
+to expose private commands your module must expose a property called *private_commands* which is a mapping from the command name to functions that are invoked when the command is invoked.
 
 * the private command gets these parameters
 	1. receives the nick of the person who invoked it.
@@ -52,7 +50,7 @@ types *!help &lt;command_name&gt;*
 * for examples look at the modules **alert** or **msg_box**.
 
 ### Message Listeners ###
-	to expose message_listeners your module must expose a property called *message_listeners* which is an array of functions.
+to expose message\_listeners your module must expose a property called *message_listeners* which is an array of functions.
 
 * message\_listeners get a copy of every message and action and can react to them if necessary. When invoked a
 message\_listener receives
@@ -62,10 +60,16 @@ message\_listener receives
 * for examples look at the modules **imdb\_url\_identifier** or **tell**
 
 ### Private Listeners ###
-	to expose private_listeners your module must expose a property called *message_listeners* which is an array of functions. private_listeners get a copy of every message sent via pm. When invoked a private_listener receives
+to expose private\_listeners your module must expose a property called *private_listeners* which is an array of functions. private\_listeners get a copy of every message sent via pm. When invoked a private_listener receives
 
 1. the nick of the person who sent the message
 2. the remaining text on that line
+
+### Text Listeners ###
+
+to expose text\_listeners, your module must expose a property called *text_listeners* which is an array of functions. text\_listeners get a copy of nearly all events in the channel in a standard text format. This includes messages by the bot itself. The primary purpose of this is to display irc text to a user. When invoked a text\_listener receives
+
+1. a line of text indicating what has just occurred.
 
 ### Web Extensions ###
 the web server runs a web framework called express. documentation for express can be seen [here](http://expressjs.com/)

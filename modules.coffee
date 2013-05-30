@@ -22,6 +22,7 @@ class Modules
     @_private_commands = _({}).extend(_(instances).pluck('private_commands')...)
     @_message_listeners = extract_array_prop instances, 'message_listeners'
     @_private_listeners = extract_array_prop instances, 'private_listeners'
+    @_text_listeners = extract_array_prop instances, 'text_listeners'
     @web_extensions = @extract_web_extensions instances
     _(['high', 'medium', 'low']).each (priority) =>
       _(@web_extensions[priority]).each (ext_fn) -> ext_fn(app)
@@ -30,12 +31,12 @@ class Modules
     channel = @options['settings']['channel']
     @bot.on "message#{channel}", @on_channel_msg
     @bot.on 'action', (from, to, msg) => @on_channel_msg(from, msg) if to is channel
-
     @bot.on 'pm', (from, msg) =>
       _(@_private_listeners).each (l) -> l(from, msg)
       [command, rest...] = _(msg.split(" ")).compact()
       if command and typeof (@_private_commands[command]) is "function"
         @_private_commands[command] from, rest, (r) => @bot.say from, r
+    _(@_text_listeners).each (l) => @bot.on 'text', l
 
   on_channel_msg: (from, msg) =>
     _(@_message_listeners).each (l) -> l(from, msg)

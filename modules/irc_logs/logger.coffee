@@ -1,17 +1,18 @@
 fs = require("fs")
-_ = require("underscore")
-require "./utils"
+path = require("path")
+_ = require "../../utils"
+basepath = path.join(__dirname, "../../data/irclogs")
 
 class Logger
   constructor: ->
     @_msgs = []
     @_flushing = false
 
-  _writestream: (gmtDate) ->
+  _writestream: (gmtDate) =>
     return @_ws  if @_gmtDate and @_gmtDate is gmtDate
     @_ws.end()  if @_ws
     @_gmtDate = gmtDate
-    @_ws = fs.createWriteStream("#{__dirname}/data/irclogs/" + gmtDate + ".log",
+    @_ws = fs.createWriteStream("#{basepath}/#{gmtDate}.log",
       encoding: "utf-8"
       flags: "a"
     )
@@ -37,8 +38,5 @@ class Logger
       @_flushing = false
       process.nextTick @_maybeFlush unless _(@_msgs).isEmpty()
 
-exports.Logger = (textEmittor) ->
-  logger = new Logger
-  textEmittor.on "text", logger.log
-  logger
+module.exports = Logger
 

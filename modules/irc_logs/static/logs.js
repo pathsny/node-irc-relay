@@ -118,6 +118,7 @@ function init() {
       var location = _(data).sortedIndex({timestamp: timestamp}, function(log){
         return log.timestamp;
       });
+      if (location >= data.length) location = data.length - 1
       topMarker = {date: date, location: location};
       bottomMarker = {date: date, location: location};
       logTemplate.tmpl({Logs: [data[location]]}).appendTo("#content");
@@ -133,7 +134,7 @@ function getLog(dateString, cb) {
     if (dateString in logs) {
         cb(logs[dateString]);
     } else {
-        $.get("/" + dateString + ".log", function(data){
+        $.get("/logs/" + dateString + ".log", function(data){
             logs[dateString] = _(data.split('\n')).chain().
             reject(function(l) {
                 return l === ''

@@ -58,8 +58,6 @@ module.exports =
 
   #
   # app.use(express.static("#{__dirname}/../data/irclogs"))
-  # app.use(express.cookieParser())
-  # app.use(auth)
   # app.get "/", (req, res, next) ->
   #   res.type("html")
   #   res.send ejs.render(views["index"], locals: title: "MISAKA logs")
