@@ -1,6 +1,7 @@
 userdb = require("dirty")("#{__dirname}/data/user.db")
 _ = require "./utils"
 inflection = require 'inflection'
+uuid = require("node-uuid")
 userdb.addIndex "nickId", (k, v) -> [v.nickId]
 
 userdb.listeners = [
