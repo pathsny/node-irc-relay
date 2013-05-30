@@ -1,15 +1,16 @@
+# takes care of logging all data and allows you to request logs for any point in time and view it on the web
 fs = require("fs")
 _ = require('../utils')
 PEG = require("pegjs")
 Logger = require('./irc_logs/logger')
 express = require('express')
 ejs = require('ejs')
-parser = PEG.buildParser(fs.readFileSync("#{__dirname}/log_request/log_request.pegjs", "ascii"))
+parser = PEG.buildParser(fs.readFileSync("#{__dirname}/irc_logs/log_request.pegjs", "ascii"))
 
 class IrcLogs
   constructor: (settings: {baseURL, port}) ->
     @commands = {logs: @command}
-    @command._help = "Display logs for the channel for some point in time. usage: !logs <x days, y hours, z mins ago> or !logs now or !logs q <search terms>"
+    @command._help = "Display logs for the channel for some point in time. usage: !logs <x days, y hours, z mins ago> or !logs now"
     @url = "#{baseURL}:#{port}"
     @text_listeners = [new Logger().log]
     @web_extensions = {'low': @display_logs}
@@ -18,12 +19,6 @@ class IrcLogs
     cb @parse(tokens)
 
   parse: (tokens) =>
-    return "#{@url}/##{_.now(true)}" if _(tokens).head() is "now"
-    return "#{@url}/search?q=#{_(tokens).tail().join("+")}" if _(tokens).head() is "q"
-    return @check_time_in_past(tokens) if _(tokens).last() is "ago"
-    "usage: !logs <x days, y hours, z mins ago> or !logs now or !logs q <search terms>"
-
-  check_time_in_past: (tokens) =>
     try
       time = parser.parse(_(tokens).join(" "))
       time_hash = _(time).inject((hsh, item) =>
@@ -34,9 +29,9 @@ class IrcLogs
       if time_hash
         "#{@url}/##{_.now().subtract(time_hash).date.getTime()}"
       else
-       "that makes no sense"
+       "usage: !logs <x days, y hours, z mins ago> or !logs now"
     catch err
-      "that makes no sense"
+      "usage: !logs <x days, y hours, z mins ago> or !logs now"
 
   display_logs: (app) =>
     display_logs = fs.readFileSync("#{__dirname}/irc_logs/display_logs.ejs", "utf8")
