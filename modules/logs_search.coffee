@@ -1,7 +1,7 @@
 exec = require("child_process").exec
 fs = require('fs')
 _ = require("../utils")
-ejs = require('ejs')
+eco = require "eco"
 
 class LogsSearch
   constructor: (settings: {baseURL, port}) ->
@@ -14,14 +14,13 @@ class LogsSearch
     cb "#{@url}/search?q=#{tokens.join('+')}"
 
   search_logs: (app) =>
-    search_page = fs.readFileSync("#{__dirname}/logs_search/view.ejs", "utf8")
+    search_page = fs.readFileSync("#{__dirname}/logs_search/view.eco", "utf8")
     app.get '/search', (req, res) =>
       locals = {title: 'MISAKA logs', search: req.query.q, results: []}
       if locals.search and locals.search != ''
         tokens = locals.search.split(' ')
         cmd = "egrep -h -m 10 '\\b(#{tokens.join('|')})\\b' data/irclogs/*.log"
         exec cmd, (e, stdout, stderr) =>
-          console.log("command #{cmd}")
           locals.results = _(stdout.split("\n")).chain().map((l) =>
             return null if l == ""
             t = l.indexOf(",")
@@ -31,8 +30,8 @@ class LogsSearch
               date: _.date(timestamp).format("dddd, MMMM Do YYYY, hh:mm:ss"),
               msg: l.slice(t+2, -2)
             }).compact().value()
-          res.send ejs.render(search_page, locals: locals)
+          res.send eco.render(search_page, locals)
       else
-        res.send ejs.render(search_page, locals: locals)
+        res.send eco.render(search_page, locals)
 
 module.exports = LogsSearch

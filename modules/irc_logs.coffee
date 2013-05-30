@@ -4,7 +4,7 @@ _ = require('../utils')
 PEG = require("pegjs")
 Logger = require('./irc_logs/logger')
 express = require('express')
-ejs = require('ejs')
+eco = require('eco')
 parser = PEG.buildParser(fs.readFileSync("#{__dirname}/irc_logs/log_request.pegjs", "ascii"))
 
 class IrcLogs
@@ -34,11 +34,11 @@ class IrcLogs
       "usage: !logs <x days, y hours, z mins ago> or !logs now"
 
   display_logs: (app) =>
-    display_logs = fs.readFileSync("#{__dirname}/irc_logs/view.ejs", "utf8")
+    display_logs = fs.readFileSync("#{__dirname}/irc_logs/view.eco", "utf8")
     app.use('/logs', express.static("#{__dirname}/../data/irclogs"))
     app.use('/irc_logs', express.static("#{__dirname}/irc_logs/static"))
     app.get "/", (req, res) =>
-      res.send ejs.render(display_logs, locals: {title: "MISAKA logs"})
+      res.send eco.render(display_logs, {title: "MISAKA logs"})
 
 
 module.exports = IrcLogs

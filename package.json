@@ -22,7 +22,6 @@
       "irc": "~ 0.3.6",
       "node-uuid": "~ 1.4.0",
       "twitter-node":">= 0.0.2",
-      "ejs": "~ 0.8.3",
       "qs": "~ 0.6.3",
       "pegjs": "~ 0.7.0",
       "sanitizer": "~ 0.0.15",
@@ -32,7 +31,8 @@
       "socket.io": "~ 0.9.14",
 	  "coffee-script": "~ 1.6.2",
 	  "inflection": "~ 1.2.5",
-	  "express": "~ 3.2.5"
+	  "express": "~ 3.2.5",
+	  "eco": "~ 1.1.0-rc-3"
   },
   "private": true
 }

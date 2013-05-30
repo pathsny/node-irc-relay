@@ -1,13 +1,13 @@
 <!doctype html>
 <html>
 <head><meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<title><%= title %></title>
+	<title><%= @title %></title>
 </head>
 <body>
-	<h3>Unauthorized! Get a token from <%= nick %></h3>
+	<h3>Unauthorized! Get a token from <%= @nick %></h3>
 	<form name="input" action="/login" method="post" >
 	 Token: <input type="text" name="mtoken" />
-	 <input type="hidden" name="return_url" value="<%= return_url %>" >
+	 <input type="hidden" name="return_url" value="<%= @return_url %>" >
 	 <input type="submit" value="Submit" />
 	 </form>
 

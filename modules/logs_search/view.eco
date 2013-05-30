@@ -2,23 +2,23 @@
 <html>
 <head><meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" type="text/css" href="stylesheets/style.css" />
-	<title><%= title %></title>
+	<title><%= @title %></title>
 </head>
 <body>
 	<form name="input" action="/search" method="get" >
-		Search Terms: <input type="text" name="q" value="<%=search%>"/>
+		Search Terms: <input type="text" name="q" value="<%=@search%>"/>
 		<input type="submit" value="Submit" />
 	</form>
 	<div>
-	<% if (results.length === 0) {%>
+	<% if @results.length is 0: %>
 		No Results
-	<% } else { %>
+	<% else: %>
 		<ul>
-			<% for(var i=0; i<results.length; i++) {%>
-			   <li><a href='/#<%= results[i].timestamp %>'><%= results[i].date %></a><%= results[i].msg %></li>
-			<% } %>
+			<% for {timestamp, date, msg} in @results: %>
+			  <li><a href='/#<%= timestamp %>'><%= date %></a><%= msg %></li>
+			<% end %>
 		</ul>
-	<% } %>
+	<% end %>
 	<div>
 </body>
 
