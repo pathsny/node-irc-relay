@@ -57,10 +57,6 @@ module.exports =
   #     render res, "", []
 
   #
-  # app.use(express.static("#{__dirname}/../data/irclogs"))
-  # app.get "/", (req, res, next) ->
-  #   res.type("html")
-  #   res.send ejs.render(views["index"], locals: title: "MISAKA logs")
   # app.get "/search", search
   # app.get "/video", (req, res) ->
   #   aliases = users.aliases(users.validToken(req.cookies["mtoken"]).key)

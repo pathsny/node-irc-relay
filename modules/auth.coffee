@@ -22,7 +22,7 @@ class Auth
     @users.find("token", token)[0]
 
   auth_user: (app) =>
-    login = fs.readFileSync("#{__dirname}/auth/login.ejs", "utf8")
+    login = fs.readFileSync("#{__dirname}/auth/view.ejs", "utf8")
     app.use (req, res, next) =>
       if user = @get_user(req.cookies["mtoken"])
         req.session = {nick: user.key}

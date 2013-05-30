@@ -10,11 +10,15 @@
 		<input type="submit" value="Submit" />
 	</form>
 	<div>
+	<% if (results.length === 0) {%>
+		No Results
+	<% } else { %>
 		<ul>
 			<% for(var i=0; i<results.length; i++) {%>
 			   <li><a href='/#<%= results[i].timestamp %>'><%= results[i].date %></a><%= results[i].msg %></li>
 			<% } %>
 		</ul>
-	<div>	
+	<% } %>
+	<div>
 </body>
 
