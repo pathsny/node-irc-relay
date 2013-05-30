@@ -8,7 +8,7 @@ extract_array_prop = (list, prop) ->
   value()
 
 class Modules
-  constructor: (users, settings) ->
+  constructor: (users, settings, app) ->
     @options = {users: users, settings: settings, emitter: @emitter}
     instances = _(fs.readdirSync("#{__dirname}/modules")).
       chain().
@@ -22,7 +22,9 @@ class Modules
     @_private_commands = _({}).extend(_(instances).pluck('private_commands')...)
     @_message_listeners = extract_array_prop instances, 'message_listeners'
     @_private_listeners = extract_array_prop instances, 'private_listeners'
-
+    @web_extensions = @extract_web_extensions instances
+    _(['high', 'medium', 'low']).each (priority) =>
+      _(@web_extensions[priority]).each (ext_fn) -> ext_fn(app)
 
   initialize: (@bot) =>
     channel = @options['settings']['channel']
@@ -49,6 +51,17 @@ class Modules
     return ((f) -> _(modules).contains(f)) if restriction is 'whitelist'
     return ((f) -> !_(modules).contains(f)) if restriction is 'blacklist'
     throw "unrecognised setting for load_modules"
+
+  extract_web_extensions: (instances) =>
+    _(instances).
+    chain().
+    pluck('web_extensions').
+    compact().
+    reduce((ext, web_i) ->
+      _(['high', 'medium', 'low']).each (p) ->
+        ext[p].push(web_i[p]) if web_i[p]
+      ext
+    , {'high': [], 'medium': [], 'low': []}).value()
 
   create_module: (file) =>
     try

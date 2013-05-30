@@ -66,3 +66,12 @@ message\_listener receives
 
 1. the nick of the person who sent the message
 2. the remaining text on that line
+
+### Web Extensions ###
+the web server runs a web framework called express. documentation for express can be seen [here](http://expressjs.com/)
+
+* Each module can expose a property called web\_extensions
+* this property must be an object with the keys 'high', 'medium' and 'low' (any of which need not be present)
+* the value with any of these keys is a function that gets the "app" (result of calling express()) and can do what it needs.
+* For example to create a handler for a url you can do this
+	app.get('/foo', (req, res) -> res.send "foo")

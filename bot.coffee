@@ -1,20 +1,21 @@
 _ = require("./utils")
-webserver = require("./web/app")
 fs = require("fs")
 settings = JSON.parse(fs.readFileSync("#{__dirname}/data/settings.json", "ascii"))
 IrcToText = require("./irc_to_text")
 ircToText = new IrcToText(settings['channel'], settings['nick'])
 ircLogger = require("./irc_log").Logger(ircToText)
 Modules = require('./modules')
+{app, start_webserver} = require("./web/app")
 users = require("./model")
-modules = new Modules(users, settings)
+modules = new Modules(users, settings, app)
 create_bot = require('./create_bot')
 
 users.on 'load', ->
   bot = create_bot(settings)
   _(users.listeners).each (l) -> bot.on l.type, l.listener
   _(ircToText.listeners()).each (l) -> bot.on l.type, l.listener
-  modules.initialize(bot)
+  modules.initialize(bot, app)
+  start_webserver(settings.port)
 
   bot.on "error", (message) ->
     console.error "ERROR: #{settings["server"]} : #{message.command} : #{message.args.join(' ')}"

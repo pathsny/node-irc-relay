@@ -1,10 +1,7 @@
 userdb = require("dirty")("#{__dirname}/data/user.db")
-uuid = require("node-uuid")
-_ = require("underscore")
-require "./utils"
+_ = require "./utils"
 inflection = require 'inflection'
 userdb.addIndex "nickId", (k, v) -> [v.nickId]
-userdb.addIndex "token", (k, v) -> if v.token then [v.token] else []
 
 userdb.listeners = [
   type: "names"
@@ -147,17 +144,6 @@ userdb.dedupNicks = (nicks) ->
     unknown_nicks: unknown_nicks or []
     known_nicks: _(groups).chain().values().map((a) -> a[0]).value()
   }
-
-userdb.createToken = (nick) ->
-  rec = userdb.get(nick)
-  return  if rec.status isnt "online"
-  rec["token"] = uuid()
-  userdb.set nick, rec
-  rec["token"]
-
-userdb.validToken = (token) ->
-  return  unless token
-  _(userdb.find("token", token)).first()
 
 userdb.clearProperty = (prop_name, nick) ->
   _(@aliases(nick)).

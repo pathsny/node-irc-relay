@@ -7,12 +7,12 @@
 	<h3>Unauthorized! Get a token from <%= nick %></h3>
 	<form name="input" action="/login" method="post" >
 	 Token: <input type="text" name="mtoken" />
-	 <input type="hidden" name="ReturnUrl" value="<%= ReturnUrl %>" >
+	 <input type="hidden" name="return_url" value="<%= return_url %>" >
 	 <input type="submit" value="Submit" />
 	 </form>
-	
+
 	<script type="text/javascript">
-		document.forms[0]["ReturnUrl"].value += window.location.hash;
+		document.forms[0]["return_url"].value += window.location.hash;
 	</script>
 </body>
 
