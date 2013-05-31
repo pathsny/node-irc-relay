@@ -14,7 +14,6 @@ class DbCompacter
     @last_msg_time = new Date().getTime()
 
   compact: =>
-    console.log('trying to compact');
     idle_time = new Date().getTime() - @last_msg_time
     if @users.redundantLength > MAX_REDUNDANT_ROWS and idle_time > COMPACT_TIME_LIMIT
       console.log('compacting');
