@@ -13,7 +13,7 @@ class IrcLogs
     @command._help = "Display logs for the channel for some point in time. usage: !logs <x days, y hours, z mins ago> or !logs now"
     @url = "#{baseURL}:#{port}"
     @text_listeners = [new Logger().log]
-    @web_extensions = {'low': @display_logs}
+    @web_extensions = {'low': @display_logs, 'high': @static_resources}
 
   command: (from, tokens, cb) =>
     cb @parse(tokens)
@@ -33,10 +33,12 @@ class IrcLogs
     catch err
       "usage: !logs <x days, y hours, z mins ago> or !logs now"
 
+  static_resources: (app) =>
+    app.staticPathWithGeneratedCoffee('/irc_logs', "#{__dirname}/irc_logs/static")
+    app.use('/logs', express.static("#{__dirname}/../data/irclogs"))
+
   display_logs: (app) =>
     display_logs = fs.readFileSync("#{__dirname}/irc_logs/view.eco", "utf8")
-    app.use('/logs', express.static("#{__dirname}/../data/irclogs"))
-    app.use('/irc_logs', express.static("#{__dirname}/irc_logs/static"))
     app.get "/", (req, res) =>
       res.send eco.render(display_logs, {title: "MISAKA logs"})
 

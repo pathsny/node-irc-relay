@@ -75,7 +75,8 @@ to expose text\_listeners, your module must expose a property called *text_liste
 the web server runs a web framework called express. documentation for express can be seen [here](http://expressjs.com/)
 
 * Each module can expose a property called web\_extensions
-* this property must be an object with the keys 'high', 'medium' and 'low' (any of which need not be present)
+* this property must be an object with the keys *high*, *medium* and *low* (any of which need not be present)
+* typically *high* is good for static resources, *medium* is good for something that intercepts all routes (like auth) and *low* for a standard route handler
 * the value with any of these keys is a function that gets the "app" (result of calling express()) and can do what it needs.
 * For example to create a handler for a url you can do this
 	app.get('/foo', (req, res) -> res.send "foo")

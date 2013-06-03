@@ -9,7 +9,7 @@ class Auth
     @users.addIndex "token", (k, v) -> if v.token then [v.token] else []
     @private_commands = {token: @private_command}
     @private_command._help = "token : gives you a token for the web history at #{baseURL}:#{port}"
-    @web_extensions = {'high': @auth_user}
+    @web_extensions = {'medium': @auth_user}
 
   private_command: (from, tokens, cb) =>
     return if @users.get(from)?.status isnt "online"
@@ -32,7 +32,7 @@ class Auth
         res.cookie('mtoken', req.body.mtoken, { maxAge: 3153600000})
         res.redirect(req.body.return_url or '/')
       else
-        res.send eco.render(login, {
+        res.send 401, eco.render(login, {
           title: 'logs',
           return_url: req.body.return_url or req.url,
           nick: @nick

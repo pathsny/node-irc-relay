@@ -32,7 +32,8 @@
 	  "coffee-script": "~ 1.6.2",
 	  "inflection": "~ 1.2.5",
 	  "express": "~ 3.2.5",
-	  "eco": "~ 1.1.0-rc-3"
+	  "eco": "~ 1.1.0-rc-3",
+	  "connect-coffee-script": "https://github.com/pathsny/node-connect-coffee-script/archive/5a788ecd12.tar.gz"
   },
   "private": true
 }
