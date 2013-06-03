@@ -1,9 +1,6 @@
 _ = require("./utils")
 fs = require("fs")
 settings = JSON.parse(fs.readFileSync("#{__dirname}/data/settings.json", "ascii"))
-
-# ircToText = new IrcToText(settings['channel'], settings['nick'])
-# ircLogger = require("./irc_log").Logger(ircToText)
 Modules = require('./modules')
 {app, start_webserver} = require("./web/app")
 users = require("./model")
@@ -13,7 +10,6 @@ create_bot = require('./create_bot')
 users.on 'load', ->
   bot = create_bot(settings)
   _(users.listeners).each (l) -> bot.on l.type, l.listener
-  # _(ircToText.listeners()).each (l) -> bot.on l.type, l.listener
   modules.initialize(bot, app)
   start_webserver(settings.port)
 
@@ -36,6 +32,5 @@ users.on 'load', ->
     process.on condition, (err) ->
       console.log condition, err
       process.exit()
-
 
 
