@@ -1,13 +1,29 @@
 express = require('express')
+fs = require('fs')
+path = require('path')
+connectCoffeescript = require('connect-coffee-script');
+logpath = path.join(__dirname, '../data/weblogs/all.log')
 app = express()
+app.use(express.logger({stream: fs.createWriteStream(logpath, {flags: "a"})}))
 app.use(express.compress())
 app.use(express.bodyParser())
 app.use(express.cookieParser())
+app.staticPathWithGeneratedCoffee = (urlPrefix, location) ->
+  jsPrefix = "#{urlPrefix}/generated_js"
+  app.use(jsPrefix, connectCoffeescript({
+    src: location,
+    dest: "#{location}/generated_js",
+    sourceMapRoot: jsPrefix,
+    sourceRoot: urlPrefix,
+    bare: true,
+    sourceMap: true,
+  }));
+  app.use(urlPrefix, express.static(location))
+
 module.exports =
   app: app,
   start_webserver: (port) ->
     app.use(express.static("#{__dirname}/public"))
-    app.get '/', (req, res) -> res.send('hello')
     console.log "starting webserver on port #{port}"
     app.listen Number(port)
 
