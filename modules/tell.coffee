@@ -21,8 +21,9 @@ class Tell
     else
       @utell from, tokens, cb
 
-  utell: (from, tokens, cb) =>
+  utell: (from, tokens, cb, topic) =>
     directed_message from, tokens, cb, @users, (nick, data) =>
+      _(data).extend({topic: topic}) if topic
       @users.add_tell nick, data
 
   ttell: (from, topic, tokens, cb) =>
@@ -33,7 +34,7 @@ class Tell
     else
       followers = _(@users.find('topics', topic)).reject (f) => @users.isAliasOf from, f.key
       if (followers.length > 0)
-        _(followers).each (f) => @utell(from, _([f.key]).concat(tokens), -> )
+        _(followers).each (f) => @utell(from, _([f.key]).concat(tokens), (->), topic)
         cb "#{from}: Message Noted and passed on to all followers of #{topic}"
       else
         cb "No one but you is following topic #{topic}"
@@ -44,7 +45,9 @@ class Tell
     tells = @users.get_tells(from)
     return if _(tells).isEmpty()
     _(tells).each (item) =>
-      @emitter "#{from}: #{item.from} said '#{item.msg}' #{_.date(item.time).fromNow()}"
+      display_msg = "#{from}: #{item.from} said '#{item.msg}'"
+      display_msg += " to followers of topic ##{item.topic}" if item.topic
+      @emitter "#{display_msg} #{_.date(item.time).fromNow()}"
     @users.clear_tells from
 
   topic: (from, [command, topic_name, rest...], cb) =>
