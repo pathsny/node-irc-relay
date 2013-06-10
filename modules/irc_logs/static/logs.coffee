@@ -1,25 +1,25 @@
 displayAbove = (hash) ->
-  return  if topMarker.lock
-  topMarker.lock = true
-  topData topMarker, 200, (rows, newTopMarker) ->
-    topMarker = newTopMarker
-    logTemplate.tmpl(Logs: rows).prependTo "#content"
+  return if window.topMarker.lock
+  window.topMarker.lock = true
+  topData window.topMarker, 200, (rows, newTopMarker) ->
+    window.topMarker = newTopMarker
+    window.logTemplate.tmpl(Logs: rows).prependTo "#content"
     if hash
       setTimeout (->
         window.location.hash = "#1"
         window.location.hash = "#" + hash
-        topMarker.lock = `undefined`
+        window.topMarker.lock = `undefined`
       ), 100
     else
-      topMarker.lock = `undefined`
+      window.topMarker.lock = `undefined`
 
 displayBelow = (hash) ->
-  return  if bottomMarker.lock
-  bottomMarker.lock = true
-  bottomData bottomMarker, 200, (rows, newBottomMarker) ->
-    bottomMarker = newBottomMarker
-    logTemplate.tmpl(Logs: rows).appendTo "#content"
-    bottomMarker.lock = `undefined`
+  return  if window.bottomMarker.lock
+  window.bottomMarker.lock = true
+  bottomData window.bottomMarker, 200, (rows, newBottomMarker) ->
+    window.bottomMarker = newBottomMarker
+    window.logTemplate.tmpl(Logs: rows).appendTo "#content"
+    window.bottomMarker.lock = `undefined`
     if hash
       setTimeout (->
         window.location.hash = "#1"
@@ -63,31 +63,6 @@ topData = (marker, number, cb, rows) ->
         marker.location = `undefined`
       topData marker, number - count, cb, _(rlogs).concat(rows or [])
 
-init = ->
-  logTemplate = $("#logTemplate")
-  url = document.location.toString()
-  match = /.*#(.*)/.exec(url)
-  timestamp = (if match then Number(match[1]) else new Date().getTime())
-  date = _(timestamp).chain().date().gmtDate().value()
-  getLog date, (data) ->
-    location = _(data).sortedIndex(
-      timestamp: timestamp
-    , (log) ->
-      log.timestamp
-    )
-    location = data.length - 1  if location >= data.length
-    topMarker =
-      date: date
-      location: location
-
-    bottomMarker =
-      date: date
-      location: location
-
-    logTemplate.tmpl(Logs: [data[location]]).appendTo "#content"
-    displayAbove()
-    displayBelow data[location].timestamp
-
 getLog = (dateString, cb) ->
   if dateString of logs
     cb logs[dateString]
@@ -107,17 +82,33 @@ getLog = (dateString, cb) ->
       console.log arguments
       cb `undefined`
 
-$ init
-logTemplate = undefined
+window.logTemplate = undefined
+
+$ ->
+  window.logTemplate = $("#logTemplate")
+  url = document.location.toString()
+  match = /.*#(.*)/.exec(url)
+  timestamp = (if match then Number(match[1]) else new Date().getTime())
+  date = _(timestamp).chain().date().gmtDate().value()
+  getLog date, (data) ->
+    location = _(data).sortedIndex {timestamp: timestamp}, (log) -> log.timestamp
+    location = data.length - 1  if location >= data.length
+    window.topMarker = {date: date, location: location}
+    window.bottomMarker = { date: date, location: location}
+    window.logTemplate.tmpl(Logs: [data[location]]).appendTo "#content"
+    displayAbove()
+    displayBelow data[location].timestamp
+
+
 _.mixin
   gmtDate: (date) ->
-    date = date.date  if date.date
-    yyyy = "" + date.getUTCFullYear()
-    mm = "" + date.getUTCMonth()
-    mm = "0" + mm  if mm.length is 1
-    dd = "" + date.getUTCDate()
-    dd = "00" + dd  if dd.length is 1
-    yyyy + "_" + mm + "_" + dd
+    date = date.date if date.date
+    yyyy = date.getUTCFullYear().toString()
+    mm = date.getUTCMonth().toString()
+    mm = "0#{mm}" if mm.length is 1
+    dd = date.getUTCDate().toString()
+    dd = "00#{dd}" if dd.length is 1
+    "#{yyyy}_#{mm}_#{dd}"
 
   createGmtDate: (str) ->
     dtm = /(.*)_(.*)_(.*)/.exec(str)
@@ -127,18 +118,14 @@ _.mixin
     d.setUTCDate dtm[3]
     _.date d
 
-topMarker = {}
-bottomMarker = {}
+window.topMarker = {}
+window.bottomMarker = {}
 logs = {}
 $(window).scroll (e) ->
-  
   #scroll position
-  
   #wait for 500 milliseconds to confirm the user scroll action
   displayBelow()  if $(document).height() - $(window).scrollTop() - $(window).height() < 500
   if $(window).scrollTop() < 500
     oldHash = $("#content a").attr("name")
-    
     #wait for 500 milliseconds to confirm the user scroll action
     displayAbove oldHash
-
