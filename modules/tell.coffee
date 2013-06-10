@@ -1,5 +1,7 @@
-directed_message = require "#{__dirname}/base/directed_message"
 _ = require('../utils')
+fs = require('fs')
+PEG = require("pegjs")
+parser = PEG.buildParser(fs.readFileSync("#{__dirname}/tell/tell_command.pegjs", "ascii"))
 
 class Tell
   constructor: ({@users, @emitter, settings}) ->
@@ -10,34 +12,30 @@ class Tell
     @commands = {tell: @tell, topic: @topic}
     @private_commands = {del_topic: @del_topic}
     @message_listeners = [@message_listener]
-    @tell._help = "publically passes a message to a user or all followers of a topic whenever they next speak. usage: !tell <user> <message> or !tell #<topic> <message>.\nsee !help topic"
+    @tell._help = "publically passes a message to a user or all followers of a topic whenever they next speak. usage: !tell <user> <message> or !tell <<user1>,<user2>...> or !tell #<topic> <message>.\nsee !help topic"
     @topic._help = "subscribes or unsubscribes a user to a topic. !topic add <topic> adds you to topic <topic>, !topic remove <topic> removes you from topic <topic>, !topic add <topic> <user1> <user2> ... adds users to the topic. You are also added to the topic if you aren't following it. !topic list lists all topics. !topic list <topic> lists all followers of a topic.\nsee !help tell"
 
 
   tell: (from, tokens, cb) =>
-    topic = /^#(.*)$/.exec(_(tokens).first())?[1]
-    if (topic)
-      @ttell from, topic, _(tokens).tail(), cb
+    try
+      {topic, nicks, msg} = parser.parse(_(tokens).join(" "))
+    catch err
+      return cb("Message not understood")
+    if topic
+        followers = _(@users.find('topics', topic)).pluck('key')
+        return cb("#{topic} is not a known topic") if _(followers).isEmpty()
+        nicks = _(followers).reject (f) => @users.isAliasOf from, f
+        return cb("No one but you is following topic #{topic}") if _(nicks).isEmpty()
+    {known_nicks, unknown_nicks} = @users.dedupNicks(nicks)
+    cb "I do not know the following users: #{_(unknown_nicks).sentence()}" unless _(unknown_nicks).isEmpty()
+    return if _(known_nicks).isEmpty()
+    data = {from: from, msg: msg, time: Date.now(), topic: topic}
+    _(known_nicks).each (n) => @users.add_tell n, data
+    base_reply = "#{from}: Message noted"
+    if topic
+      cb "#{base_reply} and will be passed on to all followers of #{topic}"
     else
-      @utell from, tokens, cb
-
-  utell: (from, tokens, cb, topic) =>
-    directed_message from, tokens, cb, @users, (nick, data) =>
-      _(data).extend({topic: topic}) if topic
-      @users.add_tell nick, data
-
-  ttell: (from, topic, tokens, cb) =>
-    if _(tokens).isEmpty()
-      cb "Message not understood"
-    else if _(@users.find('topics', topic)).isEmpty()
-      cb "#{topic} is not a known topic"
-    else
-      followers = _(@users.find('topics', topic)).reject (f) => @users.isAliasOf from, f.key
-      if (followers.length > 0)
-        _(followers).each (f) => @utell(from, _([f.key]).concat(tokens), (->), topic)
-        cb "#{from}: Message Noted and passed on to all followers of #{topic}"
-      else
-        cb "No one but you is following topic #{topic}"
+      cb "#{base_reply} and will be passed on to #{_(known_nicks).sentence()}"
 
   message_listener: (from, message) =>
     rec = @users.get(from)
