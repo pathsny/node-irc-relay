@@ -23,6 +23,10 @@ check the Readme there to create new modules
 Currently the bot assumes that you only want to sit in one channel. This assumption
 is baked into a lot of the core functionality and modules.
 
+## todo ##
+
+move count to a different model
+
 
 other dependencies by now
 libicu-dev
