@@ -33,7 +33,8 @@
 	  "inflection": "~ 1.2.5",
 	  "express": "~ 3.2.5",
 	  "eco": "~ 1.1.0-rc-3",
-	  "connect-coffee-script": "~ 0.1.4"
+	  "connect-coffee-script": "~ 0.1.4",
+	  "newrelic":"~ 1.1.1"
   },
   "private": true
 }

@@ -1,3 +1,4 @@
+require('newrelic');
 _ = require("./utils")
 fs = require("fs")
 settings = JSON.parse(fs.readFileSync("#{__dirname}/data/settings.json", "ascii"))
